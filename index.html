@@ -1,385 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>YAMADOG NFT Mint</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>YAMADOG Mint</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<script defer src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
 <style>
-/* ===================== */
-/* 🌤️ PIXEL WORLD */
-/* ===================== */
-body {
-  font-family: 'Press Start 2P', monospace;
-  margin: 0;
-  padding: 16px;
-  text-align: center;
-  color: #111;
-  min-height: 100vh;
-  overflow-x: hidden;
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #111;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
 
-  background:
-    linear-gradient(#fff 0 0) bottom / 100% 22% no-repeat,
-    repeating-linear-gradient(90deg,#6bbf8e 0 14px,#5cab82 14px 28px)
-      bottom / 100% 34% no-repeat,
-    linear-gradient(135deg,#c6ccd3 25%,transparent 25%)
-      bottom left / 40% 46% no-repeat,
-    linear-gradient(225deg,#d6dde3 25%,transparent 25%)
-      bottom right / 40% 46% no-repeat,
-    linear-gradient(to bottom,#8fd3ff,#cfe9ff,#f4fbff);
+    .card {
+        width: 100%;
+        max-width: 420px;
+        padding: 24px;
+        border-radius: 16px;
+        background: #1a1a1a;
+        box-shadow: 0 0 40px rgba(0,0,0,.6);
+        text-align: center;
+    }
 
-  image-rendering: pixelated;
-}
+    h1 {
+        margin-bottom: 8px;
+        font-size: 28px;
+    }
 
-/* ☀️ SUN */
-.sun {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  width: 64px;
-  height: 64px;
-  background: #ffd166;
-  box-shadow: inset -6px -6px 0 #ffb703;
-  z-index: 0;
-}
+    p {
+        font-size: 14px;
+        opacity: 0.8;
+        line-height: 1.5;
+    }
 
-/* ☁️ CLOUDS */
-.cloud {
-  position: fixed;
-  top: 70px;
-  width: 120px;
-  height: 32px;
-  background: #fff;
-  box-shadow: 24px 0 #fff,48px 0 #fff,12px -16px #fff,36px -16px #fff;
-  animation: cloudMove linear infinite;
-  z-index: 0;
-}
-.cloud.c1 { animation-duration: 60s; }
-.cloud.c2 { top:120px; animation-duration: 90s; opacity:.8; }
+    button {
+        width: 100%;
+        padding: 14px;
+        margin-top: 12px;
+        border-radius: 12px;
+        border: none;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        background: #f4c430;
+        color: #000;
+    }
 
-@keyframes cloudMove {
-  from { left:-200px }
-  to { left:110% }
-}
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
-/* ❄️ SNOW */
-.snow span {
-  position: fixed;
-  top:-10px;
-  width:4px;
-  height:4px;
-  background:#fff;
-  animation: snowFall linear infinite;
-  z-index:0;
-}
-@keyframes snowFall {
-  to { transform: translateY(110vh); }
-}
+    .status {
+        margin-top: 16px;
+        font-size: 13px;
+        min-height: 18px;
+        opacity: 0.9;
+    }
 
-/* 🐕 DOGS */
-.dog {
-  position: fixed;
-  bottom: 22%;
-  left: -40px;
-  width: 32px;
-  height: 16px;
-  animation: dogRun linear infinite;
-  z-index: 0;
-}
-@keyframes dogRun {
-  to { transform: translateX(110vw); }
-}
-.dog.brown { background:#8d5524; box-shadow:8px 0 #8d5524,16px 0 #8d5524,0 -8px #6f421f,8px -8px #6f421f; }
-.dog.white { background:#ddd; box-shadow:8px 0 #ddd,16px 0 #ddd,0 -8px #bbb,8px -8px #bbb; }
-.dog.black { background:#333; box-shadow:8px 0 #333,16px 0 #333,0 -8px #111,8px -8px #111; }
-
-/* ===================== */
-/* 🎮 GAMEBOY UI */
-/* ===================== */
-.ui {
-  position: relative;
-  z-index: 2;
-}
-
-h1 {
-  color:#ffb703;
-  text-shadow:3px 3px 0 #000;
-}
-
-.card {
-  background:#111;
-  color:#fff;
-  padding:18px;
-  max-width:420px;
-  margin:12px auto;
-  border:4px solid #000;
-  box-shadow:8px 8px 0 #555;
-}
-
-hr {
-  border:none;
-  height:4px;
-  background: repeating-linear-gradient(to right,#444 0 6px,transparent 6px 12px);
-  margin:14px 0;
-}
-
-button {
-  font-family:inherit;
-  font-size:10px;
-  padding:14px 18px;
-  margin:8px;
-  border:4px solid #000;
-  background:#ffb703;
-  box-shadow:4px 4px 0 #000;
-  cursor:pointer;
-}
-button:hover { background:#ffd166; }
-
-.nft-supply{color:#4fc3ff}
-.yama-supply{color:#6bff95}
-.yama-burned{color:#ff5c28;text-shadow:0 0 6px #ff5c28}
-
-/* 🔥 BURN EFFECT */
-.burn {
-  animation: burnFlash .6s ease;
-}
-@keyframes burnFlash {
-  0%{background:#111}
-  50%{background:#ff5c28}
-  100%{background:#111}
-}
-
-/* 🔗 LINK BUTTONS */
-.link-buttons{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-/* 📜 DESCRIPTION */
-.description {
-  max-width: 620px;
-  margin: 30px auto 20px;
-}
-
-.description p {
-  background:#fff;
-  color:#111;
-  border:4px solid #000;
-  padding:14px;
-  margin-bottom:14px;
-  box-shadow:6px 6px 0 #000;
-  font-size:10px;
-  line-height:1.7;
-}
-
-/* ===================== */
-/* 🪟 PIXEL MODAL */
-/* ===================== */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.modal {
-  background:#fff;
-  color:#111;
-  border:4px solid #000;
-  box-shadow:8px 8px 0 #000;
-  padding:18px;
-  width:90%;
-  max-width:320px;
-  font-size:10px;
-  animation: popIn .2s steps(2);
-}
-
-.modal.info { background:#e3f2ff }
-.modal.error { background:#ffe3e3 }
-.modal.success { background:#e3ffe9 }
-
-.modal h3 {
-  margin-top:0;
-  font-size:12px;
-}
-
-@keyframes popIn {
-  from { transform:scale(.8); opacity:0 }
-  to { transform:scale(1); opacity:1 }
-}
-
-/* 📱 MOBILE */
-@media(max-width:480px){
-  button{display:block;width:100%;max-width:300px;margin:10px auto}
-}
+    .wallet {
+        margin-top: 8px;
+        font-size: 13px;
+        opacity: 0.7;
+        word-break: break-all;
+    }
 </style>
 </head>
 
 <body>
 
-<div class="sun"></div>
-<div class="cloud c1"></div>
-<div class="cloud c2"></div>
+<div class="card">
+    <h1>YAMADOG 🐕</h1>
+    <p>Mint by burning <b>2,000 YAMA</b><br>
+    Fully on-chain • Sepolia Testnet</p>
 
-<div class="snow">
-  <span style="left:10%;animation-duration:9s"></span>
-  <span style="left:30%;animation-duration:12s"></span>
-  <span style="left:50%;animation-duration:8s"></span>
-  <span style="left:70%;animation-duration:14s"></span>
-  <span style="left:90%;animation-duration:10s"></span>
-</div>
+    <button id="connectBtn">Connect Wallet</button>
+    <button id="mintBtn" disabled>Mint YAMADOG</button>
 
-<div class="dog brown" style="animation-duration:18s"></div>
-<div class="dog white" style="animation-duration:22s;bottom:24%"></div>
-<div class="dog black" style="animation-duration:26s;bottom:26%"></div>
-
-<div class="ui">
-<h1>🐕 YAMADOG</h1>
-<p>Mint price: <b>2000 YAMA</b></p>
-
-<div id="card" class="card">
-  <h3>MAX YAMADOG SUPPLY</h3>
-  <p id="nftSupply" class="nft-supply">Loading...</p>
-  <hr>
-  <h3>CURRENT YAMA SUPPLY</h3>
-  <p id="supply" class="yama-supply">Loading...</p>
-  <hr>
-  <h3>TOTAL YAMA BURNED</h3>
-  <p id="burned" class="yama-burned">Loading...</p>
-</div>
-
-<button onclick="connectWallet()">CONNECT WALLET</button>
-<button onclick="mintNFT()">MINT YAMADOG</button>
-
-<!-- 🔗 NEW SIDE-BY-SIDE BUTTONS -->
-<div class="link-buttons">
-  <button onclick="window.open('https://pancakeswap.com','_blank')">PANCAKESWAP</button>
-  <button onclick="window.open('https://opensea.io','_blank')">OPENSEA</button>
-</div>
-
-<!-- ✅ FULL ORIGINAL DESCRIPTION -->
-<div class="description">
-  <p>
-    YAMADOG is a collection of 5,000 fully on-chain NFTs.<br>
-    No IPFS. No servers. No images.<br>
-    Just pure code on Ethereum.
-  </p>
-
-  <p>
-    To mint a YAMADOG, a sacrifice is required.<br>
-    2,000 YAMA is burned forever to give birth to one YAMADOG.
-  </p>
-
-  <p>
-    Initial YAMA supply: 10,000,000.<br>
-    No minting. No inflation.<br>
-    Only extinction.
-  </p>
-
-  <p>
-    YAMA exists to burn.<br>
-    YAMADOG exists to live. 🔥🐕
-  </p>
-</div>
-</div>
-
-<!-- PIXEL MODAL -->
-<div id="modalOverlay" class="modal-overlay">
-  <div id="modalBox" class="modal">
-    <h3 id="modalTitle"></h3>
-    <p id="modalMessage"></p>
-    <button onclick="closeModal()">OK</button>
-  </div>
+    <div class="wallet" id="wallet"></div>
+    <div class="status" id="status"></div>
 </div>
 
 <script>
-window.addEventListener("load",()=>{ if(typeof ethers!=="undefined")init(); });
+/* ---------------- CONFIG ---------------- */
 
-const RPC_URL="https://ethereum-sepolia-rpc.publicnode.com";
-const NFT_ADDRESS="0x77CA6E72CdfA303E3Ee1065cd672DC73eB4EB88e";
-const ERC20_ADDRESS="0xc9F6Ea476EBA9d82cdF88fE830642C0131bfA4c3";
-const MAX_NFT_SUPPLY=5000;
+const SEPOLIA_CHAIN_ID = "0xaa36a7"; // 11155111
 
-const NFT_ABI=[
- {"inputs":[],"name":"MINT_PRICE","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
- {"inputs":[],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},
- {"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"}
+const NFT_ADDRESS  = "0x77CA6E72CdfA303E3Ee1065cd672DC73eB4EB88e";
+const ERC20_ADDRESS = "0xc9F6Ea476EBA9d82cdF88fE830642C0131bfA4c3";
+
+const MINT_PRICE = ethers.utils.parseUnits("2000", 18);
+
+/* ---------------- ABI ---------------- */
+
+const ERC20_ABI = [
+    "function balanceOf(address) view returns (uint256)",
+    "function allowance(address,address) view returns (uint256)",
+    "function approve(address,uint256) returns (bool)"
 ];
 
-const ERC20_ABI=[
- {"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
- {"inputs":[],"name":"decimals","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
- {"inputs":[{"type":"address"},{"type":"address"}],"name":"allowance","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
- {"inputs":[{"type":"address"},{"type":"uint256"}],"name":"approve","outputs":[{"type":"bool"}],"stateMutability":"nonpayable","type":"function"}
+const NFT_ABI = [
+    "function mint()",
+    "function totalSupply() view returns (uint256)",
+    "function MAX_SUPPLY() view returns (uint256)"
 ];
 
-let provider,signer,nftContract,erc20Contract,user,tokenDecimals,initialSupply;
+/* ---------------- STATE ---------------- */
 
-async function init(){
- provider=new ethers.providers.JsonRpcProvider(RPC_URL);
- nftContract=new ethers.Contract(NFT_ADDRESS,NFT_ABI,provider);
- erc20Contract=new ethers.Contract(ERC20_ADDRESS,ERC20_ABI,provider);
- tokenDecimals=await erc20Contract.decimals();
- initialSupply=await erc20Contract.totalSupply();
- loadStats();
+let provider, signer, user;
+let erc20, nft;
+
+/* ---------------- UI ---------------- */
+
+const connectBtn = document.getElementById("connectBtn");
+const mintBtn = document.getElementById("mintBtn");
+const statusEl = document.getElementById("status");
+const walletEl = document.getElementById("wallet");
+
+/* ---------------- FUNCTIONS ---------------- */
+
+function setStatus(msg) {
+    statusEl.textContent = msg;
 }
 
-async function loadStats(){
- const minted=await nftContract.totalSupply();
- nftSupply.innerText=minted+" / "+MAX_NFT_SUPPLY;
- const current=await erc20Contract.totalSupply();
- supply.innerText=ethers.utils.formatUnits(current,tokenDecimals)+" YAMA";
- burned.innerText=ethers.utils.formatUnits(initialSupply.sub(current),tokenDecimals)+" YAMA";
+async function ensureSepolia() {
+    const chainId = await window.ethereum.request({ method: "eth_chainId" });
+    if (chainId !== SEPOLIA_CHAIN_ID) {
+        await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: SEPOLIA_CHAIN_ID }]
+        });
+    }
 }
 
-function showModal(type,title,msg){
- modalBox.className="modal "+type;
- modalTitle.innerText=title;
- modalMessage.innerText=msg;
- modalOverlay.style.display="flex";
-}
-function closeModal(){ modalOverlay.style.display="none"; }
+async function connectWallet() {
+    if (!window.ethereum) {
+        alert("MetaMask not detected");
+        return;
+    }
 
-async function connectWallet(){
- if(!window.ethereum)
-  return showModal("error","NO WALLET DETECTED","Install MetaMask or a Web3 wallet.");
- await ethereum.request({method:"eth_requestAccounts"});
- const web3=new ethers.providers.Web3Provider(window.ethereum);
- signer=web3.getSigner();
- user=await signer.getAddress();
- nftContract=nftContract.connect(signer);
- erc20Contract=erc20Contract.connect(signer);
- showModal("success","WALLET CONNECTED",""+user.slice(0,6)+"..."+user.slice(-4));
+    await ensureSepolia();
+
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    signer = provider.getSigner();
+
+    const accounts = await provider.send("eth_requestAccounts", []);
+    user = accounts[0];
+
+    erc20 = new ethers.Contract(ERC20_ADDRESS, ERC20_ABI, signer);
+    nft   = new ethers.Contract(NFT_ADDRESS, NFT_ABI, signer);
+
+    walletEl.textContent = `Connected: ${user}`;
+    connectBtn.textContent = "Wallet Connected";
+    connectBtn.disabled = true;
+    mintBtn.disabled = false;
+
+    setStatus("Wallet connected");
 }
 
-async function mintNFT(){
- if(!signer)
-  return showModal("error","WALLET REQUIRED","Connect your wallet first.");
- try{
-  const price=await nftContract.MINT_PRICE();
-  const allowance=await erc20Contract.allowance(user,NFT_ADDRESS);
-  if(allowance.lt(price)){
-    showModal("info","APPROVAL REQUIRED","Approve YAMA burn to continue.");
-    await (await erc20Contract.approve(NFT_ADDRESS,price)).wait();
-  }
-  await (await nftContract.mint()).wait();
-  card.classList.add("burn");
-  setTimeout(()=>card.classList.remove("burn"),600);
-  showModal("success","🔥 DOG BORN 🔥","2,000 YAMA burned forever.");
-  loadStats();
- }catch(e){
-  showModal("error","MINT FAILED","Transaction rejected.");
- }
+async function mint() {
+    try {
+        mintBtn.disabled = true;
+        setStatus("Checking balance...");
+
+        const balance = await erc20.balanceOf(user);
+        if (balance.lt(MINT_PRICE)) {
+            throw new Error("Not enough YAMA (need 2000)");
+        }
+
+        setStatus("Checking allowance...");
+        const allowance = await erc20.allowance(user, NFT_ADDRESS);
+
+        if (allowance.lt(MINT_PRICE)) {
+            setStatus("Approving YAMA...");
+            const approveTx = await erc20.approve(NFT_ADDRESS, MINT_PRICE);
+            await approveTx.wait();
+        }
+
+        setStatus("Minting YAMADOG...");
+        const mintTx = await nft.mint();
+        await mintTx.wait();
+
+        setStatus("✅ Mint successful!");
+    } catch (err) {
+        console.error(err);
+        setStatus(err.message || "Transaction failed");
+    } finally {
+        mintBtn.disabled = false;
+    }
 }
+
+/* ---------------- EVENTS ---------------- */
+
+connectBtn.onclick = connectWallet;
+mintBtn.onclick = mint;
+
 </script>
-
 </body>
 </html>
