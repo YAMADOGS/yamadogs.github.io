@@ -445,22 +445,40 @@ function showModal(type,title,msg){
 function closeModal(){ modalOverlay.style.display="none"; }
 
 async function connectWallet(){
- if(!window.ethereum)
-  return showModal("error","NO WALLET","Install MetaMask.");
- await ethereum.request({method:"eth_requestAccounts"});
- const web3=new ethers.providers.Web3Provider(window.ethereum);
- signer=web3.getSigner();
- user=await signer.getAddress();
- nftContract=nftContract.connect(signer);
- erc20Contract=erc20Contract.connect(signer);
- mintBtn.disabled=false;
- showModal("success","CONNECTED",user.slice(0,6)+"..."+user.slice(-4));
+  if (!window.ethereum) {
+    showModal("error","NO WALLET","Install MetaMask.");
+    return;
+  }
+
+  const web3 = new ethers.providers.Web3Provider(window.ethereum);
+  await web3.send("eth_requestAccounts", []);
+
+  const network = await web3.getNetwork();
+  if (network.chainId !== 11155111) {
+    showModal("error","WRONG NETWORK","Please switch to Sepolia.");
+    return;
+  }
+
+  signer = web3.getSigner();
+  user = await signer.getAddress();
+
+  // 🔥 RECREATE CONTRACTS — DO NOT .connect()
+  provider = web3;
+  nftContract = new ethers.Contract(NFT_ADDRESS, NFT_ABI, signer);
+  erc20Contract = new ethers.Contract(ERC20_ADDRESS, ERC20_ABI, signer);
+
+  mintBtn.disabled = false;
+  showModal("success","CONNECTED",user.slice(0,6)+"..."+user.slice(-4));
 }
+
 
 async function mintNFT(){
   try {
+   if (!user) {
+  showModal("error","NOT CONNECTED","Please connect wallet first.");
+  return;
+}
     const price = ethers.utils.parseEther("2000");
-
 
     // 🔍 CHECK REAL YAMA BALANCE FIRST
     const balance = await erc20Contract.balanceOf(user);
