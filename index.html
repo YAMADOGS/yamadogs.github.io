@@ -376,12 +376,14 @@ const NFT_ABI=[
  {"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"}
 ];
 
-const ERC20_ABI=[
- {"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
- {"inputs":[],"name":"decimals","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
- {"inputs":[{"type":"address"},{"type":"address"}],"name":"allowance","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
- {"inputs":[{"type":"address"},{"type":"uint256"}],"name":"approve","outputs":[{"type":"bool"}],"stateMutability":"nonpayable","type":"function"}
+const ERC20_ABI = [
+  {"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"decimals","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"type":"address"}],"name":"balanceOf","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"type":"address"},{"type":"address"}],"name":"allowance","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[{"type":"address"},{"type":"uint256"}],"name":"approve","outputs":[{"type":"bool"}],"stateMutability":"nonpayable","type":"function"}
 ];
+
 
 let provider,signer,nftContract,erc20Contract,user,tokenDecimals,initialSupply;
 
@@ -424,19 +426,44 @@ async function connectWallet(){
 }
 
 async function mintNFT(){
- try{
-  const price=await nftContract.MINT_PRICE();
-  const allowance=await erc20Contract.allowance(user,NFT_ADDRESS);
-  if(allowance.lt(price)){
-    await (await erc20Contract.approve(NFT_ADDRESS,price)).wait();
+  try {
+    const price = await nftContract.MINT_PRICE();
+
+    // 🔍 CHECK REAL YAMA BALANCE FIRST
+    const balance = await erc20Contract.balanceOf(user);
+    if (balance.lt(price)) {
+      showModal(
+        "error",
+        "NOT ENOUGH YAMA",
+        "You need 2,000 YAMA to mint a YAMADOG."
+      );
+      return;
+    }
+
+    // ✅ CHECK / SET ALLOWANCE
+    const allowance = await erc20Contract.allowance(user, NFT_ADDRESS);
+    if (allowance.lt(price)) {
+      const txApprove = await erc20Contract.approve(NFT_ADDRESS, price);
+      await txApprove.wait();
+    }
+
+    // 🐕 MINT
+    const txMint = await nftContract.mint();
+    await txMint.wait();
+
+    showModal("success","🔥 DOG BORN 🔥","2,000 YAMA burned.");
+    loadStats();
+
+  } catch (e) {
+    console.error(e);
+    showModal(
+      "error",
+      "FAILED",
+      e?.error?.message || e?.reason || e?.message || "Transaction failed"
+    );
   }
-  await (await nftContract.mint()).wait();
-  showModal("success","🔥 DOG BORN 🔥","2,000 YAMA burned.");
-  loadStats();
- }catch{
-  showModal("error","FAILED","Transaction rejected.");
- }
 }
+
 
 function copyLink(){
  navigator.clipboard.writeText("Yamadog.com");
