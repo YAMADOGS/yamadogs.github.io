@@ -8,200 +8,320 @@
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
 <style>
-    body {
-        margin: 0;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-        background: #111;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-    }
+/* ================= BASE ================= */
+body {
+    margin: 0;
+    font-family: monospace;
+    background: linear-gradient(#7ec8e3, #bde9f3);
+    overflow-x: hidden;
+}
 
-    .card {
-        width: 100%;
-        max-width: 420px;
-        padding: 24px;
-        border-radius: 16px;
-        background: #1a1a1a;
-        box-shadow: 0 0 40px rgba(0,0,0,.6);
-        text-align: center;
-    }
+/* ================= CLOUDS ================= */
+.cloud {
+    position: absolute;
+    top: 60px;
+    width: 120px;
+    height: 40px;
+    background: #fff;
+    image-rendering: pixelated;
+    animation: moveClouds linear infinite;
+}
+.cloud::before, .cloud::after {
+    content: "";
+    position: absolute;
+    background: #fff;
+}
+.cloud::before { width: 40px; height: 40px; left: -20px; top: 10px; }
+.cloud::after  { width: 50px; height: 50px; right: -25px; top: 0; }
 
-    h1 {
-        margin-bottom: 8px;
-        font-size: 28px;
-    }
+@keyframes moveClouds {
+    from { left: -150px; }
+    to   { left: 110%; }
+}
 
-    p {
-        font-size: 14px;
-        opacity: 0.8;
-        line-height: 1.5;
-    }
+/* ================= SNOW ================= */
+.snow {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+}
+.snow span {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: white;
+    animation: fall linear infinite;
+}
+@keyframes fall {
+    to { transform: translateY(110vh); }
+}
 
-    button {
-        width: 100%;
-        padding: 14px;
-        margin-top: 12px;
-        border-radius: 12px;
-        border: none;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        background: #f4c430;
-        color: #000;
-    }
+/* ================= GROUND ================= */
+.ground {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 120px;
+    background: #8b5a2b;
+}
 
-    button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
+/* ================= CARD ================= */
+.container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 120px;
+}
 
-    .status {
-        margin-top: 16px;
-        font-size: 13px;
-        min-height: 18px;
-        opacity: 0.9;
-    }
+.card {
+    background: #111;
+    color: #fff;
+    padding: 24px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    border: 4px solid #fff;
+    box-shadow: 8px 8px #000;
+}
 
-    .wallet {
-        margin-top: 8px;
-        font-size: 13px;
-        opacity: 0.7;
-        word-break: break-all;
-    }
+button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 16px;
+    background: #f4c430;
+    border: 3px solid #000;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.5;
+}
+
+.status, .wallet, .supply {
+    font-size: 13px;
+    margin-top: 8px;
+    word-break: break-word;
+}
+
+/* ================= MODAL ================= */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #111;
+    border: 4px solid #fff;
+    padding: 16px;
+    position: relative;
+    max-width: 340px;
+}
+
+.close {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    background: red;
+    color: white;
+    border: 3px solid #000;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.mint-text {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.congrats {
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 6px;
+}
+
+.tokenid {
+    font-size: 14px;
+    font-weight: bold;
+    color: #f4c430;
+}
+
+.modal-content svg {
+    width: 300px;
+    height: 300px;
+    image-rendering: pixelated;
+}
 </style>
 </head>
 
 <body>
 
-<div class="card">
-    <h1>YAMADOG 🐕</h1>
-    <p>Mint by burning <b>2,000 YAMA</b><br>
-    Fully on-chain • Sepolia Testnet</p>
+<!-- Clouds -->
+<div class="cloud" style="animation-duration:60s; top:60px;"></div>
+<div class="cloud" style="animation-duration:45s; top:120px;"></div>
 
-    <button id="connectBtn">Connect Wallet</button>
-    <button id="mintBtn" disabled>Mint YAMADOG</button>
+<!-- Snow -->
+<div class="snow" id="snow"></div>
 
-    <div class="wallet" id="wallet"></div>
-    <div class="status" id="status"></div>
+<div class="container">
+    <div class="card">
+        <h1>YAMADOG 🐕</h1>
+        <p>Mint by burning <b>2,000 YAMA</b></p>
+
+        <div class="supply" id="supply">Minted: -- / 5000</div>
+
+        <button id="connectBtn">Connect Wallet</button>
+        <button id="mintBtn" disabled>Mint YAMADOG</button>
+
+        <div class="wallet" id="wallet"></div>
+        <div class="status" id="status"></div>
+    </div>
+</div>
+
+<div class="ground"></div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <div class="close" onclick="closeModal()">X</div>
+
+        <div class="mint-text">
+            <div class="congrats">
+                Congrats! You just give birth to your very own YAMADOG!<br>
+                although you also burn your 2000 YAMA token out of the existance too bad.. for YAMAINU
+            </div>
+            <div class="tokenid" id="tokenIdText"></div>
+        </div>
+
+        <div id="nftImage"></div>
+    </div>
 </div>
 
 <script>
-/* ---------------- CONFIG ---------------- */
-
-const SEPOLIA_CHAIN_ID = "0xaa36a7"; // 11155111
-
+/* ================= CONFIG ================= */
+const CHAIN_ID = "0xaa36a7"; // Sepolia
 const NFT_ADDRESS  = "0x77CA6E72CdfA303E3Ee1065cd672DC73eB4EB88e";
 const ERC20_ADDRESS = "0xc9F6Ea476EBA9d82cdF88fE830642C0131bfA4c3";
+const PRICE = ethers.utils.parseUnits("2000", 18);
 
-const MINT_PRICE = ethers.utils.parseUnits("2000", 18);
-
-/* ---------------- ABI ---------------- */
-
+/* ================= ABI ================= */
 const ERC20_ABI = [
-    "function balanceOf(address) view returns (uint256)",
-    "function allowance(address,address) view returns (uint256)",
-    "function approve(address,uint256) returns (bool)"
+  "function balanceOf(address) view returns(uint256)",
+  "function allowance(address,address) view returns(uint256)",
+  "function approve(address,uint256) returns(bool)"
 ];
 
 const NFT_ABI = [
-    "function mint()",
-    "function totalSupply() view returns (uint256)",
-    "function MAX_SUPPLY() view returns (uint256)"
+  "function mint()",
+  "function totalSupply() view returns(uint256)",
+  "function tokenURI(uint256) view returns(string)"
 ];
 
-/* ---------------- STATE ---------------- */
+let provider, signer, user, erc20, nft;
 
-let provider, signer, user;
-let erc20, nft;
-
-/* ---------------- UI ---------------- */
-
+/* ================= UI ================= */
 const connectBtn = document.getElementById("connectBtn");
 const mintBtn = document.getElementById("mintBtn");
 const statusEl = document.getElementById("status");
 const walletEl = document.getElementById("wallet");
+const supplyEl = document.getElementById("supply");
+const modal = document.getElementById("modal");
+const nftImage = document.getElementById("nftImage");
 
-/* ---------------- FUNCTIONS ---------------- */
+/* ================= FUNCTIONS ================= */
+function setStatus(msg){ statusEl.textContent = msg; }
 
-function setStatus(msg) {
-    statusEl.textContent = msg;
-}
-
-async function ensureSepolia() {
-    const chainId = await window.ethereum.request({ method: "eth_chainId" });
-    if (chainId !== SEPOLIA_CHAIN_ID) {
-        await window.ethereum.request({
-            method: "wallet_switchEthereumChain",
-            params: [{ chainId: SEPOLIA_CHAIN_ID }]
-        });
-    }
-}
-
-async function connectWallet() {
-    if (!window.ethereum) {
-        alert("MetaMask not detected");
-        return;
-    }
-
-    await ensureSepolia();
+async function connect() {
+    await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: CHAIN_ID }]
+    });
 
     provider = new ethers.providers.Web3Provider(window.ethereum);
     signer = provider.getSigner();
-
-    const accounts = await provider.send("eth_requestAccounts", []);
-    user = accounts[0];
+    user = (await provider.send("eth_requestAccounts", []))[0];
 
     erc20 = new ethers.Contract(ERC20_ADDRESS, ERC20_ABI, signer);
-    nft   = new ethers.Contract(NFT_ADDRESS, NFT_ABI, signer);
+    nft = new ethers.Contract(NFT_ADDRESS, NFT_ABI, signer);
 
-    walletEl.textContent = `Connected: ${user}`;
-    connectBtn.textContent = "Wallet Connected";
+    walletEl.textContent = user;
     connectBtn.disabled = true;
     mintBtn.disabled = false;
 
+    loadSupply();
     setStatus("Wallet connected");
+}
+
+async function loadSupply() {
+    const minted = await nft.totalSupply();
+    supplyEl.textContent = `Minted: ${minted} / 5000`;
 }
 
 async function mint() {
     try {
         mintBtn.disabled = true;
-        setStatus("Checking balance...");
-
-        const balance = await erc20.balanceOf(user);
-        if (balance.lt(MINT_PRICE)) {
-            throw new Error("Not enough YAMA (need 2000)");
-        }
 
         setStatus("Checking allowance...");
         const allowance = await erc20.allowance(user, NFT_ADDRESS);
-
-        if (allowance.lt(MINT_PRICE)) {
+        if (allowance.lt(PRICE)) {
             setStatus("Approving YAMA...");
-            const approveTx = await erc20.approve(NFT_ADDRESS, MINT_PRICE);
-            await approveTx.wait();
+            await (await erc20.approve(NFT_ADDRESS, PRICE)).wait();
         }
 
         setStatus("Minting YAMADOG...");
-        const mintTx = await nft.mint();
-        await mintTx.wait();
+        const tx = await nft.mint();
+        const receipt = await tx.wait();
 
-        setStatus("✅ Mint successful!");
-    } catch (err) {
-        console.error(err);
-        setStatus(err.message || "Transaction failed");
+        const event = receipt.events.find(e => e.event === "Transfer");
+        const tokenId = event.args.tokenId;
+
+        showNFT(tokenId);
+        loadSupply();
+        setStatus("Mint successful!");
+    } catch (e) {
+        setStatus(e.message || "Transaction failed");
     } finally {
         mintBtn.disabled = false;
     }
 }
 
-/* ---------------- EVENTS ---------------- */
+async function showNFT(tokenId) {
+    document.getElementById("tokenIdText").textContent =
+        "Token ID: #" + tokenId.toString();
 
-connectBtn.onclick = connectWallet;
+    const uri = await nft.tokenURI(tokenId);
+    const json = JSON.parse(atob(uri.split(",")[1]));
+    const svg = atob(json.image.split(",")[1]);
+
+    nftImage.innerHTML = svg;
+    modal.style.display = "flex";
+}
+
+function closeModal() {
+    modal.style.display = "none";
+}
+
+/* ================= EVENTS ================= */
+connectBtn.onclick = connect;
 mintBtn.onclick = mint;
 
+/* ================= SNOW GEN ================= */
+const snow = document.getElementById("snow");
+for (let i = 0; i < 60; i++) {
+    const s = document.createElement("span");
+    s.style.left = Math.random() * 100 + "%";
+    s.style.animationDuration = 5 + Math.random() * 5 + "s";
+    s.style.animationDelay = Math.random() * 5 + "s";
+    snow.appendChild(s);
+}
 </script>
+
 </body>
 </html>
