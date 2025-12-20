@@ -204,8 +204,10 @@ const ERC20_ABI = [
 
 const NFT_ABI = [
   "function mint()",
-  "function totalSupply() view returns(uint256)"
+  "function totalSupply() view returns(uint256)",
+  "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 ];
+
 
 let provider, signer, user, erc20, nft;
 
