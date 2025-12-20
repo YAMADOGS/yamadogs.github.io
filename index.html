@@ -370,11 +370,43 @@ const NFT_ADDRESS="0x77CA6E72CdfA303E3Ee1065cd672DC73eB4EB88e";
 const ERC20_ADDRESS="0xc9F6Ea476EBA9d82cdF88fE830642C0131bfA4c3";
 const MAX_NFT_SUPPLY=5000;
 
-const NFT_ABI=[
- {"inputs":[],"name":"MINT_PRICE","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
- {"inputs":[],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},
- {"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"}
+const NFT_ABI = [
+  {
+    "inputs": [],
+    "name": "mint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MINT_PRICE",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_SUPPLY",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
 ];
+
 
 const ERC20_ABI = [
   {"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
