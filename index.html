@@ -453,9 +453,9 @@ async function connectWallet(){
   const web3 = new ethers.providers.Web3Provider(window.ethereum);
   await web3.send("eth_requestAccounts", []);
 
-  const chainIdHex = await window.ethereum.request({ method: "eth_chainId" });
+  const network = await web3.getNetwork();
 
-if (chainIdHex !== "0xaa36a7") {
+if (network.chainId !== 11155111) {
   showModal(
     "error",
     "WRONG NETWORK",
@@ -463,6 +463,7 @@ if (chainIdHex !== "0xaa36a7") {
   );
   return;
 }
+
 
 
   signer = web3.getSigner();
