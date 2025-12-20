@@ -111,6 +111,29 @@ button:disabled {
     margin-top: 8px;
     word-break: break-word;
 }
+/* ================= STATUS COLORS ================= */
+.status {
+    color: #9af5c4; /* mint green default */
+}
+
+.status.approving {
+    color: #7fffd4; /* light aqua */
+}
+
+.status.minting {
+    color: #5cff9d; /* bright mint */
+}
+
+.status.success {
+    color: #00ff99; /* strong mint green */
+}
+
+.status.error {
+    color: #ff6b6b; /* red */
+}
+
+
+
 
 /* ================= MODAL ================= */
 .modal {
@@ -286,7 +309,14 @@ const modal = document.getElementById("modal");
 const tokenIdText = document.getElementById("tokenIdText");
 
 /* ================= FUNCTIONS ================= */
-function setStatus(msg){ statusEl.textContent = msg; }
+function setStatus(msg, type = "default") {
+    statusEl.textContent = msg;
+    statusEl.className = "status"; // reset previous color
+    if (type !== "default") {
+        statusEl.classList.add(type);
+    }
+}
+
 
 async function connect() {
     await window.ethereum.request({
@@ -306,7 +336,8 @@ async function connect() {
     mintBtn.disabled = false;
 
     loadSupply();
-    setStatus("Wallet connected");
+    setStatus("Wallet connected", "success");
+
 }
 
 async function loadSupply() {
@@ -318,14 +349,17 @@ async function mint() {
     try {
         mintBtn.disabled = true;
 
-        setStatus("Checking allowance...");
+        setStatus("Checking allowance...", "approving");
+
         const allowance = await erc20.allowance(user, NFT_ADDRESS);
         if (allowance.lt(PRICE)) {
-            setStatus("Approving YAMA...");
+            setStatus("Approving YAMA...", "approving");
+
             await (await erc20.approve(NFT_ADDRESS, PRICE)).wait();
         }
 
-        setStatus("Minting YAMADOG...");
+        setStatus("Minting YAMADOG...", "minting");
+
         const tx = await nft.mint();
         const receipt = await tx.wait();
 
@@ -336,9 +370,11 @@ async function mint() {
         modal.style.display = "flex";
 
         loadSupply();
-        setStatus("Mint successful!");
+        setStatus("Mint successful!", "success");
+
     } catch (e) {
-        setStatus(e.message || "Transaction failed");
+        setStatus(e.message || "Transaction failed", "error");
+
     } finally {
         mintBtn.disabled = false;
     }
