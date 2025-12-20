@@ -453,11 +453,17 @@ async function connectWallet(){
   const web3 = new ethers.providers.Web3Provider(window.ethereum);
   await web3.send("eth_requestAccounts", []);
 
-  const network = await web3.getNetwork();
-  if (network.chainId !== 11155111) {
-    showModal("error","WRONG NETWORK","Please switch to Sepolia.");
-    return;
-  }
+  const chainIdHex = await window.ethereum.request({ method: "eth_chainId" });
+
+if (chainIdHex !== "0xaa36a7") {
+  showModal(
+    "error",
+    "WRONG NETWORK",
+    "Please switch MetaMask to Sepolia Test Network."
+  );
+  return;
+}
+
 
   signer = web3.getSigner();
   user = await signer.getAddress();
