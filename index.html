@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'none';">
+
+<title>YAMADOG NFT Mint</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script defer src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+<style>
+body {
+  font-family: 'Press Start 2P', monospace;
+  margin: 0;
+  padding: 16px;
+  text-align: center;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    linear-gradient(#fff 0 0) bottom / 100% 22% no-repeat,
+    repeating-linear-gradient(90deg,#6bbf8e 0 14px,#5cab82 14px 28px)
+      bottom / 100% 34% no-repeat,
+    linear-gradient(135deg,#c6ccd3 25%,transparent 25%)
+      bottom left / 40% 46% no-repeat,
+    linear-gradient(225deg,#d6dde3 25%,transparent 25%)
+      bottom right / 40% 46% no-repeat,
+    linear-gradient(to bottom,#8fd3ff,#cfe9ff,#f4fbff);
+  image-rendering: pixelated;
+}
+
+/* PIXEL BORDER */
+.pixel {
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+
+/* DECOR */
+.sun {
+  position:fixed;top:24px;right:24px;width:64px;height:64px;
+  background:#ffd166;box-shadow:inset -6px -6px 0 #ffb703;z-index:0;
+}
+.cloud {
+  position:fixed;top:70px;width:120px;height:32px;background:#fff;
+  box-shadow:24px 0 #fff,48px 0 #fff,12px -16px #fff,36px -16px #fff;
+  animation:cloudMove linear infinite;z-index:0;
+}
+.cloud.c1{animation-duration:60s}
+.cloud.c2{top:120px;animation-duration:90s;opacity:.8}
+@keyframes cloudMove{from{left:-200px}to{left:110%}}
+
+.snow span{
+  position:fixed;top:-10px;width:4px;height:4px;background:#fff;
+  animation:snowFall linear infinite;z-index:0;
+}
+@keyframes snowFall{to{transform:translateY(110vh)}}
+
+.ui{position:relative;z-index:2}
+h1{color:#ffb703;text-shadow:3px 3px 0 #000}
+
+/* CARD */
+.card{
+  background:#111;color:#fff;padding:18px;max-width:420px;margin:12px auto;
+  box-shadow:8px 8px 0 #555;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+
+hr{
+  border:none;height:6px;
+  background:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 12px);
+  margin:14px 0;
+}
+
+/* BUTTONS */
+button{
+  font-family:inherit;font-size:10px;padding:14px 18px;margin:8px;
+  background:#ffb703;cursor:pointer;box-shadow:4px 4px 0 #000;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: none;
+}
+
+
+button:hover{background:#ffd166}
+
+#mintBtn{background:#6fdcff}
+#mintBtn:hover{background:#8be6ff}
+#mintBtn:disabled{background:#777;opacity:.6;cursor:not-allowed}
+
+/* SUPPLY COLORS */
+.nft-supply{color:#4fc3ff}
+.yama-supply{color:#6bff95}
+.yama-burned{color:#ff5c28;text-shadow:0 0 6px #ff5c28}
+
+/* COPY BOX */
+.copy-box{
+  background:#fff;padding:14px;max-width:420px;margin:16px auto;
+  box-shadow:6px 6px 0 #000;font-size:10px;line-height:1.7;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+.copy-link{
+  display:inline-block;margin-top:8px;padding:6px 10px;background:#e6d3a3;
+  cursor:pointer;box-shadow:3px 3px 0 #000;
+  border:3px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 3;
+}
+.copy-link {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  user-select: none;
+}
+
+.copy-link:focus,
+.copy-link:active {
+  outline: none;
+  box-shadow: 3px 3px 0 #000; /* keep your pixel shadow */
+}
+
+
+
+/* DESCRIPTION */
+.description{max-width:620px;margin:30px auto}
+.description p{
+  background:#fff;padding:14px;margin-bottom:14px;
+  box-shadow:6px 6px 0 #000;font-size:10px;line-height:1.7;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:none;align-items:center;justify-content:center;z-index:999;
+}
+.modal{
+  background:#fff;padding:18px;width:90%;max-width:320px;
+  box-shadow:8px 8px 0 #000;font-size:10px;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+.modal.copy{background:#e6d3a3}
+
+@media(max-width:480px){
+  button{display:block;width:100%;max-width:300px;margin:10px auto}
+}
+
+.title-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title-logo {
+  height: 1em;          /* matches text height automatically */
+  width: auto;
+  image-rendering: pixelated;
+}
+.title-logo {
+  height: 5em;      /* increase this: 1.2em – 1.6em */
+  width: auto;
+  image-rendering: pixelated;
+}
+.title-wrapper {
+  position: fixed;
+
+  /* True screen edge (mobile + desktop safe) */
+  top: env(safe-area-inset-top, 0);
+  right: 0;
+  left:0;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  margin: 0;
+  padding: 10px 14px;
+
+  background-color: #8ecae6; /* Lighter pixel sky */
+
+  /* Pixel border */
+  border:7px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+
+  z-index: 9999;
+}
+body {
+  padding-top: 120px;
+}
+
+.security-warning {
+  margin: 12px auto;
+  padding: 10px 14px;
+  max-width: 520px;
+  font-size: 10px;
+  text-align: center;
+  background: #e6d3a3;
+  color: #000;
+  border: 3px solid #000;
+  box-shadow: 3px 3px 0 #000;
+}
+
+.contract-info {
+  font-size: 10px;
+  margin-top: 6px;
+  opacity: 0.85;
+}
+
+
+#contractAddressText {
+  display: inline-block;
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="sun"></div>
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+
+<div class="snow">
+  <span style="left:5%;animation-duration:8s;"></span>
+  <span style="left:15%;animation-duration:10s;"></span>
+  <span style="left:25%;animation-duration:7s;"></span>
+  <span style="left:35%;animation-duration:11s;"></span>
+  <span style="left:45%;animation-duration:9s;"></span>
+  <span style="left:55%;animation-duration:12s;"></span>
+  <span style="left:65%;animation-duration:8s;"></span>
+  <span style="left:75%;animation-duration:10s;"></span>
+  <span style="left:85%;animation-duration:7s;"></span>
+  <span style="left:95%;animation-duration:11s;"></span>
+</div>
+
+<div class="ui">
+<div class="title-wrapper">
+  <img src="logo.svg" alt="YAMADOG Logo" class="title-logo">
+  <h1 class="title">YAMADOG</h1>
+</div>
+
+<div class="security-warning">
+  ⚠️ Official Site Notice: Always verify the contract address before minting.
+  We will NEVER DM you links or ask for private keys. and make sure you are in the right website Yamadog.github.io
+</div>
+<p class="contract-info copy">
+  YAMADOG NFT Contract Address: <span id="contractAddressText">0x77CA6E72CdfA303E3Ee1065cd672DC73eB4EB88e</span>
+</p>
+
+
+<p>Mint price: <b>2000 YAMA</b></p>
+
+<div id="card" class="card">
+  <h3>MAX YAMADOG SUPPLY</h3>
+  <p id="nftSupply" class="nft-supply">Loading...</p>
+  <hr>
+  <h3>CURRENT YAMA SUPPLY</h3>
+  <p id="supply" class="yama-supply">Loading...</p>
+  <hr>
+  <h3>TOTAL YAMA BURNED</h3>
+  <p id="burned" class="yama-burned">Loading...</p>
+</div>
+
+<div class="copy-box">
+  Mobile wallet not detected?<br><br>
+  Copy the link below and open it inside your wallet browser.
+  <div class="copy-link" onclick="copyLink()">Yamadog.github.io</div>
+</div>
+
+<button onclick="connectWallet()">CONNECT WALLET</button>
+<button id="mintBtn" onclick="mintNFT()" disabled>MINT YAMADOG</button>
+
+<!-- ✅ RESTORED BUTTONS -->
+<div class="link-buttons">
+  <button onclick="window.open('https://pancakeswap.com','_blank')">(Base Chain)PANCAKESWAP</button>
+  <button onclick="window.open('https://testnet.rarible.com/collection/0x77ca6e72cdfa303e3ee1065cd672dc73eb4eb88e/items','_blank')">OPENSEA</button>
+</div>
+
+<div class="description">
+  <p>YAMADOG is a pack of 5,000 fully on-chain good dogs, inspired by the ancient mountain dogs known as Yamainu.
+These dogs are summoned by pure code, chaos, and soul, randomly generated directly on the blockchain like nature intended.
+No servers. No IPFS. No middlemen.
+The art is literally string-based code living on-chain, forever etched into the blockchain.
+If the chain lives, YAMADOG lives.
+Immutable. Trustless. Certified mountain dog energy.</p>
+  <p>But no YAMADOG is born for free.
+Every YAMADOG requires a sacrifice.
+To mint one good dog, 2,000 YAMAINU (YAMA) meme coins are permanently burned.
+Gone. Reduced to ash. Never coming back. 🔥
+
+Why call it a cost?
+Because every YAMADOG minted destroys 2,000 YAMA forever—that’s not a fee, that’s a blood pact written into the contract.
+
+No YAMAINU burned. No YAMADOG born.</p>
+  <p>The math is brutal. The contract doesn’t care.
+The initial YAMAINU (YAMA) supply is 10,000,000.
+The max supply of YAMADOG is 5,000.
+
+Each YAMADOG demands 2,000 YAMA burned to be born.
+Do the math.
+5,000 × 2,000 = 10,000,000 YAMA.
+
+That means the system is designed to consume the entire YAMAINU supply to give life to all 5,000 YAMADOGS.
+Total annihilation. Total transformation. 🔥
+
+Every YAMADOG is YAMA turned into code, fur, and legend.
+No extra supply. No shortcuts.
+Just pure on-chain alchemy.</p>
+  <p>YAMAINU (YAMA) has one soul purpose:
+to give birth to the 5,000 YAMADOG NFTs.
+That’s it. That’s the lore. That’s the contract.
+
+So no—this is NOT a “buy and hope for returns” token.
+If you’re here to hold YAMA and pray for green candles…
+are you lost, anon?
+
+Do NOT diamond-hand YAMAINU.
+YAMAINU is meant to be used, not hoarded.
+Burn it. Sacrifice it.
+Turn meme coin into on-chain dog energy.
+
+No YAMA burned = no YAMADOG born.
+That’s the entire mechanic.
+🔥🐕</p>
+<p><b>Liquidity notice (read this):</b>
+Only a very small amount of liquidity will be added.
+The LP tokens will be burned, just like YAMAINU itself. 🔥
+This means expect high slippage.
+No market games. No fake stability.
+
+Full transparency:
+I’m not adding big liquidity.
+I’m not extracting and cannot extract profit from YAMADOGS minting as the 2000 YAMA token is all burned and not sent to my EMPTY wallet.
+This isn’t a cash grab—it’s an on-chain experiment.
+
+If you get it, you get it.
+If you don’t… the dogs weren’t meant for you. </p>
+</div>
+</div>
+
+<div id="modalOverlay" class="modal-overlay">
+  <div id="modalBox" class="modal">
+    <h3 id="modalTitle"></h3>
+    <p id="modalMessage"></p>
+    <button onclick="closeModal()">OK</button>
+  </div>
+</div>
+
+<script>
+window.addEventListener("load",()=>{ if(typeof ethers!=="undefined")init(); });
+
+const RPC_URL="https://ethereum-sepolia-rpc.publicnode.com";
+const NFT_ADDRESS="0x77CA6E72CdfA303E3Ee1065cd672DC73eB4EB88e";
+const ERC20_ADDRESS="0xc9F6Ea476EBA9d82cdF88fE830642C0131bfA4c3";
+const MAX_NFT_SUPPLY=5000;
+
+const NFT_ABI=[
+ {"inputs":[],"name":"MINT_PRICE","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+ {"inputs":[],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},
+ {"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"}
+];
+
+const ERC20_ABI=[
+ {"inputs":[],"name":"totalSupply","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+ {"inputs":[],"name":"decimals","outputs":[{"type":"uint8"}],"stateMutability":"view","type":"function"},
+ {"inputs":[{"type":"address"},{"type":"address"}],"name":"allowance","outputs":[{"type":"uint256"}],"stateMutability":"view","type":"function"},
+ {"inputs":[{"type":"address"},{"type":"uint256"}],"name":"approve","outputs":[{"type":"bool"}],"stateMutability":"nonpayable","type":"function"}
+];
+
+let provider,signer,nftContract,erc20Contract,user,tokenDecimals,initialSupply;
+
+async function init(){
+ provider=new ethers.providers.JsonRpcProvider(RPC_URL);
+ nftContract=new ethers.Contract(NFT_ADDRESS,NFT_ABI,provider);
+ erc20Contract=new ethers.Contract(ERC20_ADDRESS,ERC20_ABI,provider);
+ tokenDecimals=await erc20Contract.decimals();
+ initialSupply=await erc20Contract.totalSupply();
+ loadStats();
+}
+
+async function loadStats(){
+ const minted=await nftContract.totalSupply();
+ nftSupply.innerText=minted+" / "+MAX_NFT_SUPPLY;
+ const current=await erc20Contract.totalSupply();
+ supply.innerText=ethers.utils.formatUnits(current,tokenDecimals)+" YAMA";
+ burned.innerText=ethers.utils.formatUnits(initialSupply.sub(current),tokenDecimals)+" YAMA";
+}
+
+function showModal(type,title,msg){
+ modalBox.className="modal "+type;
+ modalTitle.innerText=title;
+ modalMessage.innerText=msg;
+ modalOverlay.style.display="flex";
+}
+function closeModal(){ modalOverlay.style.display="none"; }
+
+async function connectWallet(){
+ if(!window.ethereum)
+  return showModal("error","NO WALLET","Install MetaMask.");
+ await ethereum.request({method:"eth_requestAccounts"});
+ const web3=new ethers.providers.Web3Provider(window.ethereum);
+ signer=web3.getSigner();
+ user=await signer.getAddress();
+ nftContract=nftContract.connect(signer);
+ erc20Contract=erc20Contract.connect(signer);
+ mintBtn.disabled=false;
+ showModal("success","CONNECTED",user.slice(0,6)+"..."+user.slice(-4));
+}
+
+async function mintNFT(){
+ try{
+  const price=await nftContract.MINT_PRICE();
+  const allowance=await erc20Contract.allowance(user,NFT_ADDRESS);
+  if(allowance.lt(price)){
+    await (await erc20Contract.approve(NFT_ADDRESS,price)).wait();
+  }
+  await (await nftContract.mint()).wait();
+  showModal("success","🔥 DOG BORN 🔥","2,000 YAMA burned.");
+  loadStats();
+ }catch{
+  showModal("error","FAILED","Transaction rejected.");
+ }
+}
+
+function copyLink(){
+ navigator.clipboard.writeText("Yamadog.com");
+ showModal("copy","COPIED","Open inside wallet browser.");
+}
+</script>
+
+
+<div class="description">
+<p>The minting website of YAMDADOG is fully open Source, Anyone can audit it! <a href="https://yamadogs.github.io">SOURCE CODE</a></p>
+</div>
+</body>
+</html>
