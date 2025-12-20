@@ -1,206 +1,325 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>YAMADOG Mint</title>
 
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
 <style>
+/* ================= BASE ================= */
 body {
-  margin:0;
-  font-family: monospace;
-  background: linear-gradient(#7ccfff, #e9f8ff);
-  min-height:100vh;
+    margin: 0;
+    font-family: monospace;
+    background: linear-gradient(#7ec8e3, #bde9f3);
+    overflow-x: hidden;
 }
 
-/* ❄️ SNOW */
+/* ================= CLOUDS ================= */
+.cloud {
+    position: absolute;
+    top: 60px;
+    width: 120px;
+    height: 40px;
+    background: #fff;
+    image-rendering: pixelated;
+    animation: moveClouds linear infinite;
+}
+.cloud::before, .cloud::after {
+    content: "";
+    position: absolute;
+    background: #fff;
+}
+.cloud::before { width: 40px; height: 40px; left: -20px; top: 10px; }
+.cloud::after  { width: 50px; height: 50px; right: -25px; top: 0; }
+
+@keyframes moveClouds {
+    from { left: -150px; }
+    to   { left: 110%; }
+}
+
+/* ================= SNOW ================= */
 .snow {
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:1;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
 }
 .snow span {
-  position:absolute;
-  width:6px;height:6px;
-  background:white;
-  top:-10px;
-  animation: fall linear infinite;
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: white;
+    animation: fall linear infinite;
 }
-@keyframes fall { to { transform: translateY(110vh); } }
+@keyframes fall {
+    to { transform: translateY(110vh); }
+}
 
-/* UI */
+/* ================= GROUND ================= */
+.ground {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 120px;
+    background: #8b5a2b;
+}
+
+/* ================= CARD ================= */
 .container {
-  position:relative;
-  z-index:5;
-  max-width:420px;
-  margin:60px auto;
-  background:white;
-  border:6px solid black;
-  padding:20px;
-  text-align:center;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 120px;
+}
+
+.card {
+    background: #111;
+    color: #fff;
+    padding: 24px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    border: 4px solid #fff;
+    box-shadow: 8px 8px #000;
 }
 
 button {
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  font-size:16px;
-  border:4px solid black;
-  background:#f4c430;
-  cursor:pointer;
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 16px;
+    background: #f4c430;
+    border: 3px solid #000;
+    cursor: pointer;
 }
 
-button:disabled { opacity:.6; }
+button:disabled {
+    opacity: 0.5;
+}
 
-#spinner {
-  display:none;
-  width:24px;
-  height:24px;
-  border:4px solid black;
-  border-top:4px solid transparent;
-  margin:10px auto;
-  animation: spin .8s linear infinite;
+.status, .wallet, .supply {
+    font-size: 13px;
+    margin-top: 8px;
+    word-break: break-word;
 }
-@keyframes spin { to { transform:rotate(360deg); } }
 
-/* MODAL */
-#modal {
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.7);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:10;
+/* ================= MODAL ================= */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
-.modal-box {
-  background:white;
-  border:6px solid black;
-  padding:16px;
-  max-width:360px;
-  width:90%;
-  position:relative;
+
+.modal-content {
+    background: #111;
+    border: 4px solid #fff;
+    padding: 16px;
+    position: relative;
+    max-width: 340px;
 }
+
 .close {
-  position:absolute;
-  right:8px;
-  top:6px;
-  cursor:pointer;
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    background: red;
+    color: white;
+    border: 3px solid #000;
+    cursor: pointer;
+    padding: 4px 8px;
 }
-#nftImage svg {
-  width:100%;
-  border:4px solid black;
+
+.mint-text {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.congrats {
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 6px;
+}
+
+.tokenid {
+    font-size: 14px;
+    font-weight: bold;
+    color: #f4c430;
+}
+
+.modal-content svg {
+    width: 300px;
+    height: 300px;
+    image-rendering: pixelated;
 }
 </style>
 </head>
 
 <body>
 
-<div class="snow">
-  <span style="left:10%;animation-duration:7s"></span>
-  <span style="left:30%;animation-duration:9s"></span>
-  <span style="left:50%;animation-duration:6s"></span>
-  <span style="left:70%;animation-duration:10s"></span>
-  <span style="left:90%;animation-duration:8s"></span>
-</div>
+<!-- Clouds -->
+<div class="cloud" style="animation-duration:60s; top:60px;"></div>
+<div class="cloud" style="animation-duration:45s; top:120px;"></div>
+
+<!-- Snow -->
+<div class="snow" id="snow"></div>
 
 <div class="container">
-  <h1>🐕 YAMADOG</h1>
-  <div id="supply">Minted: -- / 5000</div>
+    <div class="card">
+        <h1>YAMADOG 🐕</h1>
+        <p>Mint by burning <b>2,000 YAMA</b></p>
 
-  <button onclick="connectWallet()">Connect Wallet</button>
-  <button id="mintBtn" onclick="mintNFT()" disabled>Mint (2000 YAMA)</button>
+        <div class="supply" id="supply">Minted: -- / 5000</div>
 
-  <div id="spinner"></div>
-  <div id="status"></div>
+        <button id="connectBtn">Connect Wallet</button>
+        <button id="mintBtn" disabled>Mint YAMADOG</button>
 
-  <div style="margin-top:10px;font-size:12px">
-    <a target="_blank" href="https://sepolia.etherscan.io/address/0x77CA6E72CdfA303E3Ee1065cd672DC73eB4EB88e">NFT</a><br>
-    <a target="_blank" href="https://sepolia.etherscan.io/address/0xc9F6Ea476EBA9d82cdF88fE830642C0131bfA4c3">YAMA</a>
-  </div>
+        <div class="wallet" id="wallet"></div>
+        <div class="status" id="status"></div>
+    </div>
 </div>
 
-<div id="modal">
-  <div class="modal-box">
-    <div class="close" onclick="modal.style.display='none'">✖</div>
-    <p>
-      Congrats! You just give birth to your very own YAMADOG!<br>
-      2000 YAMA burned forever 🔥
-    </p>
-    <div id="tokenIdText"></div>
-    <div id="nftImage"></div>
-  </div>
+<div class="ground"></div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <div class="close" onclick="closeModal()">X</div>
+
+        <div class="mint-text">
+            <div class="congrats">
+                Congrats! You just give birth to your very own YAMADOG!<br>
+                although you also burn your 2000 YAMA token out of the existance too bad.. for YAMAINU
+            </div>
+            <div class="tokenid" id="tokenIdText"></div>
+        </div>
+
+        <div id="nftImage"></div>
+    </div>
 </div>
 
 <script>
-const RPC = "https://eth-sepolia.g.alchemy.com/v2/GlVVBWhm9E9SWPmraQIlt";
-const NFT_ADDR = "0x77CA6E72CdfA303E3Ee1065cd672DC73eB4EB88e";
-const ERC20_ADDR = "0xc9F6Ea476EBA9d82cdF88fE830642C0131bfA4c3";
-const PRICE = ethers.utils.parseUnits("2000",18);
+/* ================= CONFIG ================= */
+const CHAIN_ID = "0xaa36a7"; // Sepolia
+const NFT_ADDRESS  = "0x77CA6E72CdfA303E3Ee1065cd672DC73eB4EB88e";
+const ERC20_ADDRESS = "0xc9F6Ea476EBA9d82cdF88fE830642C0131bfA4c3";
+const PRICE = ethers.utils.parseUnits("2000", 18);
+
+/* ================= ABI ================= */
+const ERC20_ABI = [
+  "function balanceOf(address) view returns(uint256)",
+  "function allowance(address,address) view returns(uint256)",
+  "function approve(address,uint256) returns(bool)"
+];
 
 const NFT_ABI = [
   "function mint()",
   "function totalSupply() view returns(uint256)",
-  "function tokenURI(uint256)",
-  "event Transfer(address indexed from,address indexed to,uint256 indexed tokenId)"
-];
-const ERC20_ABI = [
-  "function allowance(address,address) view returns(uint256)",
-  "function approve(address,uint256)"
+  "function tokenURI(uint256) view returns(string)"
 ];
 
-let provider, signer, nft, erc20, user;
+let provider, signer, user, erc20, nft;
+
+/* ================= UI ================= */
+const connectBtn = document.getElementById("connectBtn");
+const mintBtn = document.getElementById("mintBtn");
+const statusEl = document.getElementById("status");
+const walletEl = document.getElementById("wallet");
+const supplyEl = document.getElementById("supply");
 const modal = document.getElementById("modal");
+const nftImage = document.getElementById("nftImage");
 
-async function connectWallet() {
-  if (!window.ethereum) {
-    alert("Open in MetaMask browser");
-    return;
-  }
+/* ================= FUNCTIONS ================= */
+function setStatus(msg){ statusEl.textContent = msg; }
 
-  provider = new ethers.providers.Web3Provider(window.ethereum);
-  await provider.send("eth_requestAccounts", []);
-  const net = await provider.getNetwork();
-  if (net.chainId !== 11155111) {
-    alert("Switch to Sepolia");
-    return;
-  }
+async function connect() {
+    await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: CHAIN_ID }]
+    });
 
-  signer = provider.getSigner();
-  user = await signer.getAddress();
-  nft = new ethers.Contract(NFT_ADDR, NFT_ABI, signer);
-  erc20 = new ethers.Contract(ERC20_ADDR, ERC20_ABI, signer);
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    signer = provider.getSigner();
+    user = (await provider.send("eth_requestAccounts", []))[0];
 
-  document.getElementById("mintBtn").disabled = false;
-  document.getElementById("status").innerText = "Connected: " + user.slice(0,6)+"...";
+    erc20 = new ethers.Contract(ERC20_ADDRESS, ERC20_ABI, signer);
+    nft = new ethers.Contract(NFT_ADDRESS, NFT_ABI, signer);
+
+    walletEl.textContent = user;
+    connectBtn.disabled = true;
+    mintBtn.disabled = false;
+
+    loadSupply();
+    setStatus("Wallet connected");
 }
 
-async function mintNFT() {
-  document.getElementById("spinner").style.display="block";
+async function loadSupply() {
+    const minted = await nft.totalSupply();
+    supplyEl.textContent = `Minted: ${minted} / 5000`;
+}
 
-  const allowance = await erc20.allowance(user, NFT_ADDR);
-  if (allowance.lt(PRICE)) {
-    const txA = await erc20.approve(NFT_ADDR, PRICE);
-    await txA.wait();
-  }
+async function mint() {
+    try {
+        mintBtn.disabled = true;
 
-  const tx = await nft.mint();
-  const receipt = await tx.wait();
+        setStatus("Checking allowance...");
+        const allowance = await erc20.allowance(user, NFT_ADDRESS);
+        if (allowance.lt(PRICE)) {
+            setStatus("Approving YAMA...");
+            await (await erc20.approve(NFT_ADDRESS, PRICE)).wait();
+        }
 
-  const evt = receipt.events.find(e=>e.event==="Transfer");
-  const tokenId = evt.args.tokenId.toString();
+        setStatus("Minting YAMADOG...");
+        const tx = await nft.mint();
+        const receipt = await tx.wait();
 
-  const uri = await nft.tokenURI(tokenId);
-  const svg = atob(uri.split(",")[1]);
+        const event = receipt.events.find(e => e.event === "Transfer");
+        const tokenId = event.args.tokenId;
 
-  document.getElementById("tokenIdText").innerText = "Token ID: " + tokenId;
-  document.getElementById("nftImage").innerHTML = svg;
-  modal.style.display="flex";
+        showNFT(tokenId);
+        loadSupply();
+        setStatus("Mint successful!");
+    } catch (e) {
+        setStatus(e.message || "Transaction failed");
+    } finally {
+        mintBtn.disabled = false;
+    }
+}
 
-  document.getElementById("spinner").style.display="none";
+async function showNFT(tokenId) {
+    document.getElementById("tokenIdText").textContent =
+        "Token ID: #" + tokenId.toString();
+
+    const uri = await nft.tokenURI(tokenId);
+    const json = JSON.parse(atob(uri.split(",")[1]));
+    const svg = atob(json.image.split(",")[1]);
+
+    nftImage.innerHTML = svg;
+    modal.style.display = "flex";
+}
+
+function closeModal() {
+    modal.style.display = "none";
+}
+
+/* ================= EVENTS ================= */
+connectBtn.onclick = connect;
+mintBtn.onclick = mint;
+
+/* ================= SNOW GEN ================= */
+const snow = document.getElementById("snow");
+for (let i = 0; i < 60; i++) {
+    const s = document.createElement("span");
+    s.style.left = Math.random() * 100 + "%";
+    s.style.animationDuration = 5 + Math.random() * 5 + "s";
+    s.style.animationDelay = Math.random() * 5 + "s";
+    snow.appendChild(s);
 }
 </script>
 
