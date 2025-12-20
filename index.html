@@ -120,9 +120,10 @@ button:disabled {
 .modal-content {
     background: #111;
     border: 4px solid #fff;
-    padding: 16px;
+    padding: 20px;
     position: relative;
     max-width: 340px;
+    text-align: center;
 }
 
 .close {
@@ -137,26 +138,15 @@ button:disabled {
 }
 
 .mint-text {
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.congrats {
-    font-size: 13px;
+    font-size: 16px;
     line-height: 1.4;
-    margin-bottom: 6px;
 }
 
 .tokenid {
+    margin-top: 10px;
     font-size: 14px;
     font-weight: bold;
     color: #f4c430;
-}
-
-.modal-content svg {
-    width: 300px;
-    height: 300px;
-    image-rendering: pixelated;
 }
 </style>
 </head>
@@ -191,16 +181,10 @@ button:disabled {
 <div class="modal" id="modal">
     <div class="modal-content">
         <div class="close" onclick="closeModal()">X</div>
-
         <div class="mint-text">
-            <div class="congrats">
-                Congrats! You just give birth to your very own YAMADOG!<br>
-                although you also burn your 2000 YAMA token out of the existance too bad.. for YAMAINU
-            </div>
-            <div class="tokenid" id="tokenIdText"></div>
+            WOW! YOUVE JUST GIVEN LIFE TO YOUR VERY OWN YAMDOG NFT!
         </div>
-
-        <div id="nftImage"></div>
+        <div class="tokenid" id="tokenIdText"></div>
     </div>
 </div>
 
@@ -220,8 +204,7 @@ const ERC20_ABI = [
 
 const NFT_ABI = [
   "function mint()",
-  "function totalSupply() view returns(uint256)",
-  "function tokenURI(uint256) view returns(string)"
+  "function totalSupply() view returns(uint256)"
 ];
 
 let provider, signer, user, erc20, nft;
@@ -233,7 +216,7 @@ const statusEl = document.getElementById("status");
 const walletEl = document.getElementById("wallet");
 const supplyEl = document.getElementById("supply");
 const modal = document.getElementById("modal");
-const nftImage = document.getElementById("nftImage");
+const tokenIdText = document.getElementById("tokenIdText");
 
 /* ================= FUNCTIONS ================= */
 function setStatus(msg){ statusEl.textContent = msg; }
@@ -282,7 +265,9 @@ async function mint() {
         const event = receipt.events.find(e => e.event === "Transfer");
         const tokenId = event.args.tokenId;
 
-        showNFT(tokenId);
+        tokenIdText.textContent = "Token ID: #" + tokenId.toString();
+        modal.style.display = "flex";
+
         loadSupply();
         setStatus("Mint successful!");
     } catch (e) {
@@ -290,18 +275,6 @@ async function mint() {
     } finally {
         mintBtn.disabled = false;
     }
-}
-
-async function showNFT(tokenId) {
-    document.getElementById("tokenIdText").textContent =
-        "Token ID: #" + tokenId.toString();
-
-    const uri = await nft.tokenURI(tokenId);
-    const json = JSON.parse(atob(uri.split(",")[1]));
-    const svg = atob(json.image.split(",")[1]);
-
-    nftImage.innerHTML = svg;
-    modal.style.display = "flex";
 }
 
 function closeModal() {
