@@ -63,6 +63,7 @@ body {
     width: 100%;
     height: 120px;
     background: #8b5a2b;
+    position: relative; /* footer positions inside */
 }
 
 /* ================= CARD ================= */
@@ -150,6 +151,33 @@ button:disabled {
     font-weight: bold;
     color: #f4c430;
 }
+
+/* ================= FOOTER ================= */
+.footer {
+    position: absolute;
+    bottom: 0;            /* 👈 bottom of the ground */
+    width: 100%;
+    text-align: center;
+    font-family: monospace;
+    font-size: 12px;
+    color: #000;
+}
+
+.footer a {
+    color: #0000EE;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.footer a:hover {
+    color: #FF8C00;
+}
+
+.footer p {
+    margin: 4px 0;
+}
+
+
 </style>
 </head>
 
@@ -164,8 +192,8 @@ button:disabled {
 
 <div class="container">
     <div class="card">
-        <h1>YAMADOG 🐕</h1>
-        <p>Mint by burning <b>2,000 YAMA</b></p>
+        <h1>YAMADOG NFT</h1>
+        <p>Mint by burning <b>2,000 <span style="color:#FF8C00;"> $YAMA</span></b></p>
 
         <div class="supply" id="supply">Minted: -- / 5000</div>
 
@@ -174,8 +202,21 @@ button:disabled {
 
         <div class="wallet" id="wallet"></div>
         <div class="status" id="status"></div>
+        
+       <p> <b>Make sure that you are connected to <span style="color:#87CEEB;">BASE Chain Network</span>!
+         </b></p>
+       <p> Make sure that you are connected to the correct YAMADOG Website link! <span style="color:#87CEEB;">https://yamadogs.github.io</span>!
+         </p>
+         <p>Make sure that your wallet is loaded with <b><span style="color:#FF8C00;">YAMAINU</span></b> token! Because to mint 1 YAMADOG will cost 2000<b><span style="color:#FF8C00;"> $YAMA</span></b> tokens</p>
+        <p>Don't have <b><span style="color:#FF8C00;">$YAMA</span></b>? Get <b><a href="https://pancakeswap.com">here</a></b>.</p>
+         <p>Trade and check your YAMADOG NFTs here <b><a href="https://testnet.rarible.com/collection/0x77ca6e72cdfa303e3ee1065cd672dc73eb4eb88e/items">Opensea</a></b></p>
+         
+      <p><b>📱MOBILE USERS:</b>If connect wallet button don't work on you.. Just copy the website link and open it onto the built in browser of your wallet like Metamask </p>
+      <p><span style="color:#5CFF9D;">https://yamadogs.github.io</span></p>
+         
     </div>
 </div>
+
 
 <div class="ground"></div>
 
@@ -184,11 +225,27 @@ button:disabled {
     <div class="modal-content">
         <div class="close" onclick="closeModal()">X</div>
         <div class="mint-text">
-            CONGRATS! YOU'VE JUST BURNED 2000 YAMAINU TOKENS!AND GIVE BIRTH TO YOUR VERY OWN YAMADOG NFT!
+            CONGRATS! YOU'VE JUST BURNED 2000 YAMAINU TOKENS!🔥🔥 AND GIVE BIRTH TO YOUR VERY OWN YAMADOG NFT!
         </div>
         <div class="tokenid" id="tokenIdText"></div>
     </div>
 </div>
+
+
+<div class="ground">
+    <footer class="footer">
+        <p>Did you know that YAMADOG is a fully Open-source? both Frontend & Backend? </p>
+        <p>
+            <a href="https://github.com/YAMADOGS/yamadogs.github.io" target="_blank" rel="noopener noreferrer">
+                SOURCE CODE
+            </a>
+        </p>
+        <p class="copyright">
+            © 2025 YAMADOG. Open-source under the MIT License.
+        </p>
+    </footer>
+</div>
+
 
 <script>
 /* ================= CONFIG ================= */
@@ -299,6 +356,7 @@ for (let i = 0; i < 60; i++) {
     snow.appendChild(s);
 }
 </script>
+
 
 </body>
 </html>
