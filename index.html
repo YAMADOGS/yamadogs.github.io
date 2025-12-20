@@ -288,7 +288,7 @@ body {
 
 <!-- ✅ RESTORED BUTTONS -->
 <div class="link-buttons">
-  <button onclick="window.open('https://pancakeswap.com','_blank')">(Base Chain)PANCAKESWAP</button>
+  <button onclick="window.open('https://pancakeswap.com','_blank')">(Sepolia Chain)PANCAKESWAP</button>
   <button onclick="window.open('https://testnet.rarible.com/collection/0x77ca6e72cdfa303e3ee1065cd672dc73eb4eb88e/items','_blank')">OPENSEA</button>
 </div>
 
@@ -459,7 +459,8 @@ async function connectWallet(){
 
 async function mintNFT(){
   try {
-    const price = await nftContract.MINT_PRICE();
+    const price = ethers.utils.parseEther("2000");
+
 
     // 🔍 CHECK REAL YAMA BALANCE FIRST
     const balance = await erc20Contract.balanceOf(user);
