@@ -254,7 +254,7 @@ button:disabled {
     <div class="modal-content">
         <div class="close" onclick="closeModal()">X</div>
         <div class="mint-text">
-            CONGRATS! YOU'VE JUST BURNED 2000 YAMAINU TOKENS!🔥🔥 AND GIVE BIRTH TO YOUR VERY OWN YAMADOG NFT!
+            CONGRATS! YOU'VE JUST BURNED 2000 YAMAINU TOKENS!🔥🔥 AND GIVE BIRTH TO THE DOG OF THE PAST! "YAMADOG NFT"!
         </div>
         <div class="tokenid" id="tokenIdText"></div>
     </div>
@@ -353,12 +353,12 @@ async function mint() {
 
         const allowance = await erc20.allowance(user, NFT_ADDRESS);
         if (allowance.lt(PRICE)) {
-            setStatus("Approving YAMA...", "approving");
+            setStatus("Approving $YAMA token...", "approving");
 
             await (await erc20.approve(NFT_ADDRESS, PRICE)).wait();
         }
 
-        setStatus("Minting YAMADOG...", "minting");
+        setStatus("Minting YAMADOG NFT...", "minting");
 
         const tx = await nft.mint();
         const receipt = await tx.wait();
