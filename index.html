@@ -1,404 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>YAMADOG Mint</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<meta http-equiv="Content-Security-Policy" content="
+default-src 'self';
+script-src 'self';
+style-src 'self';
+img-src 'self';
+connect-src 'self' https://ethereum-sepolia-rpc.publicnode.com;
+frame-ancestors 'none';
+base-uri 'none';
+object-src 'none';
+form-action 'none';
+frame-src 'none';
+">
 
-<style>
-/* ================= BASE ================= */
-body {
-    margin: 0;
-    font-family: monospace;
-    background: linear-gradient(#7ec8e3, #bde9f3);
-    overflow-x: hidden;
-}
+<title>Mint YAMADOGS</title>
 
-/* ================= CLOUDS ================= */
-.cloud {
-    position: absolute;
-    top: 20px;
-    width: 120px;
-    height: 40px;
-    background: #fff;
-    image-rendering: pixelated;
-    animation: moveClouds linear infinite;
-    z-index: 1;
-    pointer-events: none;
-}
-
-
-.cloud::before { width: 40px; height: 40px; left: -20px; top: 10px; }
-.cloud::after  { width: 50px; height: 50px; right: -25px; top: 0; }
-
-@keyframes moveClouds {
-    from { left: -150px; }
-    to   { left: 110%; }
-}
-
-.sky {
-    position: relative;
-    height: 90px;            /* 👈 visible sky area */
-    overflow: hidden;
-    z-index: 1;
-}
-
-/* ================= SNOW ================= */
-.snow {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-}
-.snow span {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: white;
-    animation: fall linear infinite;
-}
-@keyframes fall {
-    to { transform: translateY(110vh); }
-}
-
-/* ================= GROUND ================= */
-.ground {
-    position: relative;     /* 👈 was fixed */
-    width: 100%;
-    height: 80px;
-    background: #8b5a2b;
-    margin-top: 40px;       /* space above ground */
-}
-
-/* ================= CARD ================= */
-.container {
-    display: flex;
-    justify-content: center;
-    margin: 12px 0;          /* 👈 small gap between containers */
-    position: relative;
-    z-index: 5;
-}
-
-.card {
-    background: #111;
-    color: #fff;
-    padding: 24px;
-    width: 100%;
-    max-width: 420px;
-    text-align: center;
-    border: 4px solid #fff;
-    box-shadow: 8px 8px #000;
-}
-
-button {
-    width: 100%;
-    margin-top: 10px;
-    padding: 12px;
-    font-family: monospace;
-    font-size: 16px;
-    background: #f4c430;
-    border: 3px solid #000;
-    cursor: pointer;
-}
-
-button:disabled {
-    opacity: 0.5;
-}
-
-.status, .wallet, .supply {
-    font-size: 13px;
-    margin-top: 8px;
-    word-break: break-word;
-}
-/* ================= STATUS COLORS ================= */
-.status {
-    color: #9af5c4; /* mint green default */
-}
-
-.status.approving {
-    color: #7fffd4; /* light aqua */
-}
-
-.status.minting {
-    color: #5cff9d; /* bright mint */
-}
-
-.status.success {
-    color: #00ff99; /* strong mint green */
-}
-
-.status.error {
-    color: #ff6b6b; /* red */
-}
-
-
-
-
-/* ================= MODAL ================= */
-.modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.7);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background: #111;
-    border: 4px solid #fff;
-    padding: 20px;
-    position: relative;
-    max-width: 340px;
-    text-align: center;
-}
-
-.close {
-    position: absolute;
-    top: -12px;
-    right: -12px;
-    background: red;
-    color: white;
-    border: 3px solid #000;
-    cursor: pointer;
-    padding: 4px 8px;
-}
-
-.mint-text {
-    font-size: 16px;
-    line-height: 1.4;
-    font-weight: bold;
-    color: #f4c430;
-}
-
-.tokenid {
-    margin-top: 10px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #f4c430;
-}
-
-/* ================= FOOTER ================= */
-.footer {
-    position: absolute;
-    bottom: 0;            /* 👈 bottom of the ground */
-    width: 100%;
-    text-align: center;
-    font-family: monospace;
-    font-size: 12px;
-    color: #000;
-}
-
-.footer a {
-    color: #0000EE;
-    font-weight: bold;
-    text-decoration: underline;
-}
-
-.footer a:hover {
-    color: #FF8C00;
-}
-
-.footer p {
-    margin: 4px 0;
-}
-
-
-</style>
+<link rel="stylesheet" href="mint.css">
+<script src="ethers.umd.min.js"></script>
+<script src="mint.js" defer></script>
 </head>
 
 <body>
 
-<!-- Clouds -->
-<div class="sky">
-    <div class="cloud" style="animation-duration:60s;"></div>
-    <div class="cloud" style="animation-duration:45s; top:50px;"></div>
-</div>
-<!-- Snow -->
-<div class="snow" id="snow"></div>
+<div class="sun"></div>
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
 
-<div class="container">
-    <div class="card">
-        <h1>YAMAINU NFT</h1>
-        <p>Mint by burning <b>2,000 <span style="color:#FF8C00;"> $YAMI</span></b></p>
+<div class="ui">
 
-        <div class="supply" id="supply">Minted: -- / 5000</div>
+  <!-- HEADER -->
+  <div class="title-wrapper">
+    <img src="logo.svg" class="title-logo">
+    <h1>MINT YAMADOGS</h1>
+  </div>
 
-        <button id="connectBtn">Connect Wallet</button>
-        <button id="mintBtn" disabled>Mint YAMAINU</button>
+  <!-- WARNING -->
+  <div class="security-warning">
+    ⚠️ Always verify the contract address and website URL.<br><br>
+    Make sure you are on the correct website and connected to <b>Sepolia Network</b>.
+  </div>
 
-        <div class="wallet" id="wallet"></div>
-        <div class="status" id="status"></div>
-        </div>
-        </div>
-     <div class="container">
-    <div class="card">
-       <p> <b>Make sure that you are connected to <span style="color:#87CEEB;">BASE Chain Network</span>!
-         </b></p>
-       <p> Make sure that you are connected to the correct YAMAINU Website link! <span style="color:#87CEEB;">https://yamadogs.github.io</span>!
-         </p>
-         <p>Make sure that your wallet is loaded with <b><span style="color:#FF8C00;">Yami Inu</span></b> token! Because to mint 1 YAMAINU NFT will cost 2000<b><span style="color:#FF8C00;"> $YAMI</span></b> tokens</p>
-        <p>Don't have <b><span style="color:#FF8C00;">$YAMI</span></b>? Get <b><a href="https://pancakeswap.com">here</a></b>.</p>
-         <p>Trade and check your YAMAINU NFTs here <b><a href="https://testnet.rarible.com/collection/0x459e6b0dd01b1e698dd2a0c954a4bbf253953663/items">Opensea</a></b></p>
-         
-      <p><b>📱MOBILE USERS:</b>If connect wallet button don't work on you.. Just copy the website link and open it onto the built in browser of your wallet like Metamask </p>
-      <p><span style="color:#5CFF9D;">https://yamadogs.github.io</span></p>
-         
+  <!-- COPY LINKS -->
+  <div class="copy-box">
+    <b>Tap to copy official links:</b><br><br>
+    <div class="copy-link" data-copy="https://yamadogs.org">https://yamadogs.org</div><br>
+    <div class="copy-link" data-copy="https://yamadogs.github.io">https://yamadogs.github.io</div><br><br>
+    <b>Copy contract address:</b><br>
+    <div class="copy-link" id="contractCopy"></div>
+  </div>
+
+  <!-- SUPPLY -->
+  <div class="card">
+    <h3>MINT STATUS</h3>
+    <p class="nft-supply">
+      <span id="minted">—</span> / 2026
+    </p>
+  </div>
+
+  <!-- NETWORK -->
+  <div class="network-box">
+    <img src="logo.svg" alt="Sepolia">
+    <span>Sepolia Chain</span>
+  </div>
+
+  <!-- ACTIONS -->
+  <button id="connectBtn">CONNECT WALLET</button>
+  <button id="mintBtn" disabled>MINT YAMADOGS</button>
+
+  <!-- STATUS -->
+  <div class="status-box" id="statusBox"></div>
+
+  <!-- SUCCESS MODAL -->
+  <div class="modal" id="successModal">
+    <div class="modal-box">
+      <button class="close-btn" id="closeModal">✕</button>
+      <h3>🎉 CONGRATULATIONS!</h3>
+      <p>You’ve just minted your <b>YAMADOGS NFT</b> successfully!</p>
     </div>
+  </div>
+
 </div>
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-    <div class="modal-content">
-        <div class="close" onclick="closeModal()">X</div>
-        <div class="mint-text">
-            CONGRATS! YOU'VE JUST BURNED 2000 $YAMI TOKENS!🔥🔥 AND GIVE BIRTH TO THE DOG OF THE PAST! "YAMAINU NFT"!
-        </div>
-        <div class="tokenid" id="tokenIdText"></div>
-    </div>
+<!-- FOOTER -->
+<div class="site-footer">
+  © 2025 YAMADOGS — MIT License<br>
+  This website is open-source and permissionless.<br>
+  <button id="viewSourceBtn">VIEW SOURCE CODE</button>
 </div>
 
-
-<div class="ground">
-    <footer class="footer">
-        <p>Did you know that YAMADOG is a fully Open-source? both Frontend & Backend? </p>
-        <p>
-            <a href="https://github.com/YAMADOGS/yamadogs.github.io" target="_blank" rel="noopener noreferrer">
-                SOURCE CODE
-            </a>
-        </p>
-        <p class="copyright">
-            © 2025 YAMAINU. Open-source under the MIT License.
-        </p>
-    </footer>
-</div>
-
-
-<script>
-/* ================= CONFIG ================= */
-const CHAIN_ID = "0xaa36a7"; // Sepolia
-const NFT_ADDRESS  = "0x459E6b0dD01B1e698DD2a0c954A4BBF253953663";
-const ERC20_ADDRESS = "0xc9F6Ea476EBA9d82cdF88fE830642C0131bfA4c3";
-const PRICE = ethers.utils.parseUnits("2000", 18);
-
-/* ================= ABI ================= */
-const ERC20_ABI = [
-  "function balanceOf(address) view returns(uint256)",
-  "function allowance(address,address) view returns(uint256)",
-  "function approve(address,uint256) returns(bool)"
-];
-
-const NFT_ABI = [
-  "function mint()",
-  "function totalSupply() view returns(uint256)",
-  "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
-];
-
-
-let provider, signer, user, erc20, nft;
-
-/* ================= UI ================= */
-const connectBtn = document.getElementById("connectBtn");
-const mintBtn = document.getElementById("mintBtn");
-const statusEl = document.getElementById("status");
-const walletEl = document.getElementById("wallet");
-const supplyEl = document.getElementById("supply");
-const modal = document.getElementById("modal");
-const tokenIdText = document.getElementById("tokenIdText");
-
-/* ================= FUNCTIONS ================= */
-function setStatus(msg, type = "default") {
-    statusEl.textContent = msg;
-    statusEl.className = "status"; // reset previous color
-    if (type !== "default") {
-        statusEl.classList.add(type);
-    }
-}
-
-
-async function connect() {
-    await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: CHAIN_ID }]
-    });
-
-    provider = new ethers.providers.Web3Provider(window.ethereum);
-    signer = provider.getSigner();
-    user = (await provider.send("eth_requestAccounts", []))[0];
-
-    erc20 = new ethers.Contract(ERC20_ADDRESS, ERC20_ABI, signer);
-    nft = new ethers.Contract(NFT_ADDRESS, NFT_ABI, signer);
-
-    walletEl.textContent = user;
-    connectBtn.disabled = true;
-    mintBtn.disabled = false;
-
-    loadSupply();
-    setStatus("Wallet connected", "success");
-
-}
-
-async function loadSupply() {
-    const minted = await nft.totalSupply();
-    supplyEl.textContent = `Minted: ${minted} / 5000`;
-}
-
-async function mint() {
-    try {
-        mintBtn.disabled = true;
-
-        setStatus("Checking allowance...", "approving");
-
-        const allowance = await erc20.allowance(user, NFT_ADDRESS);
-        if (allowance.lt(PRICE)) {
-            setStatus("Approving $YAMI token...", "approving");
-
-            await (await erc20.approve(NFT_ADDRESS, PRICE)).wait();
-        }
-
-        setStatus("Minting YAMAINU NFT...", "minting");
-
-        const tx = await nft.mint();
-        const receipt = await tx.wait();
-
-        const event = receipt.events.find(e => e.event === "Transfer");
-        const tokenId = event.args.tokenId;
-
-        tokenIdText.textContent = "Token ID: #" + tokenId.toString();
-        modal.style.display = "flex";
-
-        loadSupply();
-        setStatus("Mint successful!", "success");
-
-    } catch (e) {
-        setStatus(e.message || "Transaction failed", "error");
-
-    } finally {
-        mintBtn.disabled = false;
-    }
-}
-
-function closeModal() {
-    modal.style.display = "none";
-}
-
-/* ================= EVENTS ================= */
-connectBtn.onclick = connect;
-mintBtn.onclick = mint;
-
-/* ================= SNOW GEN ================= */
-const snow = document.getElementById("snow");
-for (let i = 0; i < 60; i++) {
-    const s = document.createElement("span");
-    s.style.left = Math.random() * 100 + "%";
-    s.style.animationDuration = 5 + Math.random() * 5 + "s";
-    s.style.animationDelay = Math.random() * 5 + "s";
-    snow.appendChild(s);
-}
-</script>
-
+<div class="copy-toast" id="toast">Copied!</div>
 
 </body>
 </html>
