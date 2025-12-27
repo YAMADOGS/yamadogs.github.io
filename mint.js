@@ -1,152 +1,108 @@
 document.addEventListener("DOMContentLoaded", () => {
-
+  // ---------------- CONFIG ----------------
   const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
-  const CONTRACT = "0x715B3f16ec032aA81f4FE0828E913689295ea7Cc";
+  const CONTRACT_ADDRESS = "0x715B3f16ec032aA81f4FE0828E913689295ea7Cc";
   const ABI = [
     "function mint() payable",
-    "function totalSupply() view returns(uint256)"
+    "function totalSupply() view returns (uint256)"
   ];
 
-  const mintedEl = document.getElementById("minted");
+  // ---------------- ELEMENTS ----------------
   const connectBtn = document.getElementById("connectBtn");
   const mintBtn = document.getElementById("mintBtn");
   const statusBox = document.getElementById("statusBox");
-  const modal = document.getElementById("successModal");
+  const mintedEl = document.getElementById("minted");
+  const successModal = document.getElementById("successModal");
+  const closeModal = document.getElementById("closeModal");
+  const contractCopy = document.getElementById("contractCopy");
+  const toast = document.getElementById("toast");
+  const copyLinks = document.querySelectorAll(".copy-link");
 
-  let provider, signer, contract;
+  // Show contract address
+  contractCopy.textContent = CONTRACT_ADDRESS;
 
-  // -------------------------------
-  // Toast notification
-  // -------------------------------
-  function showToast(msg) {
-    const t = document.getElementById("toast");
-    if (!t) return;
-    t.innerText = msg;
-    t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 2000);
+  // ---------------- HELPERS ----------------
+  function showStatus(msg) {
+    statusBox.textContent = msg;
   }
 
-  // -------------------------------
-  // Clipboard copy with fallback
-  // -------------------------------
-  function copyText(text) {
-    if (navigator.clipboard && window.isSecureContext) {
-      // Modern API
-      navigator.clipboard.writeText(text).then(() => showToast("Copied!"))
-        .catch(() => fallbackCopy(text));
-    } else {
-      fallbackCopy(text);
-    }
+  function showToast(msg = "Copied!") {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2000);
   }
 
-  function fallbackCopy(text) {
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.style.position = "fixed";
-    textarea.style.top = "-9999px";
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-    try {
-      document.execCommand("copy");
-      showToast("Copied!");
-    } catch {
-      alert("Copy failed. Please copy manually: " + text);
-    }
-    textarea.remove();
-  }
-
-  // -------------------------------
-  // Load current supply
-  // -------------------------------
-  async function loadSupply() {
-    try {
-      const tempProvider = new ethers.providers.JsonRpcProvider(RPC_URL);
-      const tempContract = new ethers.Contract(CONTRACT, ABI, tempProvider);
-      const supply = await tempContract.totalSupply();
-      mintedEl.innerText = supply.toString();
-    } catch (e) {
-      mintedEl.innerText = "—";
-      console.warn("Failed to load supply:", e);
-    }
-  }
-
-  // -------------------------------
-  // Update status box
-  // -------------------------------
-  function setStatus(msg) {
-    statusBox.innerText = msg;
-  }
-
-  // -------------------------------
-  // Connect wallet
-  // -------------------------------
-  connectBtn.onclick = async () => {
-    if (!window.ethereum) return setStatus("No wallet detected");
-
-    try {
-      provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      signer = provider.getSigner();
-      contract = new ethers.Contract(CONTRACT, ABI, signer);
-
-      const addr = await signer.getAddress();
-      setStatus("Wallet connected:\n" + addr);
-      connectBtn.disabled = true;
-      mintBtn.disabled = false;
-    } catch (e) {
-      setStatus("Connection failed");
-      console.warn("Wallet connect error:", e);
-    }
-  };
-
-  // -------------------------------
-  // Mint NFT
-  // -------------------------------
-  mintBtn.onclick = async () => {
-    if (!contract) return setStatus("Wallet not connected");
-
-    try {
-      setStatus("Minting...");
-      const tx = await contract.mint({ value: ethers.utils.parseEther("0.0005") });
-      await tx.wait();
-      setStatus("Mint successful!");
-      modal.style.display = "flex";
-      loadSupply();
-    } catch (e) {
-      setStatus("Mint failed or rejected");
-      console.warn("Mint error:", e);
-    }
-  };
-
-  // -------------------------------
-  // Close modal
-  // -------------------------------
-  document.getElementById("closeModal").onclick = () => {
-    modal.style.display = "none";
-  };
-
-  // -------------------------------
-  // View source
-  // -------------------------------
-  document.getElementById("viewSourceBtn").onclick = () => {
-    window.open("https://yamadogs.github.io", "_blank", "noopener");
-  };
-
-  // -------------------------------
-  // Copy links and contract
-  // -------------------------------
-  document.querySelectorAll(".copy-link").forEach(el => {
-    el.onclick = () => copyText(el.dataset.copy || CONTRACT);
+  // ---------------- COPY FUNCTION ----------------
+  copyLinks.forEach(el => {
+    el.addEventListener("click", () => {
+      navigator.clipboard.writeText(el.dataset.copy || el.textContent)
+        .then(() => showToast())
+        .catch(() => showToast("Copy failed"));
+    });
   });
 
-  const contractEl = document.getElementById("contractCopy");
-  contractEl.innerText = CONTRACT;
-  contractEl.dataset.copy = CONTRACT;
+  // ---------------- WALLET & CONTRACT ----------------
+  let provider, signer, contract;
 
-  // -------------------------------
-  // Initial load
-  // -------------------------------
-  loadSupply();
+  async function connectWallet() {
+    if (!window.ethereum) {
+      showStatus("⚠️ MetaMask not detected!");
+      return;
+    }
+    try {
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      signer = provider.getSigner();
+      contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+      showStatus("✅ Wallet connected!");
+      connectBtn.textContent = "WALLET CONNECTED";
+      mintBtn.disabled = false;
+      updateSupply();
+    } catch (err) {
+      console.error(err);
+      showStatus("❌ Connection failed");
+    }
+  }
 
+  async function updateSupply() {
+    try {
+      const total = await contract.totalSupply();
+      mintedEl.textContent = total.toString();
+    } catch (err) {
+      console.error(err);
+      mintedEl.textContent = "—";
+    }
+  }
+
+  async function mintNFT() {
+    if (!contract) {
+      showStatus("⚠️ Wallet not connected!");
+      return;
+    }
+    try {
+      showStatus("⏳ Minting...");
+      const tx = await contract.mint({ value: ethers.utils.parseEther("0.01") }); // adjust price if needed
+      await tx.wait();
+      showStatus("✅ Mint successful!");
+      successModal.style.display = "block";
+      updateSupply();
+    } catch (err) {
+      console.error(err);
+      showStatus("❌ Mint failed: " + (err.message || err));
+    }
+  }
+
+  // ---------------- EVENT LISTENERS ----------------
+  connectBtn.addEventListener("click", connectWallet);
+  mintBtn.addEventListener("click", mintNFT);
+  closeModal.addEventListener("click", () => {
+    successModal.style.display = "none";
+  });
+  window.addEventListener("click", (e) => {
+    if (e.target === successModal) successModal.style.display = "none";
+  });
+
+  // ---------------- INITIALIZATION ----------------
+  // Populate contract copy
+  contractCopy.textContent = CONTRACT_ADDRESS;
 });
