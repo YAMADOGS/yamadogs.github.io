@@ -2,97 +2,45 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
-<meta http-equiv="Content-Security-Policy" content="
-default-src 'self';
-script-src 'self';
-style-src 'self';
-img-src 'self';
-connect-src 'self' https://ethereum-sepolia-rpc.publicnode.com;
-frame-ancestors 'none';
-base-uri 'none';
-object-src 'none';
-form-action 'none';
-frame-src 'none';
-">
-
-<title>Mint YAMADOGS</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YAMADOGS Minting</title>
 <link rel="stylesheet" href="mint.css">
-<script src="ethers.umd.min.js"></script>
-<script src="mint.js" defer></script>
 </head>
-
 <body>
 
-<div class="sun"></div>
-<div class="cloud c1"></div>
-<div class="cloud c2"></div>
-
-<div class="ui">
-
-  <!-- HEADER -->
-  <div class="title-wrapper">
-    <img src="logo.svg" class="title-logo">
-    <h1>MINT YAMADOGS</h1>
-  </div>
-
-  <!-- WARNING -->
-  <div class="security-warning">
-    ⚠️ Always verify the contract address and website URL.<br><br>
-    Make sure you are on the correct website and connected to <b>Sepolia Network</b>.
-  </div>
-
-  <!-- COPY LINKS -->
-  <div class="copy-box">
-    <b>Tap to copy official links:</b><br><br>
-    <div class="copy-link" data-copy="https://yamadogs.org">https://yamadogs.org</div><br>
-    <div class="copy-link" data-copy="https://yamadogs.github.io">https://yamadogs.github.io</div><br><br>
-    <b>Copy contract address:</b><br>
-    <div class="copy-link" id="contractCopy"></div>
-  </div>
-
-  <!-- SUPPLY -->
-  <div class="card">
-    <h3>MINT STATUS</h3>
-    <p class="nft-supply">
-      <span id="minted">—</span> / 2026
-    </p>
-  </div>
-
-  <!-- NETWORK -->
-  <div class="network-box">
-    <img src="logo.svg" alt="Sepolia">
-    <span>Sepolia Chain</span>
-  </div>
-
-  <!-- ACTIONS -->
-  <button id="connectBtn">CONNECT WALLET</button>
-  <button id="mintBtn" disabled>MINT YAMADOGS</button>
-
-  <!-- STATUS -->
-  <div class="status-box" id="statusBox"></div>
-
-  <!-- SUCCESS MODAL -->
-  <div class="modal" id="successModal">
-    <div class="modal-box">
-      <button class="close-btn" id="closeModal">✕</button>
-      <h3>🎉 CONGRATULATIONS!</h3>
-      <p>You’ve just minted your <b>YAMADOGS NFT</b> successfully!</p>
-    </div>
-  </div>
-
+<div class="title-wrapper">
+  <img src="logo.svg" alt="YAMADOGS Logo" class="title-logo">
+  <h1>YAMADOGS Minting</h1>
 </div>
 
-<!-- FOOTER -->
+<div class="security-warning">
+  ⚠️ Users must verify they are interacting with the correct YAMADOGS website and contract address.
+</div>
+
+<div class="contract-wrapper">
+  <div class="contract-label">Official Website:</div>
+  <div class="contract-address" onclick="copyToClipboard('https://yamadogs.org')">https://yamadogs.org</div>
+  <div class="contract-label">Contract Address:</div>
+  <div class="contract-address" onclick="copyToClipboard('0x715B3f16ec032aA81f4FE0828E913689295ea7Cc')">0x715B3f16ec032aA81f4FE0828E913689295ea7Cc</div>
+</div>
+
+<div class="card">
+  <div class="nft-supply" id="mintCounter">Minted: 0 / 2026</div>
+  <div style="margin:12px 0;">
+    <img src="sepolia_logo.svg" alt="Sepolia Logo" style="height:40px;vertical-align:middle;margin-right:8px;">
+    Sepolia Chain
+  </div>
+  <button id="connectBtn">Connect Wallet</button>
+  <div id="walletAddress" style="margin-top:6px;font-size:10px;"></div>
+  <button id="mintBtn" disabled>Mint</button>
+  <div id="mintStatus" style="margin-top:12px;font-size:10px;"></div>
+</div>
+
 <div class="site-footer">
-  © 2025 YAMADOGS — MIT License<br>
-  This website is open-source and permissionless.<br>
-  <button id="viewSourceBtn">VIEW SOURCE CODE</button>
+  &copy; 2025 YAMADOGS | <button onclick="window.open('https://github.com','_blank')">View Source Code</button>
 </div>
 
-<div class="copy-toast" id="toast">Copied!</div>
-
+<script src="ethers.umd.min.js"></script>
+<script src="mint.js"></script>
 </body>
 </html>
