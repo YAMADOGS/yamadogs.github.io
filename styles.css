@@ -1,0 +1,294 @@
+
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('PressStart2P-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+html,body{width:100%;overflow-x:hidden;margin:0;padding:0;}
+*{box-sizing:border-box}
+
+body{
+  font-family:'Press Start 2P', monospace;
+  margin:0;padding:16px;padding-top:120px;
+  text-align:center;min-height:100vh;
+  image-rendering:pixelated;
+  background:
+    linear-gradient(#fff 0 0) bottom / 100% 22% no-repeat,
+    repeating-linear-gradient(90deg,#6bbf8e 0 14px,#5cab82 14px 28px)
+      bottom / 100% 34% no-repeat,
+    linear-gradient(135deg,#c6ccd3 25%,transparent 25%)
+      bottom left / 40% 46% no-repeat,
+    linear-gradient(225deg,#d6dde3 25%,transparent 25%)
+      bottom right / 40% 46% no-repeat,
+    linear-gradient(to bottom,#8fd3ff,#cfe9ff,#f4fbff);
+}
+
+/* DECOR */
+.sun{position:fixed;top:24px;right:24px;width:64px;height:64px;background:#ffd166;box-shadow:inset -6px -6px 0 #ffb703}
+.cloud{position:fixed;top:70px;width:120px;height:32px;background:#fff;
+box-shadow:24px 0 #fff,48px 0 #fff,12px -16px #fff,36px -16px #fff;
+animation:cloudMove linear infinite}
+.cloud.c1{animation-duration:60s}
+.cloud.c2{top:120px;animation-duration:90s;opacity:.8}
+@keyframes cloudMove{from{left:-200px}to{left:110%}}
+
+.ui{position:relative;z-index:2}
+h1{color:#ffb703;text-shadow:3px 3px 0 #000}
+
+/* HEADER */
+.title-wrapper{
+  position:fixed;top:0;left:0;right:0;
+  display:flex;align-items:center;gap:10px;
+  padding:10px 7px;background:#8ecae6;
+  border:7px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+  z-index:9999;
+}
+.title-logo{height:5em}
+
+/* WARNING */
+.security-warning{
+  margin:12px auto;padding:10px 14px;
+  max-width:520px;font-size:10px;
+  background:#e6d3a3;color:#000;
+  border:3px solid #000;
+  box-shadow:3px 3px 0 #000;
+}
+
+/* CONTRACT INFO CENTERED */
+.contract-wrapper{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  margin:8px auto;
+  padding:0 10px;
+  max-width:100%;
+  overflow-wrap: break-word;
+}
+.contract-label{
+  font-size:10px;
+  margin-bottom:4px;
+}
+.contract-address{
+  display:inline-block;
+  padding:6px 10px;
+  background:#e6d3a3;
+  cursor:pointer;
+  box-shadow:3px 3px 0 #000;
+  border:3px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 3;
+  font-size:10px;
+  text-align:center;
+  word-break: break-all;
+  max-width:100%;
+}
+
+/* CARD */
+.card{
+  background:#111;color:#fff;
+  padding:18px;max-width:420px;margin:12px auto;
+  box-shadow:8px 8px 0 #555;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+.nft-supply{color:#4fc3ff}
+
+/* NFT IMAGE CONTAINER - ADDED */
+.nft-container{
+  max-width:420px;
+  margin:12px auto;
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px;
+  padding:12px;
+  background:#111;
+  box-shadow:8px 8px 0 #555;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+.nft-container img{
+  width:90px;
+  height:90px;
+  object-fit:contain;
+  border:3px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 3;
+}
+.nft-container img{
+  cursor:pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Desktop hover */
+@media (hover: hover) {
+  .nft-container img:hover{
+    transform: scale(2.5);
+    z-index: 20;
+    box-shadow: 6px 6px 0 #000;
+  }
+}
+
+/* Mobile tap (active state) */
+.nft-container img.active{
+  transform: scale(2.5);
+  z-index: 20;
+  box-shadow: 6px 6px 0 #000;
+}
+
+
+/* BUTTONS */
+button{
+  font-family:inherit;font-size:10px;
+  padding:14px 18px;margin:8px;
+  background:#ffb703;cursor:pointer;
+  box-shadow:4px 4px 0 #000;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+button:hover{background:#ffd166}
+#mintBtn{background:#6fdcff}
+#mintBtn:hover{background:#8be6ff}
+
+/* COPY BOX */
+.copy-box{
+  background:#fff;padding:14px;
+  max-width:420px;margin:16px auto;
+  box-shadow:6px 6px 0 #000;
+  font-size:10px;line-height:1.7;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+.copy-link{
+  display:inline-block;margin-top:8px;
+  padding:6px 10px;background:#e6d3a3;
+  cursor:pointer;box-shadow:3px 3px 0 #000;
+  border:3px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 3;
+}
+
+/* COPY POPUP */
+.copy-toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%);
+  background:#e6d3a3;color:#000;
+  padding:10px 14px;font-size:10px;
+  border:3px solid #000;
+  box-shadow:4px 4px 0 #000;
+  opacity:0;pointer-events:none;
+  transition:.3s;z-index:9999;
+}
+.copy-toast.show{opacity:1}
+
+/* DESCRIPTION */
+.description{max-width:620px;margin:30px auto}
+.description p{
+  background:#fff;padding:14px;margin-bottom:14px;
+  box-shadow:6px 6px 0 #000;
+  font-size:10px;line-height:1.7;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+
+@media(max-width:480px){
+  button{display:block;width:100%;max-width:300px;margin:10px auto}
+  .nft-container img{width:70px;height:70px}
+}
+
+/* FAQ */
+.faq-wrapper{
+  max-width:620px;
+  margin:24px auto;
+}
+
+.faq-item{
+  background:#fff;
+  margin-bottom:14px;
+  box-shadow:6px 6px 0 #000;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+
+.faq-question{
+  padding:14px;
+  font-size:10px;
+  cursor:pointer;
+  background:#e6d3a3;
+  user-select:none;
+}
+
+.faq-answer{
+  padding:14px;
+  font-size:10px;
+  line-height:1.7;
+  display:none;
+  background:#fff;
+  border-top:3px solid #000;
+}
+
+.faq-item.active .faq-answer{
+  display:block;
+}
+
+.social-footer{
+  max-width:420px;
+  margin:40px auto 24px;
+  padding:14px;
+  display:flex;
+  justify-content:center;
+  gap:16px;
+  background:#111;
+  box-shadow:8px 8px 0 #555;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+
+.social-link{
+  width:56px;
+  height:56px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#e6d3a3;
+  box-shadow:4px 4px 0 #000;
+  border:3px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 3;
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+
+.social-link:hover{
+  transform:translate(-2px,-2px);
+  box-shadow:6px 6px 0 #000;
+}
+
+.social-link img{
+  width:40px;
+  height:40px;
+  image-rendering:pixelated;
+  filter: invert(1); /* makes icons dark */
+}
+
+/* COPYRIGHT + SOURCE */
+.site-footer{
+  max-width:420px;
+  margin:20px auto 40px;
+  padding:14px;
+  background:#fff;
+  box-shadow:6px 6px 0 #000;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+  font-size:9px;
+  line-height:1.6;
+}
+
+.site-footer button{
+  margin-top:10px;
+  padding:10px 14px;
+  font-size:9px;
+}
+
+
