@@ -1,108 +1,85 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // ---------------- CONFIG ----------------
   const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
   const CONTRACT_ADDRESS = "0x715B3f16ec032aA81f4FE0828E913689295ea7Cc";
-  const ABI = [
-    "function mint() payable",
-    "function totalSupply() view returns (uint256)"
-  ];
+  const ABI = [{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"MAX_SUPPLY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MINT_PRICE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"TREASURY","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"id","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"mint","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"id","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"pure","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"id","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"}];
 
-  // ---------------- ELEMENTS ----------------
   const connectBtn = document.getElementById("connectBtn");
   const mintBtn = document.getElementById("mintBtn");
-  const statusBox = document.getElementById("statusBox");
-  const mintedEl = document.getElementById("minted");
-  const successModal = document.getElementById("successModal");
-  const closeModal = document.getElementById("closeModal");
-  const contractCopy = document.getElementById("contractCopy");
-  const toast = document.getElementById("toast");
-  const copyLinks = document.querySelectorAll(".copy-link");
+  const walletAddressEl = document.getElementById("walletAddress");
+  const mintStatusEl = document.getElementById("mintStatus");
+  const mintCounterEl = document.getElementById("mintCounter");
 
-  // Show contract address
-  contractCopy.textContent = CONTRACT_ADDRESS;
+  let provider;
+  let signer;
+  let contract;
 
-  // ---------------- HELPERS ----------------
-  function showStatus(msg) {
-    statusBox.textContent = msg;
+  async function updateMintCounter() {
+    try {
+      const total = await contract.totalSupply();
+      mintCounterEl.textContent = `Minted: ${total} / 2026`;
+    } catch (err) {
+      console.error(err);
+    }
   }
-
-  function showToast(msg = "Copied!") {
-    toast.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2000);
-  }
-
-  // ---------------- COPY FUNCTION ----------------
-  copyLinks.forEach(el => {
-    el.addEventListener("click", () => {
-      navigator.clipboard.writeText(el.dataset.copy || el.textContent)
-        .then(() => showToast())
-        .catch(() => showToast("Copy failed"));
-    });
-  });
-
-  // ---------------- WALLET & CONTRACT ----------------
-  let provider, signer, contract;
 
   async function connectWallet() {
     if (!window.ethereum) {
-      showStatus("⚠️ MetaMask not detected!");
+      alert("Please install MetaMask or another wallet!");
       return;
     }
+
     try {
+      mintStatusEl.textContent = "Connecting wallet...";
+      
+      // Request accounts
       await window.ethereum.request({ method: "eth_requestAccounts" });
+      
+      // Initialize provider & signer using UMD ethers
       provider = new ethers.providers.Web3Provider(window.ethereum);
       signer = provider.getSigner();
-      contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-      showStatus("✅ Wallet connected!");
-      connectBtn.textContent = "WALLET CONNECTED";
-      mintBtn.disabled = false;
-      updateSupply();
-    } catch (err) {
-      console.error(err);
-      showStatus("❌ Connection failed");
-    }
-  }
+      const address = await signer.getAddress();
+      walletAddressEl.textContent = `Wallet: ${address}`;
 
-  async function updateSupply() {
-    try {
-      const total = await contract.totalSupply();
-      mintedEl.textContent = total.toString();
+      // Connect to contract
+      contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+      // Disable connect button and enable mint button
+      connectBtn.disabled = true;
+      mintBtn.disabled = false;
+      mintStatusEl.textContent = "Wallet connected";
+
+      // Update mint counter
+      updateMintCounter();
     } catch (err) {
       console.error(err);
-      mintedEl.textContent = "—";
+      mintStatusEl.textContent = "Connection failed";
     }
-  }
+}
+
 
   async function mintNFT() {
-    if (!contract) {
-      showStatus("⚠️ Wallet not connected!");
-      return;
-    }
+    if (!contract) return;
     try {
-      showStatus("⏳ Minting...");
-      const tx = await contract.mint({ value: ethers.utils.parseEther("0.01") }); // adjust price if needed
+      mintBtn.disabled = true;
+      mintStatusEl.textContent = "Minting...";
+      const tx = await contract.mint({ value: ethers.parseEther("0.0005") });
       await tx.wait();
-      showStatus("✅ Mint successful!");
-      successModal.style.display = "block";
-      updateSupply();
+      mintStatusEl.textContent = "Mint successful!";
+      updateMintCounter();
     } catch (err) {
       console.error(err);
-      showStatus("❌ Mint failed: " + (err.message || err));
+      mintStatusEl.textContent = "Mint failed";
+    } finally {
+      mintBtn.disabled = false;
     }
   }
 
-  // ---------------- EVENT LISTENERS ----------------
   connectBtn.addEventListener("click", connectWallet);
   mintBtn.addEventListener("click", mintNFT);
-  closeModal.addEventListener("click", () => {
-    successModal.style.display = "none";
-  });
-  window.addEventListener("click", (e) => {
-    if (e.target === successModal) successModal.style.display = "none";
-  });
 
-  // ---------------- INITIALIZATION ----------------
-  // Populate contract copy
-  contractCopy.textContent = CONTRACT_ADDRESS;
+  // Copy to clipboard function
+  window.copyToClipboard = function(text) {
+    navigator.clipboard.writeText(text);
+    alert("Copied: " + text);
+  };
 });
