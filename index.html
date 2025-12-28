@@ -2,87 +2,169 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src 'self';
-  style-src 'self';
-  img-src 'self';
-  connect-src 'self' https://ethereum-sepolia-rpc.publicnode.com;
-  object-src 'none';
-  frame-ancestors 'none';
-  base-uri 'self';
-  form-action 'self';
-  upgrade-insecure-requests;
+default-src 'self';
+script-src 'self';
+style-src 'self';
+img-src 'self' https://cdn.jsdelivr.net;
+connect-src 'self' https://ethereum-sepolia-rpc.publicnode.com;
+frame-ancestors 'none';
+base-uri 'none';
+object-src 'none';
+form-action 'none';
+frame-src 'none';   
 ">
-<title>YAMADOGS Minting</title>
+
+
+<title>YAMADOGS NFT</title>
+
 <link rel="stylesheet" href="styles.css">
+
+<script src="ethers.umd.min.js"></script>
+<script src="main.js"></script>
+
 </head>
+
 <body>
 
+<div class="sun"></div>
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+
+<div class="ui">
+
 <div class="title-wrapper">
-  <img src="logo.svg" alt="YAMADOGS Logo" class="title-logo">
-  <h1>YAMADOGS Minting</h1>
+  <img src="logo.svg" class="title-logo">
+  <h1>YAMADOGS</h1>
 </div>
 
 <div class="security-warning">
-  ⚠️ Woof! Heads up, pack!
-Don’t get tricked—always double-check that you’re on the official website and interacting with the legit YAMADOGS contract address.
+⚠️ <b>YAMADOGS is NOT financial advice!</b><br><br>
 
-<p>YAMADOGS is fully open-source—both front-end and back-end—making it super transparent… but also easier for sneaky pups to try some shady barks in the crypto space. Stay alert and keep your paws safe! 🐾</p></div>
+YAMADOGS was created purely for <b>fun</b> and as a tribute to the long-lost, legendary breed: <b>Yamainu</b>.<br><br>
+
+💥 <b>DO NOT MINT OR BUY</b> if you’re chasing quick profits or flipping opportunities!<br><br>
+
+This project was built by <b>me, solo</b>, over months, for true collectors — people who love dogs and respect the art of collecting.<br><br>
+
+💀 The risk of losing money here is real. If your only goal is profit, this is <b>NOT</b> for you.<br><br>
+
+🐶 If you simply love collecting, holding, and enjoying YAMADOGS — welcome aboard!<br><br>
+
+💡 Tip: Don’t buy or mint just to complain later. Serious collectors only. Keep your paws clean if it’s for flipping.
+</div>
+
+
+<div class="security-warning">
+⚠️ Always verify contract address.I will NEVER DM you links or ask for keys.
+This are Open-source: Website,Minting site and NFT contract. Check bottom page for refference.
+</div>
 
 <div class="contract-wrapper">
-  <div class="contract-label">Official Website:</div>
-  <div class="contract-address" id="websiteLink">https://yamadogs.org</div>
+  <span class="contract-label">TAP to copy Contract Address:</span>
+ <span class="contract-address">0x77CA6E72CdfA303E3Ee1065cd672DC73eB4EB88e</span>
+</div>
 
-  <div class="contract-label">Alternate Website:</div>
-  <div class="contract-address" id="altWebsiteLink">https://yamadogs.github.io</div>
-
-  <div class="contract-label">Contract Address:</div>
-  <div class="contract-address" id="contractLink">0x715B3f16ec032aA81f4FE0828E913689295ea7Cc</div>
-  </div>
+<p>Mint price: <b>0.0005 ETH (Base Chain))</b></p>
 
 <div class="card">
-  <div class="nft-supply" id="mintCounter">Minted: 0 / 2026</div>
-<div class="network-info">
-  <img src="baselogo.jpeg" alt="Network Logo" class="network-logo">
-  Base Chain
+  <h3>Fully On-chain</h3>
+  <h3>YAMADOGS NFT</h3>
+  <h3>MAX SUPPLY</h3>
+  <p class="nft-supply">
+    <span id="minted">Loading...</span> / 2026
+  </p>
 </div>
 
-  <button id="connectBtn">Connect Wallet</button>
-  <div id="walletAddress" style="margin-top:6px;font-size:10px;"></div>
-  <button id="mintBtn" disabled>Mint</button>
-  <div id="mintStatus" style="margin-top:12px;font-size:10px;"></div>
+<!-- NFT IMAGE CONTAINER -->
+<div class="nft-container">
+  <img src="nft1.svg" alt="NFT 1">
+  <img src="nft2.svg" alt="NFT 2">
+  <img src="nft3.svg" alt="NFT 3">
+  <img src="nft4.svg" alt="NFT 4">
+  <img src="nft5.svg" alt="NFT 4">
+  <img src="nft6.svg" alt="NFT 4">
+  <img src="nft7.svg" alt="NFT 4">
+  <img src="nft8.svg" alt="NFT 4">
 </div>
 
-<div class="site-footer">📱 MOBILE PUPS ALERT!
-If WalletConnect isn’t playing nice on your device, don’t panic—just copy the site link and open it directly inside your wallet’s built-in browser. Stay clever, stay paw-some! 🐾</div>
+<div class="copy-box">📱 
+For Mobile users if Wallet Connect dont Pop up after you click just Open the website link inside your wallet built-in browser: TAP to copy<br>
+<div class="copy-link">https://yamadogs.github.io</div>
+
+<button id="mintBtn">MINT YAMADOGS NFT</button>
 
 <div class="link-buttons">
-  <a href="/index.html" target="_blank" class="button-link">Go Home</a>
+  <button data-url="https://pancakeswap.com">Magic Eden</button>
+  <button data-url="https://testnet.rarible.com/collection/0x21b2512e025d00c3e3774c42561a0e98f4aca2cb">OPENSEA</button>
 </div>
 
 
+<div class="description">
+  <p>Images and metadata? Fully on-chain.
+Your YAMADOGS NFT lives entirely on the blockchain — no external storage, no IPFS, no central servers.
+Completely ownerless, admin-less… like a wild dog roaming free in the forest, owned by no one, keep by no one.</p>
+</div>
+
+</div>
+
+<div class="copy-toast" id="toast">Copied!</div>
+<p>FAQ</p>
+<div class="faq-wrapper">
+
+  <div class="faq-item">
+    <div class="faq-question">❓ What is YAMADOGS?</div>
+    <div class="faq-answer">
+      YAMADOGS is a fully on-chain NFT collection. Images and metadata live forever on the blockchain. No IPFS. No servers.
+    </div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-question">❓ Are the images really on-chain?</div>
+    <div class="faq-answer">
+      Yes. Every YAMADOG image is generated and stored directly on the blockchain. Nothing external. Nothing centralized.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-question">❓ Who controls the project?</div>
+    <div class="faq-answer">
+      Nobody. No admin keys. No ownership. Like a wild dog in the forest — free, untamed, and ownerless.
+    </div>
+  </div>
+
+</div>
+
+<!-- SOCIAL LINKS FOOTER -->
+<div class="social-footer">
+
+  <a class="social-link"
+     href="https://x.com/yamadogsnft?t=kxBAtJNzp2U-sXy9Pg-hbA&s=09"
+     target="_blank"
+     rel="noopener"
+     aria-label="X">
+    <img src="x.png" alt="X">
+  </a>
+
+  <a class="social-link"
+     href="https://telegram.com"
+     target="_blank"
+     rel="noopener"
+     aria-label="Telegram">
+    <img src="telegram.png" alt="Telegram">
+  </a>
+
+</div>
+<!-- COPYRIGHT + SOURCE CODE -->
 <div class="site-footer">
-  &copy; 2025 YAMADOGS | <<button id="viewSourceBtn">View Source Code</button>
+  © 2025 YAMADOGS — MIT License<br>
+  This website is open-source and permissionless.
+
+  <br>
+
+  <button id="viewSourceBtn">VIEW SOURCE CODE</button>
 </div>
 
-<div id="toastOverlay" class="toast-overlay"></div>
-<div id="mintToast" class="mint-toast">
-  <div class="mint-toast-header">
-    <span></span>
-    <button id="closeToast">✖</button>
-  </div>
-  <div class="mint-toast-body">
-    🎉 🎉 Woof! You did it!
-Your YAMADOG is minted and ready to strut in your wallet. 🐾💎
-Welcome to the pack—let the wag-worthy journeys begin! 🚀</strong>
-  </div>
-</div>
-
-<script src="ethers.umd.min.js"></script>
-<script src="confetti.min.js"></script>
-<script src="mint.js"></script>
 
 </body>
 </html>
