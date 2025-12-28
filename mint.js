@@ -22,43 +22,54 @@ document.addEventListener("DOMContentLoaded", () => {
   const mintStatusEl = document.getElementById("mintStatus");
   const mintCounterEl = document.getElementById("mintCounter");
 
-  // Toast notification
-  const toast = document.getElementById("mintToast");
-  const closeToast = document.getElementById("closeToast");
-
   /* =======================
-     ETHERS
+     COPY TO CLIPBOARD + TOAST
   ======================= */
-  let provider;
-  let signer;
-  let contract;
+  const copyToast = document.getElementById("mintToast");
+  const copyToastClose = document.getElementById("closeToast");
+  const toastOverlay = document.getElementById("toastOverlay");
 
-  /* =======================
-     TOAST FUNCTIONS
-  ======================= */
-  function showToast() {
-    toast.classList.add("show");
+  function showToast(msg) {
+    copyToast.querySelector(".mint-toast-body").textContent = msg;
+    copyToast.classList.add("show");
+    toastOverlay.classList.add("show");
+    setTimeout(hideToast, 1500);
   }
 
   function hideToast() {
-    toast.classList.remove("show");
+    copyToast.classList.remove("show");
+    toastOverlay.classList.remove("show");
   }
 
-  closeToast.addEventListener("click", hideToast);
+  copyToastClose.addEventListener("click", hideToast);
+  toastOverlay.addEventListener("click", hideToast);
 
-  /* =======================
-     COPY TO CLIPBOARD
-  ======================= */
-  window.copyToClipboard = function (text) {
-    navigator.clipboard.writeText(text);
-    alert("Copied: " + text);
-  };
+  // Copy functions
+  function copyContract() {
+    navigator.clipboard.writeText(CONTRACT_ADDRESS);
+    showToast("Contract address copied!");
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText("https://yamadogs.org");
+    showToast("Link copied!");
+  }
+
+  // Attach copy events
+  const contractEl = document.getElementById("contractLink");
+  if (contractEl) contractEl.addEventListener("click", copyContract);
+
+  const linkEl = document.getElementById("websiteLink");
+  if (linkEl) linkEl.addEventListener("click", copyLink);
 
   /* =======================
      UPDATE MINT COUNTER
   ======================= */
   async function updateMintCounter() {
     try {
+      if (!window.ethereum) return;
+      const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
       const total = await contract.totalSupply();
       mintCounterEl.textContent = `Minted: ${total} / ${MAX_SUPPLY}`;
     } catch (err) {
@@ -69,6 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =======================
      CONNECT WALLET
   ======================= */
+  let provider, signer, contract;
+
   async function connectWallet() {
     if (!window.ethereum) {
       alert("Please install MetaMask or a compatible wallet.");
@@ -118,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       mintStatusEl.textContent = "Mint successful!";
       updateMintCounter();
-      showToast();
+      showToast("🎉 Congratulations! You minted YAMADOGS!");
 
     } catch (err) {
       console.error("Mint error:", err);
