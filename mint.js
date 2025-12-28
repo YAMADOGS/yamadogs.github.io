@@ -14,9 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
   
 function launchConfetti() {
-if (document.querySelector(".confetti-canvas")) return;
+  if (document.querySelector(".confetti-canvas")) return;
 
   const canvas = document.createElement("canvas");
+  canvas.className = "confetti-canvas";
   canvas.style.position = "fixed";
   canvas.style.top = 0;
   canvas.style.left = 0;
@@ -30,26 +31,91 @@ if (document.querySelector(".confetti-canvas")) return;
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  const particles = Array.from({ length: 120 }, () => ({
+  const COLOR = "#ffb703";
+
+  const particles = Array.from({ length: 90 }, () => ({
     x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 6 + 2,
-    vx: (Math.random() - 0.5) * 6,
-    vy: Math.random() * -6,
-    life: 100
+    y: canvas.height + Math.random() * 200,
+    size: Math.random() * 6 + 6,
+    vx: (Math.random() - 0.5) * 3,
+    vy: -(Math.random() * 6 + 4),
+    rotation: Math.random() * Math.PI,
+    vr: (Math.random() - 0.5) * 0.08,
+    life: 130,
+    type: Math.random() < 0.6 ? "paw" : "bone" // 60% paws, 40% bones
   }));
+
+  function drawPaw(x, y, size, rotation) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+    ctx.fillStyle = COLOR;
+
+    // Main pad
+    ctx.beginPath();
+    ctx.arc(0, 0, size, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Toe pads
+    const toeOffset = size * 0.9;
+    const toeSize = size * 0.45;
+
+    [
+      [-toeOffset, -toeOffset],
+      [0, -toeOffset * 1.2],
+      [toeOffset, -toeOffset],
+      [-toeOffset * 0.6, -toeOffset * 1.6]
+    ].forEach(([tx, ty]) => {
+      ctx.beginPath();
+      ctx.arc(tx, ty, toeSize, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.restore();
+  }
+
+  function drawBone(x, y, size, rotation) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+    ctx.fillStyle = COLOR;
+
+    const r = size * 0.45;
+    const length = size * 2;
+
+    // Left nub
+    ctx.beginPath();
+    ctx.arc(-length / 2, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Right nub
+    ctx.beginPath();
+    ctx.arc(length / 2, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Center bar
+    ctx.beginPath();
+    ctx.rect(-length / 2, -r, length, r * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
 
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     particles.forEach(p => {
       p.x += p.vx;
       p.y += p.vy;
-      p.vy += 0.2;
+      p.vy += 0.18;
+      p.rotation += p.vr;
       p.life--;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = "#6fdcff";
-      ctx.fill();
+
+      if (p.type === "paw") {
+        drawPaw(p.x, p.y, p.size, p.rotation);
+      } else {
+        drawBone(p.x, p.y, p.size, p.rotation);
+      }
     });
 
     if (particles.some(p => p.life > 0)) {
