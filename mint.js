@@ -21,29 +21,36 @@ document.addEventListener("DOMContentLoaded", () => {
   const walletAddressEl = document.getElementById("walletAddress");
   const mintStatusEl = document.getElementById("mintStatus");
   const mintCounterEl = document.getElementById("mintCounter");
-
-  /* =======================
-     COPY TO CLIPBOARD + TOAST
-  ======================= */
   const copyToast = document.getElementById("mintToast");
   const copyToastClose = document.getElementById("closeToast");
   const toastOverlay = document.getElementById("toastOverlay");
+  const contractEl = document.getElementById("contractLink");
+  const linkEl = document.getElementById("websiteLink");
+  const viewSourceBtn = document.getElementById("viewSourceBtn");
 
+  /* =======================
+     TOAST FUNCTIONS
+  ======================= */
   function showToast(msg) {
-    copyToast.querySelector(".mint-toast-body").textContent = msg;
+    if (!copyToast || !toastOverlay) return;
+    const body = copyToast.querySelector(".mint-toast-body");
+    if (!body) return;
+    body.textContent = msg;
     copyToast.classList.add("show");
     toastOverlay.classList.add("show");
   }
 
   function hideToast() {
-    copyToast.classList.remove("show");
-    toastOverlay.classList.remove("show");
+    copyToast?.classList.remove("show");
+    toastOverlay?.classList.remove("show");
   }
 
-  copyToastClose.addEventListener("click", hideToast);
-  toastOverlay.addEventListener("click", hideToast);
+  copyToastClose?.addEventListener("click", hideToast);
+  toastOverlay?.addEventListener("click", hideToast);
 
-  // Copy functions
+  /* =======================
+     COPY FUNCTIONS
+  ======================= */
   function copyContract() {
     navigator.clipboard.writeText(CONTRACT_ADDRESS);
     showToast("Contract address copied!");
@@ -54,12 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
     showToast("Link copied!");
   }
 
-  // Attach copy events
-  const contractEl = document.getElementById("contractLink");
-  if (contractEl) contractEl.addEventListener("click", copyContract);
-
-  const linkEl = document.getElementById("websiteLink");
-  if (linkEl) linkEl.addEventListener("click", copyLink);
+  contractEl?.addEventListener("click", copyContract);
+  linkEl?.addEventListener("click", copyLink);
 
   /* =======================
      UPDATE MINT COUNTER
@@ -70,7 +73,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
       const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
       const total = await contract.totalSupply();
-      mintCounterEl.textContent = `Minted: ${total} / ${MAX_SUPPLY}`;
+      if (mintCounterEl) {
+        mintCounterEl.textContent = `Minted: ${total} / ${MAX_SUPPLY}`;
+      }
     } catch (err) {
       console.error("Counter error:", err);
     }
@@ -80,6 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
      WALLET STATUS UTILITY
   ======================= */
   function setMintStatus(msg, color = "#6fdcff") {
+    if (!mintStatusEl) return;
     mintStatusEl.textContent = msg;
     mintStatusEl.style.color = color;
   }
@@ -101,15 +107,22 @@ document.addEventListener("DOMContentLoaded", () => {
       await window.ethereum.request({ method: "eth_requestAccounts" });
 
       provider = new ethers.providers.Web3Provider(window.ethereum);
-      signer = provider.getSigner();
 
+      const network = await provider.getNetwork();
+      if (network.chainId !== 11155111) { // replace with Base chain ID if needed
+        alert("Please switch to Base Chain");
+        setMintStatus("Wrong network", "#ff6b6b");
+        return;
+      }
+
+      signer = provider.getSigner();
       const address = await signer.getAddress();
-      walletAddressEl.textContent = `Wallet: ${address}`;
+      if (walletAddressEl) walletAddressEl.textContent = `Wallet: ${address}`;
 
       contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
-      connectBtn.disabled = true;
-      mintBtn.disabled = false;
+      connectBtn?.setAttribute("disabled", true);
+      mintBtn?.removeAttribute("disabled");
 
       setMintStatus("Wallet connected");
       updateMintCounter();
@@ -127,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!contract) return;
 
     try {
-      mintBtn.disabled = true;
+      mintBtn?.setAttribute("disabled", true);
       setMintStatus("Minting...");
 
       const tx = await contract.mint({
@@ -144,14 +157,21 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Mint error:", err);
       setMintStatus("Mint failed", "#ff6b6b");
     } finally {
-      mintBtn.disabled = false;
+      mintBtn?.removeAttribute("disabled");
     }
   }
 
   /* =======================
-     EVENTS
+     VIEW SOURCE BUTTON
   ======================= */
-  connectBtn.addEventListener("click", connectWallet);
-  mintBtn.addEventListener("click", mintNFT);
+  viewSourceBtn?.addEventListener("click", () => {
+    window.open("https://github.com", "_blank", "noopener,noreferrer");
+  });
+
+  /* =======================
+     EVENT LISTENERS
+  ======================= */
+  connectBtn?.addEventListener("click", connectWallet);
+  mintBtn?.addEventListener("click", mintNFT);
 
 });
