@@ -33,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     copyToast.querySelector(".mint-toast-body").textContent = msg;
     copyToast.classList.add("show");
     toastOverlay.classList.add("show");
-    setTimeout(hideToast, 1500);
   }
 
   function hideToast() {
@@ -78,6 +77,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =======================
+     WALLET STATUS UTILITY
+  ======================= */
+  function setMintStatus(msg, color = "#6fdcff") {
+    mintStatusEl.textContent = msg;
+    mintStatusEl.style.color = color;
+  }
+
+  /* =======================
      CONNECT WALLET
   ======================= */
   let provider, signer, contract;
@@ -89,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      mintStatusEl.textContent = "Connecting wallet...";
+      setMintStatus("Connecting wallet...");
 
       await window.ethereum.request({ method: "eth_requestAccounts" });
 
@@ -104,12 +111,12 @@ document.addEventListener("DOMContentLoaded", () => {
       connectBtn.disabled = true;
       mintBtn.disabled = false;
 
-      mintStatusEl.textContent = "Wallet connected";
+      setMintStatus("Wallet connected");
       updateMintCounter();
 
     } catch (err) {
       console.error("Connect error:", err);
-      mintStatusEl.textContent = "Wallet connection failed";
+      setMintStatus("Wallet connection failed", "#ff6b6b");
     }
   }
 
@@ -121,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       mintBtn.disabled = true;
-      mintStatusEl.textContent = "Minting...";
+      setMintStatus("Minting...");
 
       const tx = await contract.mint({
         value: ethers.utils.parseEther(MINT_PRICE)
@@ -129,13 +136,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       await tx.wait();
 
-      mintStatusEl.textContent = "Mint successful!";
+      setMintStatus("Mint successful!");
       updateMintCounter();
       showToast("🎉 Congratulations! You minted YAMADOGS!");
 
     } catch (err) {
       console.error("Mint error:", err);
-      mintStatusEl.textContent = "Mint failed";
+      setMintStatus("Mint failed", "#ff6b6b");
     } finally {
       mintBtn.disabled = false;
     }
