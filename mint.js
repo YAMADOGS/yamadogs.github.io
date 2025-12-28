@@ -203,7 +203,7 @@ altLinkEl?.addEventListener("click", copyAltLink);
 
     try {
       mintBtn?.setAttribute("disabled", true);
-      setMintStatus("Minting YAMADOG..");
+      setMintStatus("Minting YAMADOG...");
 
       const tx = await contract.mint({
         value: ethers.utils.parseEther(MINT_PRICE)
