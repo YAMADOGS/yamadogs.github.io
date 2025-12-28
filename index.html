@@ -19,17 +19,19 @@
 
 <div class="contract-wrapper">
   <div class="contract-label">Official Website:</div>
-  <div class="contract-address" onclick="copyToClipboard('https://yamadogs.org')">https://yamadogs.org</div>
-  <div class="contract-label">Contract Address:</div>
-  <div class="contract-address" onclick="copyToClipboard('0x715B3f16ec032aA81f4FE0828E913689295ea7Cc')">0x715B3f16ec032aA81f4FE0828E913689295ea7Cc</div>
+<div class="contract-address" id="websiteLink">https://yamadogs.org</div>
+<div class="contract-label">Contract Address:</div>
+<div class="contract-address" id="contractLink">0x715B3f16ec032aA81f4FE0828E913689295ea7Cc</div>
+
 </div>
 
 <div class="card">
   <div class="nft-supply" id="mintCounter">Minted: 0 / 2026</div>
-  <div style="margin:12px 0;">
-    <img src="sepolia_logo.svg" alt="Sepolia Logo" style="height:40px;vertical-align:middle;margin-right:8px;">
-    Sepolia Chain
-  </div>
+<div class="network-info">
+  <img src="baselogo.jpeg" alt="Network Logo" class="network-logo">
+  Base Chain
+</div>
+
   <button id="connectBtn">Connect Wallet</button>
   <div id="walletAddress" style="margin-top:6px;font-size:10px;"></div>
   <button id="mintBtn" disabled>Mint</button>
@@ -40,6 +42,7 @@
   &copy; 2025 YAMADOGS | <button onclick="window.open('https://github.com','_blank')">View Source Code</button>
 </div>
 
+<div id="toastOverlay" class="toast-overlay"></div>
 <div id="mintToast" class="mint-toast">
   <div class="mint-toast-header">
     <span>Notification</span>
