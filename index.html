@@ -15,7 +15,6 @@
   form-action 'self';
   upgrade-insecure-requests;
 ">
-
 <title>YAMADOGS Minting</title>
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -34,11 +33,14 @@ Don’t get tricked—always double-check that you’re on the official website 
 
 <div class="contract-wrapper">
   <div class="contract-label">Official Website:</div>
-<div class="contract-address" id="websiteLink">https://yamadogs.org</div>
-<div class="contract-label">Contract Address:</div>
-<div class="contract-address" id="contractLink">0x715B3f16ec032aA81f4FE0828E913689295ea7Cc</div>
+  <div class="contract-address" id="websiteLink">https://yamadogs.org</div>
 
-</div>
+  <div class="contract-label">Alternate Website:</div>
+  <div class="contract-address" id="altWebsiteLink">https://yamadogs.github.io</div>
+
+  <div class="contract-label">Contract Address:</div>
+  <div class="contract-address" id="contractLink">0x715B3f16ec032aA81f4FE0828E913689295ea7Cc</div>
+  </div>
 
 <div class="card">
   <div class="nft-supply" id="mintCounter">Minted: 0 / 2026</div>
@@ -57,8 +59,9 @@ Don’t get tricked—always double-check that you’re on the official website 
 If WalletConnect isn’t playing nice on your device, don’t panic—just copy the site link and open it directly inside your wallet’s built-in browser. Stay clever, stay paw-some! 🐾</div>
 
 <div class="link-buttons">
-  <button data-url="https://github.com">Go Home</button>
-  </div>
+  <a href="/index.html" target="_blank" class="button-link">Go Home</a>
+</div>
+
 
 <div class="site-footer">
   &copy; 2025 YAMADOGS | <<button id="viewSourceBtn">View Source Code</button>
@@ -67,7 +70,7 @@ If WalletConnect isn’t playing nice on your device, don’t panic—just copy 
 <div id="toastOverlay" class="toast-overlay"></div>
 <div id="mintToast" class="mint-toast">
   <div class="mint-toast-header">
-    <span>!</span>
+    <span></span>
     <button id="closeToast">✖</button>
   </div>
   <div class="mint-toast-body">
