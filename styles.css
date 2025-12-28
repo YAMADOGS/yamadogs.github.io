@@ -334,20 +334,23 @@ button:hover{background:#ffd166}
 }
 
 /* CLOSE BUTTON (TOP RIGHT) */
-.mint-toast-close{
-  position:absolute;
-  top:6px;
-  right:6px;
-  width:20px;
-  height:20px;
-  padding:0;
-  font-size:10px;
-  line-height:18px;
+#closeToast {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 16px;
+  height: 16px;
+  font-size:12px;
+  line-height:16px;
   background:#ff6b6b;
-  border:2px solid #000;
+  color:#fff;
+  border:none;
   box-shadow:2px 2px 0 #000;
   cursor:pointer;
+  padding:0;
+  border-radius:2px;
 }
+
 
 /* BODY */
 .mint-toast-body{
