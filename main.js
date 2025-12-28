@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const viewSourceBtn = document.getElementById("viewSourceBtn");
   if (viewSourceBtn) {
     viewSourceBtn.addEventListener("click", () => {
-      window.open("https://yamadogs.github.io", "_blank", "noopener");
+      window.open("https://github.com/YAMADOGS/yamadogs.github.io", "_blank", "noopener");
     });
   }
 
