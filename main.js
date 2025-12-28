@@ -1,5 +1,5 @@
 const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
-const NFT_ADDRESS = "0x77CA6E72CdfA303E3Ee1065cd672DC73eB4EB88e";
+const NFT_ADDRESS = "0x715B3f16ec032aA81f4FE0828E913689295ea7Cc";
 const NFT_ABI = ["function totalSupply() view returns(uint256)"];
 
 async function loadSupply() {
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const mintBtn = document.getElementById("mintBtn");
   if (mintBtn) {
     mintBtn.addEventListener("click", () => {
-      window.location.href = "/nftmint.html";
+      window.location.href = "/NFTmint.html";
     });
   }
 
