@@ -190,7 +190,7 @@ altLinkEl?.addEventListener("click", copyAltLink);
      VIEW SOURCE BUTTON
   ======================= */
   viewSourceBtn?.addEventListener("click", () => {
-    window.open("https://github.com", "_blank", "noopener,noreferrer");
+    window.open("https://github.com/YAMADOGS/yamadogs.github.io", "_blank", "noopener,noreferrer");
   });
 
   /* =======================
