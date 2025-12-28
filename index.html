@@ -3,6 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self';
+  style-src 'self';
+  img-src 'self';
+  connect-src 'self' https://ethereum-sepolia-rpc.publicnode.com;
+  object-src 'none';
+  frame-ancestors 'none';
+  base-uri 'self';
+  form-action 'self';
+  upgrade-insecure-requests;
+">
+
 <title>YAMADOGS Minting</title>
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -42,8 +55,13 @@ Don’t get tricked—always double-check that you’re on the official website 
 
 <div class="site-footer">📱 MOBILE PUPS ALERT!
 If WalletConnect isn’t playing nice on your device, don’t panic—just copy the site link and open it directly inside your wallet’s built-in browser. Stay clever, stay paw-some! 🐾</div>
+
+<div class="link-buttons">
+  <button data-url="/index.html">Go Home</button>
+  </div>
+
 <div class="site-footer">
-  &copy; 2025 YAMADOGS | <button onclick="window.open('https://github.com','_blank')">View Source Code</button>
+  &copy; 2025 YAMADOGS | <<button id="viewSourceBtn">View Source Code</button>
 </div>
 
 <div id="toastOverlay" class="toast-overlay"></div>
@@ -53,7 +71,9 @@ If WalletConnect isn’t playing nice on your device, don’t panic—just copy 
     <button id="closeToast">✖</button>
   </div>
   <div class="mint-toast-body">
-    🎉 Congratulations! You minted <strong>YAMADOGS!</strong>
+    🎉 🎉 Woof! You did it!
+Your YAMADOG is minted and ready to strut in your wallet. 🐾💎
+Welcome to the pack—let the wag-worthy journeys begin! 🚀</strong>
   </div>
 </div>
 
