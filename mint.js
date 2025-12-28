@@ -12,6 +12,19 @@ document.addEventListener("DOMContentLoaded", () => {
     "function mint() payable",
     "function totalSupply() view returns(uint256)"
   ];
+  
+function launchConfetti() {
+  const duration = 2 * 1000;
+  const animationEnd = Date.now() + duration;
+  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+  const interval = setInterval(function() {
+    const timeLeft = animationEnd - Date.now();
+    if (timeLeft <= 0) return clearInterval(interval);
+    const particleCount = 50 * (timeLeft / duration);
+    confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+     }, 250);
+     }
 
   /* =======================
      DOM ELEMENTS
@@ -97,9 +110,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function connectWallet() {
     if (!window.ethereum) {
-      alert("Please install MetaMask or a compatible wallet.");
-      return;
-    }
+  showToast("⚠️ Please install MetaMask or a compatible wallet.");
+  setMintStatus("Wallet not detected", "#ff6b6b"); 
+  return;
+}
+
 
     try {
       setMintStatus("Connecting wallet...");
@@ -141,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       mintBtn?.setAttribute("disabled", true);
-      setMintStatus("Minting...");
+      setMintStatus("Minting YAMADOG..");
 
       const tx = await contract.mint({
         value: ethers.utils.parseEther(MINT_PRICE)
@@ -151,8 +166,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       setMintStatus("Mint successful!");
       updateMintCounter();
-      showToast("🎉 Congratulations! You minted YAMADOGS!");
-
+      showToast("🎉 Mint success! Your YAMADOG is now part of the pack and ready for some pup-tastic journeys! 🐾");
+        launchConfetti();
     } catch (err) {
       console.error("Mint error:", err);
       setMintStatus("Mint failed", "#ff6b6b");
