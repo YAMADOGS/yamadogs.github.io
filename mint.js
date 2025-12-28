@@ -76,6 +76,16 @@ function launchConfetti() {
 
   contractEl?.addEventListener("click", copyContract);
   linkEl?.addEventListener("click", copyLink);
+  
+const altLinkEl = document.getElementById("altWebsiteLink");
+
+function copyAltLink() {
+  navigator.clipboard.writeText("https://yamadogs.github.io");
+  showToast("Alternate website link copied!");
+}
+
+altLinkEl?.addEventListener("click", copyAltLink);
+
 
   /* =======================
      UPDATE MINT COUNTER
