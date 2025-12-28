@@ -60,19 +60,23 @@ document.addEventListener("DOMContentLoaded", () => {
   async function mintNFT() {
     if (!contract) return;
     try {
-      mintBtn.disabled = true;
-      mintStatusEl.textContent = "Minting...";
-      const tx = await contract.mint({ value: ethers.parseEther("0.0005") });
-      await tx.wait();
-      mintStatusEl.textContent = "Mint successful!";
-      updateMintCounter();
+        mintBtn.disabled = true;
+        mintStatusEl.textContent = "Minting...";
+        
+        // v5 syntax for parseEther
+        const tx = await contract.mint({ value: ethers.utils.parseEther("0.0005") });
+        await tx.wait();
+        
+        mintStatusEl.textContent = "Mint successful!";
+        updateMintCounter();
     } catch (err) {
-      console.error(err);
-      mintStatusEl.textContent = "Mint failed";
+        console.error(err);
+        mintStatusEl.textContent = "Mint failed";
     } finally {
-      mintBtn.disabled = false;
+        mintBtn.disabled = false;
     }
-  }
+}
+
 
   connectBtn.addEventListener("click", connectWallet);
   mintBtn.addEventListener("click", mintNFT);
