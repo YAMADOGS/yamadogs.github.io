@@ -147,19 +147,23 @@ function launchConfetti() {
   /* =======================
      TOAST FUNCTIONS
   ======================= */
-  function showToast(msg) {
-    if (!copyToast || !toastOverlay) return;
-    const body = copyToast.querySelector(".mint-toast-body");
-    if (!body) return;
-    body.textContent = msg;
-    copyToast.classList.add("show");
-    toastOverlay.classList.add("show");
-  }
+  function showToast(msg, type = "info") {
+  if (!copyToast || !toastOverlay) return;
+  const body = copyToast.querySelector(".mint-toast-body");
+  if (!body) return;
 
-  function hideToast() {
-    copyToast?.classList.remove("show");
-    toastOverlay?.classList.remove("show");
-  }
+  body.textContent = msg;
+  copyToast.classList.remove("success", "warning", "error", "info");
+  copyToast.classList.add(type);
+  copyToast.classList.add("show");
+  toastOverlay.classList.add("show");
+}
+
+function hideToast() {
+  if (!copyToast || !toastOverlay) return;
+  copyToast.classList.remove("show", "success", "warning", "error", "info");
+  toastOverlay.classList.remove("show");
+}
 
   copyToastClose?.addEventListener("click", hideToast);
   toastOverlay?.addEventListener("click", hideToast);
@@ -238,7 +242,7 @@ altLinkEl?.addEventListener("click", copyAltLink);
 
       const network = await provider.getNetwork();
       if (network.chainId !== 11155111) { // replace with Base chain ID if needed
-        alert("Please switch to Base Chain");
+        showToast("Please switch to Base Chain");
         setMintStatus("Wrong network", "#ff6b6b");
         return;
       }

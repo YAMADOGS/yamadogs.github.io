@@ -328,6 +328,19 @@ button:hover{background:#ffd166}
   z-index:99999;
 }
 
+/* TOAST TYPES */
+.mint-toast.success { background: #28a745; color: #fff; }   /* green */
+.mint-toast.warning { background: #ffc107; color: #000; }   /* yellow */
+.mint-toast.error   { background: #ff4b5c; color: #fff; }   /* red */
+.mint-toast.info    { background: #6fdcff; color: #000; }   /* blue */
+
+/* Optional: add emoji prefix */
+.mint-toast.success::before { content: "🎉 "; }
+.mint-toast.warning::before { content: "⚠️ "; }
+.mint-toast.error::before   { content: "❌ "; }
+.mint-toast.info::before    { content: "ℹ️ "; }
+
+
 /* SHOW STATE */
 .mint-toast.show{
   display:block;
@@ -386,6 +399,7 @@ button:hover{background:#ffd166}
   margin-top: 12px;
   font-weight: bold;  /* optional for emphasis */
 }
+
 
 .button-link {
   display: inline-block;
