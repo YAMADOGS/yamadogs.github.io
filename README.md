@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="logo.png" alt="Project Logo" width="200"/>
+</p>
+
+
 🐕 YAMADOGS NFT
 
 YAMADOGS is a collection of 2,026 fully on-chain generative NFT collectibles, where 100% of the metadata and images live directly on the blockchain.
