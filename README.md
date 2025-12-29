@@ -3,7 +3,7 @@
 </p>
 
 <p align="left">
-  <img src="assets/nft5.svg" alt="NFT Image" width="200"/>
+  <img src="nft5.svg" alt="NFT Image" width="200"/>
 </p>
 
 
