@@ -9,9 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const MINT_PRICE = "0.0005"; // ETH
 
   const ABI = [
-    "function mint() payable",
-    "function totalSupply() view returns(uint256)"
-  ];
+  "function mint() payable",
+  "function totalSupply() view returns(uint256)",
+  "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
+];
+
   
 function launchConfetti() {
   if (document.querySelector(".confetti-canvas")) return;
@@ -152,7 +154,7 @@ function launchConfetti() {
   const body = copyToast.querySelector(".mint-toast-body");
   if (!body) return;
 
-  body.textContent = msg;
+  body.innerHTML = msg;
   copyToast.classList.remove("success", "warning", "error", "info");
   copyToast.classList.add(type);
   copyToast.classList.add("show");
@@ -264,6 +266,12 @@ altLinkEl?.addEventListener("click", copyAltLink);
       setMintStatus("Wallet connection failed", "#ff6b6b");
     }
   }
+  
+function openSepoliaNFT(tokenId) {
+  const url = `https://sepolia.etherscan.io/token/${CONTRACT_ADDRESS}?a=${tokenId}`;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
 
   /* =======================
      MINT NFT
@@ -279,12 +287,42 @@ altLinkEl?.addEventListener("click", copyAltLink);
         value: ethers.utils.parseEther(MINT_PRICE)
       });
 
-      await tx.wait();
+      const receipt = await tx.wait();
 
-      setMintStatus("Mint successful!");
-      updateMintCounter();
-      showToast("🎉 Mint success! Your YAMADOG is now part of the pack and ready for some pup-tastic journeys! 🐾");
-        launchConfetti();
+const transferEvent = receipt.events?.find(
+  e => e.event === "Transfer" && e.args?.from === ethers.constants.AddressZero
+);
+
+const tokenId = transferEvent?.args?.tokenId
+  ? transferEvent.args.tokenId.toString()
+  : null;
+
+
+setMintStatus("Mint successful!");
+updateMintCounter();
+
+if (tokenId) {
+  showToast(`
+    🎉 Mint successful! <b>YAMADOG #${tokenId}</b> 🐾<br>
+    <a href="#" id="viewNftLink" style="color:#ffb703; text-decoration:underline;">
+      🔗 View on Sepolia
+    </a>
+  `);
+
+  setTimeout(() => {
+    document
+      .getElementById("viewNftLink")
+      ?.addEventListener("click", (e) => {
+        e.preventDefault();
+        openSepoliaNFT(tokenId);
+      });
+  }, 50);
+} else {
+  showToast("🎉 Mint successful! Your YAMADOG has joined the pack 🐾");
+}
+
+launchConfetti();
+
     } catch (err) {
       console.error("Mint error:", err);
       setMintStatus("Mint failed", "#ff6b6b");
