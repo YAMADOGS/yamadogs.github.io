@@ -2,7 +2,10 @@
   <img src="logo.png" alt="Project Logo" width="200"/>
 </p>
 
-![NFT Image](nft5.svg)
+<p align="left">
+  <img src="assets/nft5.svg" alt="NFT Image" width="200"/>
+</p>
+
 
 🐕 YAMADOGS NFT
 
