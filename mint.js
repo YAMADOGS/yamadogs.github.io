@@ -303,7 +303,7 @@ updateMintCounter();
 
 if (tokenId) {
   showToast(`
-    🎉 Mint success! Your YAMADOGS is now part of the pack and ready for some pup-tastic journeys!<b>YAMADOGS #${tokenId}</b>🐾<br>
+    🎉 Mint success! Your YAMADOGS is now part of the pack and ready for some pup-tastic journeys!🐾<b>YAMADOGS #${tokenId}</b><br>
     <a href="#" id="viewNftLink" style="color:#ffb703; text-decoration:underline;">
       🔗 View on Sepolia
     </a>
