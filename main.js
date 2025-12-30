@@ -100,5 +100,61 @@ document.addEventListener("DOMContentLoaded", () => {
       window.open("https://github.com/YAMADOGS/yamadogs.github.io", "_blank", "noopener");
     });
   }
+  
+// ===============================
+// STARTUP INTRO (7s) → THEN NOTIFICATION
+// ===============================
+const intro = document.getElementById("startupIntro");
+const progressBar = document.getElementById("introProgressBar");
+
+const pageLoadNotif = document.getElementById("pageLoadNotification");
+const pageLoadOverlay = document.getElementById("pageLoadOverlay");
+const closePageLoadBtn = document.getElementById("closePageLoad");
+
+// Hide warning at first
+if (pageLoadNotif && pageLoadOverlay) {
+  pageLoadNotif.style.display = "none";
+  pageLoadOverlay.style.display = "none";
+}
+
+const INTRO_DURATION = 7000;
+const startTime = performance.now();
+
+function introLoop(now) {
+  const elapsed = now - startTime;
+  const progress = Math.min(elapsed / INTRO_DURATION, 1);
+
+  if (progressBar) {
+    progressBar.style.width = (progress * 100) + "%";
+  }
+
+  if (progress < 1) {
+    requestAnimationFrame(introLoop);
+  } else {
+    // End intro
+    if (intro) intro.style.display = "none";
+
+    // Show warning notification
+    if (pageLoadNotif && pageLoadOverlay) {
+      pageLoadNotif.style.display = "block";
+      pageLoadOverlay.style.display = "block";
+      document.body.classList.add("blurred");
+    }
+  }
+}
+
+requestAnimationFrame(introLoop);
+
+// Close warning
+if (closePageLoadBtn) {
+  closePageLoadBtn.addEventListener("click", () => {
+    pageLoadNotif.style.display = "none";
+    pageLoadOverlay.style.display = "none";
+    document.body.classList.remove("blurred");
+  });
+}
+
 
 });
+
+

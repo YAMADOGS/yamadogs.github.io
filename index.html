@@ -7,7 +7,7 @@
 default-src 'self';
 script-src 'self';
 style-src 'self';
-img-src 'self' https://cdn.jsdelivr.net;
+img-src 'self';
 connect-src 'self' https://ethereum-sepolia-rpc.publicnode.com;
 frame-ancestors 'none';
 base-uri 'none';
@@ -21,19 +21,59 @@ frame-src 'none';
 
 
 <title>YAMADOGS NFT</title>
+<meta name="description" content="YAMADOGS NFT is a collection of 2,026 fully on-chain generative NFT collectibles, where 100% of the metadata and images live directly on the blockchain. ❌ No IPFS ❌ No external servers ❌ No private hosting ✅ Pure on-chain permanence Once deployed, YAMADOGS exists as long as the blockchain exists.">
 
 <link rel="stylesheet" href="styles.css">
-
 <script src="ethers.umd.min.js"></script>
 <script src="main.js"></script>
-
 </head>
-
 <body>
+<!-- ===============================
+     STARTUP INTRO (7s)
+=============================== -->
+<div id="startupIntro">
+  <div class="intro-center">
 
+    <img src="logo.svg" class="intro-logo" alt="YAMADOGS Logo">
+
+    <div class="intro-progress">
+      <div class="intro-progress-bar" id="introProgressBar"></div>
+    </div>
+
+  </div>
+</div>
+
+  
 <div class="sun"></div>
 <div class="cloud c1"></div>
 <div class="cloud c2"></div>
+
+<!-- PAGE LOAD NOTIFICATION -->
+<div class="toast-overlay" id="pageLoadOverlay"></div>
+<div class="mint-toast show" id="pageLoadNotification">
+  <button id="closePageLoad" title="Close">✖</button>
+  <div class="mint-toast-body">
+    <p>
+<b>Yo pups!</b>🐾 Don’t get lost in the pack! Always fetch YAMADOGS from the official den:
+ https://yamadogs.org
+ https://yamadogs.github.io
+
+    </p>
+   
+    ⚠️ YAMADOGS is NOT financial advice!
+
+YAMADOGS was created purely for fun and as a tribute to the long-lost, legendary breed: Yamainu.
+
+💥 DO NOT MINT OR BUY if you’re chasing quick profits or flipping opportunities!
+
+This project was built by me, solo, over months, for true collectors — people who love dogs and respect the art of collecting.
+
+💀 The risk of losing money here is real. If your only goal is profit, this is NOT for you.
+
+🐶 If you simply love collecting, holding, and enjoying YAMADOGS — welcome aboard!
+</div>
+</div>
+
 
 <div class="ui">
 
@@ -43,19 +83,11 @@ frame-src 'none';
 </div>
 
 <div class="security-warning">
-⚠️ <b>YAMADOGS is NOT financial advice!</b><br><br>
-
-YAMADOGS was created purely for <b>fun</b> and as a tribute to the long-lost, legendary breed: <b>Yamainu</b>.<br><br>
-
-💥 <b>DO NOT MINT OR BUY</b> if you’re chasing quick profits or flipping opportunities!<br><br>
-
-This project was built by <b>me, solo</b>, over months, for true collectors — people who love dogs and respect the art of collecting.<br><br>
-
-💀 The risk of losing money here is real. If your only goal is profit, this is <b>NOT</b> for you.<br><br>
-
-🐶 If you simply love collecting, holding, and enjoying YAMADOGS — welcome aboard!<br><br>
-
-💡 Tip: Don’t buy or mint just to complain later. Serious collectors only. Keep your paws clean if it’s for flipping.
+<p></b>Yo pack!</b> 🐾 Stay sharp and don’t sniff the wrong trail! ⚡</p>
+<p>Only roam these official YAMADOGS paths:</p>
+<p></b>🌐 https://yamadogs.org</b></p>
+<p></b>🌐 https://yamadogs.github.io</b></p>
+<p>Sniff-test time! 👃 Double-check the URL you’re on—if it ain’t one of these, don’t click or connect your wallet!</p>
 </div>
 
 
@@ -67,9 +99,9 @@ This project was built by <b>me, solo</b>, over months, for true collectors — 
   <span class="contract-label">TAP to copy Contract Address:</span>
  <span class="contract-address">0x77CA6E72CdfA303E3Ee1065cd672DC73eB4EB88e</span>
 </div>
-
-<p>Mint price: <b>0.0005 ETH (Base Chain))</b></p>
-
+<div class="security-warning">
+<p>Mint price: <b>0.0005 ETH </b></p>
+</div>
 <div class="card">
   <h3>Fully On-chain</h3>
   <h3>YAMADOGS NFT</h3>
@@ -127,25 +159,87 @@ Completely ownerless, admin-less… like a wild dog roaming free in the forest, 
 <div class="faq-wrapper">
 
   <div class="faq-item">
-    <div class="faq-question">❓ What is YAMADOGS?</div>
+    <div class="faq-question">What is YAMADOGS?</div>
     <div class="faq-answer">
-      YAMADOGS is a fully on-chain NFT collection. Images and metadata live forever on the blockchain. No IPFS. No servers.
+      YAMADOGS is a collection of 2,026 fully on-chain generative NFT collectibles, where 100% of the metadata and images live directly on the blockchain. ❌ No IPFS ❌ No external servers ❌ No private hosting ✅ Pure on-chain permanence Once deployed, YAMADOGS exists as long as the blockchain exists.
     </div>
   </div>
   <div class="faq-item">
-    <div class="faq-question">❓ Are the images really on-chain?</div>
+    <div class="faq-question">The Story Behind YAMADOGS 🐕</div>
     <div class="faq-answer">
-      Yes. Every YAMADOG image is generated and stored directly on the blockchain. Nothing external. Nothing centralized.
+      <p>You’re probably asking: “What’s the story behind YAMADOGS?”</p>
+<p>Well… apparently everything needs a story these days, right? 😅
+</p><p>
+Honestly? Nothing fancy. I just love dogs. And when I create something, it’s gotta be my most loved and obsessed project—so obviously it had to be dogs.
+</p><p>
+Now, sure… there are already tons of dog NFTs out there. Same names, same vibes, same… blah blah blah. I didn’t want that. So I went on a quest: a noble, heroic, slightly obsessive quest to find a dog name that nobody else had claimed. 🕵️‍♂️🐶
+</p><p>
+It wasn’t easy. I scrolled, searched, and stared into the void of recycled dog names. 🤣
+</p><p>
+Then I stumbled upon a blog about an extinct Japanese dog breed called Yamainu. Ancient, mysterious… and kinda sad because they went extinct. Hmmmm… Japanese, I like it. Sad story… also kind of poetic. Life is harsh sometimes.
+</p><p>
+I thought about naming it Yamainu, but nah… someone might have already snatched that. Then I tried YAMADOG—but that’s a motorcycle brand 😎.
+</p><p>
+Finally, it hit me: my project isn’t a single dog… it’s a whole collection of dog art. Why not just call it YAMADOGS?
+</p><p>
+I searched. Nothing pops up. Zero. Nada. Perfect.
+And just like that… YAMADOGS was born. 🎉🐾</p>
     </div>
   </div>
 
   <div class="faq-item">
-    <div class="faq-question">❓ Who controls the project?</div>
+    <div class="faq-question">Roadmap</div>
     <div class="faq-answer">
-      Nobody. No admin keys. No ownership. Like a wild dog in the forest — free, untamed, and ownerless.
+      Roadmap? Nah, we don’t chase lines on paper. 🐕
+YAMADOGS live for the journey, sniffing, exploring, and enjoying every step.
     </div>
   </div>
+</div>
+<div class="copy-box">
+  <h1>Creator</h1>
+  <div class="description">
+<p>I’m the creator of YAMADOGS.
+You can call me <b>Yami.</b></p>
 
+<p>Where did I come from?
+You don’t need to know. 😉
+
+I value my privacy, but I still wanted to build something real.
+That’s why YAMADOGS is fully ownerless and fully open-source.
+No admin. No control. No strings. Once it exists, it’s free to roam.
+
+Did I create this to make money?
+Maybe. Yeah.
+But honestly… I don’t even know if anyone will mint a YAMADOGS. 😂
+
+I’m not famous.
+I’m not a known name in the NFTverse.
+So why collect something made by a nobody?
+
+Good question.
+
+Will YAMADOGS go mainstream?
+Probably not.
+But one thing is certain: I created YAMADOGS — and that will never change.
+
+Does YAMADOGS have something others don’t?
+On‑chain NFTs?
+Generative art?
+Decentralization?
+Blah blah blah.
+
+Let’s be real — none of that is new.
+Everything is a remix. I’m not special, and I won’t pretend to be.
+
+My only goal?
+For one real collector to notice the work.
+Even a single mint — if it comes from someone who truly appreciates it — is more than enough for me.
+
+I am nobody.
+My work might be worthless.
+
+But I put my heart and soul into creating YAMADOGS — and that part is real. 🐶</p>
+  </div>
 </div>
 
 <!-- SOCIAL LINKS FOOTER -->
