@@ -44,7 +44,7 @@ everything else = 😬 scam alert
 
 
 
-##🐕 YAMADOGS NFT
+## 🐕 YAMADOGS NFT
 
 YAMADOGS is a collection of 2,026 fully on-chain generative NFT collectibles, where 100% of the metadata and images live directly on the blockchain.
 
