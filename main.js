@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const mintBtn = document.getElementById("mintBtn");
   if (mintBtn) {
     mintBtn.addEventListener("click", () => {
-      window.location.href = "/NFTmint.html";
+      window.location.href = "/NFTmint/";
     });
   }
 
