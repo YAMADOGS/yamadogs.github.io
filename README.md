@@ -17,8 +17,11 @@ YAMADOGS has **only these official websites**:
 ---
 
 ## 💎 Official Contract Address
+
 ```text
 0x715B3f16ec032aA81f4FE0828E913689295ea7Cc
+
+---
 
 ⚠️ Beware of Scams!
 
@@ -35,6 +38,7 @@ That’s great for creativity… but also a playground for scammers. 😬
 real YAMADOGS = official links + official contract
 everything else = 😬 scam alert
 
+---
 
 <p align="left">
   <img src="nft5.svg" alt="NFT Image" width="200"/>
