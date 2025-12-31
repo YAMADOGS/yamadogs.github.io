@@ -277,23 +277,33 @@ function showMintingOverlay() {
   if (!overlay) return;
 
   overlay.style.display = "flex";
-  
-  // Force reflow for CSS animation
   void overlay.offsetWidth;
 
-  document.body.classList.add("minting-active");
+  document.body.classList.add("blurred"); // add blur
 
   const logo = overlay.querySelector(".minting-logo");
-  if (logo) logo.classList.add("jump-active");
+  if (logo) {
+    logo.classList.add("yamadogsJump"); // full jump+squeeze
+  }
 
   const bar = overlay.querySelector(".progress-bar");
   if (bar) {
-    bar.style.width = "0%"; // reset
-    // restart progress bar animation
+    bar.style.width = "0%";
     bar.style.animation = "none";
-    void bar.offsetWidth; // force reflow
+    void bar.offsetWidth;
     bar.style.animation = "progressAnim 1.5s linear forwards";
   }
+}
+
+function hideMintingOverlay() {
+  const overlay = document.getElementById("mintingOverlay");
+  if (!overlay) return;
+
+  overlay.style.display = "none";
+  document.body.classList.remove("blurred"); // remove blur
+
+  const logo = overlay.querySelector(".minting-logo");
+  if (logo) logo.classList.remove("yamadogsJump");
 }
 
 

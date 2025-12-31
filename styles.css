@@ -630,21 +630,20 @@ html {
   background: #ffd166;
 }
 
-/* ========================
-   MINTING OVERLAY
-======================== */
+/* MINTING OVERLAY */
 #mintingOverlay {
-  display: none;                   /* hidden by default */
+  display: none; /* hidden by default */
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.75); /* dark transparent overlay */
+  background: rgba(0, 0, 0, 0.75); /* dark blur overlay */
+  backdrop-filter: blur(5px);      /* blur the background */
   display: flex;
-  justify-content: center;         /* center horizontally */
-  align-items: center;             /* center vertically */
-  flex-direction: column;          /* stack logo, progress, text */
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   text-align: center;
   z-index: 99999;
 }
@@ -656,49 +655,67 @@ html {
   gap: 15px;
 }
 
-/* Logo animation */
-@keyframes jump {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-25px); }
-}
-
-.jump-active {
-  animation: jump 0.6s infinite;
-}
-
-/* Pixelated logo for retro/pixel-art look */
+/* Logo animation - jump + squeeze like startup intro */
 .minting-logo {
   width: 120px;
-  height: 120px;
   image-rendering: pixelated;
+  filter: drop-shadow(4px 4px 0 #000);
+  transform-origin: center bottom;
+  animation: yamadogsJump 0.9s infinite;
+}
+
+/* Jump + Squeeze keyframes (copy from startup) */
+@keyframes yamadogsJump {
+  0%   { transform: translateY(0) scale(1,1); }
+  12%  { transform: translateY(0) scale(1.25,0.75); }
+  25%  { transform: translateY(-26px) scale(0.9,1.15); }
+  40%  { transform: translateY(-32px) scale(1,1); }
+  55%  { transform: translateY(-14px) scale(1,1); }
+  70%  { transform: translateY(0) scale(1.2,0.8); }
+  85%  { transform: translateY(0) scale(0.95,1.05); }
+  100% { transform: translateY(0) scale(1,1); }
 }
 
 /* Progress bar container */
 .minting-progress {
+  margin-top: 14px;
   width: 200px;
-  height: 10px;
-  background: #333;
-  border-radius: 5px;
+  height: 12px;
+  background: #111;
+  border: 3px solid #000;
+  box-shadow: 3px 3px 0 #000;
   overflow: hidden;
 }
 
-/* Animated progress bar fill */
-.progress-bar {
+/* Progress bar fill */
+.minting-bar {
   width: 0%;
   height: 100%;
   background: #ffb703;
-  animation: progressAnim 1.5s linear forwards;
+  animation: barPulse 0.9s infinite, progressAnim 1.5s linear forwards;
 }
 
+/* Bar pulse animation like startup */
+@keyframes barPulse {
+  0%, 60% { transform: scaleY(1); }
+  70%     { transform: scaleY(0.85); }
+  85%     { transform: scaleY(1.05); }
+  100%    { transform: scaleY(1); }
+}
+
+/* Optional: progress from 0 → 100% during mint */
 @keyframes progressAnim {
-  0% { width: 0%; }
+  0%   { width: 0%; }
   100% { width: 100%; }
 }
 
-/* Minting title */
+/* Minting title text */
 .minting-title {
-  color: #ffb703;
+  margin-top: 10px;
   font-size: 18px;
-  font-weight: bold;
+  letter-spacing: 1px;
+  color: #ffb703;
   text-shadow: 2px 2px 0 #000;
+  font-family: inherit;
+  image-rendering: pixelated;
 }
