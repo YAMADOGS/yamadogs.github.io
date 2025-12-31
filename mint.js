@@ -243,7 +243,7 @@ altLinkEl?.addEventListener("click", copyAltLink);
       provider = new ethers.providers.Web3Provider(window.ethereum);
 
       const network = await provider.getNetwork();
-      if (network.chainId !== 11155111) { // replace with Base chain ID if needed
+      if (network.chainId !== 11155111) { 
         showToast("Please switch to Base Chain");
         setMintStatus("Wrong network", "#ff6b6b");
         return;
@@ -277,59 +277,63 @@ function openSepoliaNFT(tokenId) {
      MINT NFT
   ======================= */
   async function mintNFT() {
-    if (!contract) return;
+  if (!contract) return;
 
-    try {
-      mintBtn?.setAttribute("disabled", true);
-      setMintStatus("Minting YAMADOGS...");
+  try {
+    showMintingOverlay();  // ✅ ADD THIS: show overlay
 
-      const tx = await contract.mint({
-        value: ethers.utils.parseEther(MINT_PRICE)
-      });
+    mintBtn?.setAttribute("disabled", true);
+    setMintStatus("Minting YAMADOGS...");
 
-      const receipt = await tx.wait();
+    const tx = await contract.mint({
+      value: ethers.utils.parseEther(MINT_PRICE)
+    });
 
-const transferEvent = receipt.events?.find(
-  e => e.event === "Transfer" && e.args?.from === ethers.constants.AddressZero
-);
+    const receipt = await tx.wait(); // ✅ wait for blockchain confirmation
 
-const tokenId = transferEvent?.args?.tokenId
-  ? transferEvent.args.tokenId.toString()
-  : null;
+    hideMintingOverlay(); // ✅ HIDE overlay after mint succeeds
 
+    const transferEvent = receipt.events?.find(
+      e => e.event === "Transfer" && e.args?.from === ethers.constants.AddressZero
+    );
 
-setMintStatus("Mint successful!");
-updateMintCounter();
+    const tokenId = transferEvent?.args?.tokenId
+      ? transferEvent.args.tokenId.toString()
+      : null;
 
-if (tokenId) {
-  showToast(`
-    🎉 Mint success! Your YAMADOGS is now part of the pack and ready for some pup-tastic journeys!🐾<b>YAMADOGS #${tokenId}</b><br>
-    <a href="#" id="viewNftLink" style="color:#ffb703; text-decoration:underline;">
-      🔗 View on Sepolia
-    </a>
-  `);
+    setMintStatus("Mint successful!");
+    updateMintCounter();
 
-  setTimeout(() => {
-    document
-      .getElementById("viewNftLink")
-      ?.addEventListener("click", (e) => {
-        e.preventDefault();
-        openSepoliaNFT(tokenId);
-      });
-  }, 50);
-} else {
-  showToast("🎉 Mint successful! Your YAMADOG has joined the pack 🐾");
-}
+    if (tokenId) {
+      showToast(`
+          🎉 Mint success! Your YAMADOGS is now part of the pack and ready for some pup-tastic journeys!🐾<b>YAMADOGS #${tokenId}</b><br>
+        <a href="#" id="viewNftLink" style="color:#ffb703; text-decoration:underline;">
+          🔗 View on Sepolia
+        </a>
+      `);
 
-launchConfetti();
-
-    } catch (err) {
-      console.error("Mint error:", err);
-      setMintStatus("Mint failed", "#ff6b6b");
-    } finally {
-      mintBtn?.removeAttribute("disabled");
+      setTimeout(() => {
+        document
+          .getElementById("viewNftLink")
+          ?.addEventListener("click", (e) => {
+            e.preventDefault();
+            openSepoliaNFT(tokenId);
+          });
+      }, 50);
+    } else {
+      showToast("🎉 Mint successful! Your YAMADOG has joined the pack 🐾");
     }
+
+    launchConfetti();
+
+  } catch (err) {
+    hideMintingOverlay(); // ✅ HIDE overlay on error
+    console.error("Mint error:", err);
+    setMintStatus("Mint failed", "#ff6b6b");
+  } finally {
+    mintBtn?.removeAttribute("disabled");
   }
+}
 
   /* =======================
      VIEW SOURCE BUTTON
