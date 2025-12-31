@@ -630,57 +630,75 @@ html {
   background: #ffd166;
 }
 
+/* ========================
+   MINTING OVERLAY
+======================== */
 #mintingOverlay {
+  display: none;                   /* hidden by default */
   position: fixed;
-  inset: 0;
-  z-index: 100000;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75); /* dark transparent overlay */
   display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  backdrop-filter: blur(5px); /* blur background */
+  justify-content: center;         /* center horizontally */
+  align-items: center;             /* center vertically */
+  flex-direction: column;          /* stack logo, progress, text */
+  text-align: center;
+  z-index: 99999;
 }
 
 .minting-center {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
 }
 
-.minting-logo {
-  width: 96px;
-  image-rendering: pixelated;
-  filter: drop-shadow(4px 4px 0 #000);
-  animation: yamadogsJump 0.9s infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes yamadogsJump {
+/* Logo animation */
+@keyframes jump {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-30px); }
+  50% { transform: translateY(-25px); }
 }
 
+.jump-active {
+  animation: jump 0.6s infinite;
+}
+
+/* Pixelated logo for retro/pixel-art look */
+.minting-logo {
+  width: 120px;
+  height: 120px;
+  image-rendering: pixelated;
+}
+
+/* Progress bar container */
 .minting-progress {
-  width: 150px;
-  height: 12px;
-  border: 2px solid #ffb703;
-  border-radius: 8px;
+  width: 200px;
+  height: 10px;
+  background: #333;
+  border-radius: 5px;
   overflow: hidden;
-  margin: 0 auto 16px;
 }
 
+/* Animated progress bar fill */
 .progress-bar {
-  width: 100%;
+  width: 0%;
   height: 100%;
-  background-color: #ffb703;
-  animation: progressLoop 1.5s linear infinite;
+  background: #ffb703;
+  animation: progressAnim 1.5s linear forwards;
 }
 
-@keyframes progressLoop {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+@keyframes progressAnim {
+  0% { width: 0%; }
+  100% { width: 100%; }
 }
 
+/* Minting title */
 .minting-title {
-  font-size: 14px;
   color: #ffb703;
-  text-shadow: 3px 3px 0 #000;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 2px 2px 0 #000;
 }
