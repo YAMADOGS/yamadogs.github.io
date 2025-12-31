@@ -42,11 +42,7 @@ function copyLink() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-
-  // Load supply safely
   loadSupply();
-
-  // NFT tap-to-enlarge
   document.querySelectorAll(".nft-container img").forEach(img => {
     img.addEventListener("click", () => {
       document.querySelectorAll(".nft-container img").forEach(i => {
@@ -131,10 +127,7 @@ function introLoop(now) {
   if (progress < 1) {
     requestAnimationFrame(introLoop);
   } else {
-    // End intro
     if (intro) intro.style.display = "none";
-
-    // Show warning notification
     if (pageLoadNotif && pageLoadOverlay) {
       pageLoadNotif.style.display = "block";
       pageLoadOverlay.style.display = "block";
@@ -142,15 +135,38 @@ function introLoop(now) {
     }
   }
 }
-
 requestAnimationFrame(introLoop);
-
-// Close warning
 if (closePageLoadBtn) {
   closePageLoadBtn.addEventListener("click", () => {
     pageLoadNotif.style.display = "none";
     pageLoadOverlay.style.display = "none";
     document.body.classList.remove("blurred");
+  });
+}
+
+// DOWNLOAD LOGO
+const downloadSvgBtn = document.getElementById("downloadSvg");
+const downloadPngBtn = document.getElementById("downloadPng");
+
+if (downloadSvgBtn) {
+  downloadSvgBtn.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.href = "/logo.svg"; // must be served from your domain
+    link.download = "YAMADOGS_logo.svg";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+}
+
+if (downloadPngBtn) {
+  downloadPngBtn.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.href = "/logo.png"; // must be served from your domain
+    link.download = "YAMADOGS_logo.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   });
 }
 

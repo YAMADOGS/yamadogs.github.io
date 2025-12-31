@@ -274,7 +274,7 @@ button:hover{background:#ffd166}
   width:40px;
   height:40px;
   image-rendering:pixelated;
-  filter: invert(1); /* makes icons dark */
+  filter: invert(1); 
 }
 
 /* COPYRIGHT + SOURCE */
@@ -474,11 +474,7 @@ body.blurred > .ui {
   user-select: none;
 }
 
-/* ===============================
-   CROSS-BROWSER PIXELATED SCROLLBAR
-   =============================== */
-
-/*  (Chrome, Edge, Safari) */
+/*  (Chrome, Edge, Safari, Firefox) */
 ::-webkit-scrollbar {
   width: 16px;
   height: 16px;
@@ -500,7 +496,6 @@ body.blurred > .ui {
   background: #ffb703;
 }
 
-/* Firefox */
 * {
   scrollbar-width: thin;       
   scrollbar-color: #e6d3a3 #111;  
@@ -533,7 +528,6 @@ html {
   align-items: center;
   justify-content: center;
 
-  /* SAME BACKGROUND AS BODY */
   background:
     linear-gradient(#fff 0 0) bottom / 100% 22% no-repeat,
     repeating-linear-gradient(90deg,#6bbf8e 0 14px,#5cab82 14px 28px)
@@ -557,6 +551,8 @@ html {
   transform-origin: center bottom;
   animation: yamadogsJump 0.9s infinite;
 }
+
+
 
 /* JUMP + SQUEEZE */
 @keyframes yamadogsJump {
@@ -594,4 +590,42 @@ html {
   70%     { transform: scaleY(0.85); }
   85%     { transform: scaleY(1.05); }
   100%    { transform: scaleY(1); }
+}
+
+.intro-title {
+  margin-top: 10px;
+  font-size: 22px;           /* adjust as needed */
+  letter-spacing: 2px;
+  color: #ffb703;            /* same as header h1 */
+  text-shadow: 3px 3px 0 #000; /* same as header h1 */
+  font-family: inherit;
+  image-rendering: pixelated;
+}
+
+.download-logo {
+  max-width: 420px;
+  margin: 24px auto;
+  padding: 16px;
+  background: #fff;
+  box-shadow: 6px 6px 0 #000;
+  border: 4px solid transparent;
+  border-image: repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+  font-size: 10px;
+  text-align: center;
+}
+
+.download-logo button {
+  font-family: inherit;
+  font-size: 10px;
+  padding: 14px 18px;
+  margin: 8px;
+  background: #ffb703;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #000;
+  border: 4px solid transparent;
+  border-image: repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+
+.download-logo button:hover {
+  background: #ffd166;
 }
