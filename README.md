@@ -2,6 +2,40 @@
   <img src="logo.svg" alt="Project Logo" width="100"/>
 </p>
 
+# ⚠️ YAMADOGS Official Alert! ⚠️
+
+![YAMADOGS](https://img.shields.io/badge/YAMADOGS-Official-orange)
+
+---
+
+## 🌐 Official Websites
+YAMADOGS has **only these official websites**:
+
+- [https://yamadogs.org](https://yamadogs.org)  
+- [https://yamadogs.github.io](https://yamadogs.github.io)  
+
+---
+
+## 💎 Official Contract Address
+```text
+0x715B3f16ec032aA81f4FE0828E913689295ea7Cc
+
+⚠️ Beware of Scams!
+
+If you’re accessing YAMADOGS anywhere else… it’s NOT the real deal. 🐕💀
+
+YAMADOGS is fully open-source, which means anyone can clone it and launch their own version.
+
+That’s great for creativity… but also a playground for scammers. 😬
+
+✅ The original, OG YAMADOGS lives only on these two links with this contract address.
+
+🔑 Remember:
+
+real YAMADOGS = official links + official contract
+everything else = 😬 scam alert
+
+
 <p align="left">
   <img src="nft5.svg" alt="NFT Image" width="200"/>
 </p>
