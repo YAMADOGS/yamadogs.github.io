@@ -275,15 +275,27 @@ function openSepoliaNFT(tokenId) {
 function showMintingOverlay() {
   const overlay = document.getElementById("mintingOverlay");
   if (!overlay) return;
+
   overlay.style.display = "flex";
-  document.body.classList.add("minting-active");
   
+  // Force reflow for CSS animation
+  void overlay.offsetWidth;
+
+  document.body.classList.add("minting-active");
+
   const logo = overlay.querySelector(".minting-logo");
   if (logo) logo.classList.add("jump-active");
 
   const bar = overlay.querySelector(".progress-bar");
-  if (bar) bar.style.width = "0%"; // reset
+  if (bar) {
+    bar.style.width = "0%"; // reset
+    // restart progress bar animation
+    bar.style.animation = "none";
+    void bar.offsetWidth; // force reflow
+    bar.style.animation = "progressAnim 1.5s linear forwards";
+  }
 }
+
 
 
 function hideMintingOverlay() {
@@ -372,10 +384,16 @@ function hideMintingOverlay() {
     window.open("https://github.com/YAMADOGS/yamadogs.github.io", "_blank", "noopener,noreferrer");
   });
 
+
+
   /* =======================
      EVENT LISTENERS
   ======================= */
   connectBtn?.addEventListener("click", connectWallet);
   mintBtn?.addEventListener("click", mintNFT);
+  
+// Ensure overlay is hidden initially
+hideMintingOverlay();
+
 
 });
