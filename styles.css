@@ -719,3 +719,122 @@ html {
   font-family: inherit;
   image-rendering: pixelated;
 }
+
+/* ===============================
+   DESKTOP: 2-COLUMN LAYOUT
+=============================== */
+@media (min-width: 1024px) {
+
+  .ui {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 360px; /* content | sidebar */
+    gap: 28px;
+    align-items: start;
+  }
+
+}
+@media (min-width: 1024px) {
+
+  .contract-wrapper,
+  .card,
+  #mintBtn {
+    grid-column: 2;
+  }
+
+}
+@media (min-width: 1024px) {
+
+  .card {
+    position: sticky;
+    top: 120px; 
+  }
+
+}
+
+@media (min-width: 1440px) {
+
+  .ui {
+    max-width: 1400px;
+    gap: 48px;
+  }
+
+  .description,
+  .faq-wrapper {
+    max-width: 1000px;
+  }
+
+  .nft-container img {
+    width: 120px;
+    height: 120px;
+  }
+
+}
+@media (min-width: 1024px) {
+
+  .link-buttons {
+    grid-column: 2;
+  }
+
+}
+@media (min-width: 1024px) {
+
+  .link-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .link-buttons button {
+    width: 100%;
+  }
+
+}
+.contract-wrapper,
+.card,
+#mintBtn,
+.link-buttons {
+  grid-column: 2;
+}
+  
+.ui {
+  gap: clamp(12px, 2vw, 28px);
+}
+
+section,
+.card,
+.security-warning {
+  margin-bottom: clamp(12px, 2vw, 28px);
+}
+
+.left-content {
+  padding: clamp(12px, 2vw, 32px);
+}
+
+/* Page load notification scaling */
+#pageLoadNotification {
+  width: 90%;        /* mobile default */
+  max-width: 400px;  /* prevent too huge on mid-screen */
+  padding: 20px;
+}
+
+@media (min-width: 1024px) {
+  #pageLoadNotification {
+    width: 380px;       /* fixed reasonable size */
+    max-width: 450px;   /* can increase for bigger screens */
+    padding: 24px 32px; /* more padding for desktop */
+  }
+}
+
+@media (min-width: 1920px) {
+  #pageLoadNotification {
+    width: 500px;
+    max-width: 600px;
+    padding: 32px 40px;
+  }
+}
+#pageLoadNotification p {
+  font-size: clamp(10px, 1.2vw, 14px);
+}
+
