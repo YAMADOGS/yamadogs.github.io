@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
      CONFIG
   ======================= */
   const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
-  const CONTRACT_ADDRESS = "0x715B3f16ec032aA81f4FE0828E913689295ea7Cc";
+  const CONTRACT_ADDRESS = "0x61bA59D67ab3C06F53c1e009272aBb705D881f5A";
   const MAX_SUPPLY = 2026;
   const MINT_PRICE = "0.0005"; // ETH
 

@@ -1,5 +1,5 @@
 const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
-const NFT_ADDRESS = "0x715B3f16ec032aA81f4FE0828E913689295ea7Cc";
+const NFT_ADDRESS = "0x61bA59D67ab3C06F53c1e009272aBb705D881f5A";
 const NFT_ABI = ["function totalSupply() view returns(uint256)"];
 
 async function loadSupply() {
@@ -151,7 +151,7 @@ const downloadPngBtn = document.getElementById("downloadPng");
 if (downloadSvgBtn) {
   downloadSvgBtn.addEventListener("click", () => {
     const link = document.createElement("a");
-    link.href = "/logo.svg"; // must be served from your domain
+    link.href = "logo.svg"; // must be served from your domain
     link.download = "YAMADOGS_logo.svg";
     document.body.appendChild(link);
     link.click();
@@ -162,7 +162,7 @@ if (downloadSvgBtn) {
 if (downloadPngBtn) {
   downloadPngBtn.addEventListener("click", () => {
     const link = document.createElement("a");
-    link.href = "/logo.png"; // must be served from your domain
+    link.href = "logo.png"; // must be served from your domain
     link.download = "YAMADOGS_logo.png";
     document.body.appendChild(link);
     link.click();
