@@ -105,7 +105,8 @@ h1{color:#ffb703;text-shadow:3px 3px 0 #000}
 /* NFT IMAGE CONTAINER - ADDED */
 .nft-container{
   max-width:420px;
-  margin:12px auto;
+  margin:12px auto 6px; 
+
   display:flex;
   justify-content:center;
   flex-wrap:wrap;
@@ -206,8 +207,16 @@ button:hover{background:#ffd166}
 /* FAQ */
 .faq-wrapper{
   max-width:620px;
-  margin:24px auto;
+  margin:16px auto; /* default (mobile) */
 }
+
+@media (min-width: 1024px) {
+  .faq-wrapper{
+    margin-top: 8px;   /* 🔽 closer to NFTs */
+    margin-bottom: 12px;
+  }
+}
+
 
 .faq-item{
   background:#fff;
@@ -604,7 +613,7 @@ html {
 
 .download-logo {
   max-width: 420px;
-  margin: 24px auto;
+  margin: 16px auto; /* 🔽 smaller default gap */
   padding: 16px;
   background: #fff;
   box-shadow: 6px 6px 0 #000;
@@ -612,6 +621,12 @@ html {
   border-image: repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
   font-size: 10px;
   text-align: center;
+}
+
+@media (min-width: 1024px) {
+  .download-logo{
+    margin-top: 8px; /* 🔥 pulls it close to FAQ */
+  }
 }
 
 .download-logo button {
@@ -728,13 +743,29 @@ html {
   .ui {
     max-width: 1200px;
     margin: 0 auto;
+    padding-inline: clamp(16px, 4vw, 48px); /* ✅ equal left & right space */
     display: grid;
-    grid-template-columns: 1fr 360px; /* content | sidebar */
-    gap: 28px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+    gap: clamp(20px, 3vw, 48px);
     align-items: start;
   }
 
 }
+
+
+@media (min-width: 1024px) {
+
+  .card,
+  .copy-box,
+  .social-footer,
+  .site-footer,
+  .nft-container {
+    max-width: 100%;
+  }
+
+}
+
+
 @media (min-width: 1024px) {
 
   .contract-wrapper,
@@ -748,10 +779,12 @@ html {
 
   .card {
     position: sticky;
-    top: 120px; 
+    top: 35px;
+    align-self: start; 
   }
 
 }
+
 
 @media (min-width: 1440px) {
 
@@ -766,9 +799,10 @@ html {
   }
 
   .nft-container img {
-    width: 120px;
-    height: 120px;
-  }
+  width: clamp(120px, 10vw, 160px);
+  height: auto;
+}
+
 
 }
 @media (min-width: 1024px) {
@@ -790,12 +824,6 @@ html {
     width: 100%;
   }
 
-}
-.contract-wrapper,
-.card,
-#mintBtn,
-.link-buttons {
-  grid-column: 2;
 }
   
 .ui {
