@@ -1,5 +1,5 @@
 const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
-const NFT_ADDRESS = "0x61bA59D67ab3C06F53c1e009272aBb705D881f5A";
+const NFT_ADDRESS = "0xA33ea17695f1eBa28b997d514C666eD6a0d29400";
 const NFT_ABI = ["function totalSupply() view returns(uint256)"];
 
 async function loadSupply() {
