@@ -87,7 +87,7 @@ function mint() external payable {
 - ETH is sent only to a fixed, immutable treasury address.
 - No other function can take ETH from a user.
 
-###### ✅ Conclusion: Users cannot lose ETH accidentally.
+##### ✅ Conclusion: Users cannot lose ETH accidentally.
 
 ## 2 Token Transfer Safety
 
@@ -196,9 +196,7 @@ ERC-721 Enumerable : Supported
 ##### Design Notes:
 
 - Custom ERC-721 implementation for gas efficiency
-- 
 - On-chain SVG generation requires mappings for _ownerOf, _balanceOf, _allTokens, _ownedTokens
-- 
 - Supports both global and per-owner enumeration
 
 ======================================================================
