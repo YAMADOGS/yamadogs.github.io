@@ -1,4 +1,3 @@
-
 /*//////////////////////////////////////////////////////////////
 
 OFFICIAL WEBSITE LINKS OF  YAMADOGS NFT
@@ -14,13 +13,10 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
 
-
-interface IERC721Receiver {
-    function onERC721Received(address, address, uint256, bytes calldata) external returns (bytes4);
-}
 
 contract YAMADOGS is IERC721, IERC721Metadata, IERC721Enumerable {
     using Strings for uint256;
@@ -40,10 +36,10 @@ contract YAMADOGS is IERC721, IERC721Metadata, IERC721Enumerable {
     mapping(address => uint256[]) private _ownedTokens;
     mapping(uint256 => uint256) private _ownedTokensIndex;
     
-    address public immutable owner;
-    constructor() {
+     address public immutable owner;
+     constructor() {
     owner = msg.sender;
-   }
+    }
 
     /*//////////////////////////////////////////////////////////////
                                 MINT
@@ -72,7 +68,7 @@ contract YAMADOGS is IERC721, IERC721Metadata, IERC721Enumerable {
     );
 
     
-    _mint(msg.sender, id);
+    _safeMint(msg.sender, id);
     (bool success,) = TREASURY.call{value: msg.value}("");
     require(success, "TRANSFER_FAIL");
 }
@@ -90,6 +86,15 @@ contract YAMADOGS is IERC721, IERC721Metadata, IERC721Enumerable {
     emit Transfer(address(0), to, id);
 }
 
+function _safeMint(address to, uint256 id) internal {
+    _mint(to, id);
+    if (to.code.length != 0) {
+        require(
+            IERC721Receiver(to).onERC721Received(msg.sender, address(0), id, "") == IERC721Receiver.onERC721Received.selector,
+            "UNSAFE_RECIPIENT"
+        );
+    }
+}
 
     /*//////////////////////////////////////////////////////////////
                         ERC721 CORE
@@ -202,15 +207,14 @@ function tokenOfOwnerByIndex(address ownerAddress, uint256 index)
 }
 
 
-
     /*//////////////////////////////////////////////////////////////
                         RANDOM
     //////////////////////////////////////////////////////////////*/
-function name() external pure override returns (string memory) {
+function name() external view override returns (string memory) {
     return "YAMADOGS";
 }
 
-function symbol() external pure override returns (string memory) {
+function symbol() external view override returns (string memory) {
     return "YADO";
 }
 
@@ -532,19 +536,10 @@ function _attributes(Traits memory t)
         return string(abi.encodePacked("data:application/json;base64,", json));
     }
 
-    function onERC721Received(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external pure returns (bytes4) {
-        revert("NO_RECEIVE");
-    }
-
     
     function supportsInterface(bytes4 interfaceId)
     public
-    pure
+    view
     override
     returns (bool)
 {
