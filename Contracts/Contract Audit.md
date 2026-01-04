@@ -201,15 +201,15 @@ Bottom line: Users interacting with YAMADOGS cannot have their wallets drained o
 
 ## CONTRACT ARCHITECTURE
 
-Standards Implemented:
+##### Standards Implemented:
 
 ERC-165          : Supported
 ERC-721          : Custom implementation
 ERC-721 Metadata : Supported
 ERC-721 Enumerable : Supported
---------
-Design Notes:
---------
+
+##### Design Notes:
+
 - Custom ERC-721 implementation for gas efficiency
 - 
 - On-chain SVG generation requires mappings for _ownerOf, _balanceOf, _allTokens, _ownedTokens
@@ -237,7 +237,7 @@ Mint Price: 0.0005 ETH
 Access: Public
 Treasury: 0x7c4e9A3bB509A33d6bD5E8C0aA002Fef5171B719
 
-Mint Flow:
+##### Mint Flow:
 User calls mint() → Checks supply & ETH → Generate seed → _mint() → Forward ETH to TREASURY → Emit Transfer
 
 - Low-level call ensures safe ETH transfer
@@ -249,10 +249,10 @@ User calls mint() → Checks supply & ETH → Generate seed → _mint() → Forw
 
 ## TRAIT GENERATION & RANDOMNESS
 
-Seed Calculation:
+##### Seed Calculation:
 seed = keccak256(tokenId, msg.sender, block.timestamp, block.prevrandao)
----------
-###### Traits:
+
+##### Traits:
 - Numeric: Ears, Inner Ears, Eyes, Pupils, Nose, Mouth, Hair, Feet
 - Boolean: Fur, EyePatch, Mask,
 Traits Mapping Diagram:
@@ -270,7 +270,7 @@ Seed -> Traits Struct
          ├── eyePatch (bool)
          └── mask (bool)
 
-Notes:
+###### Notes:
 - Deterministic and immutable
 - Drives SVG rendering
 - Not secure for gambling applications
@@ -281,7 +281,7 @@ Notes:
 
 All artwork is generated on-chain using Solidity string concatenation
 
-###### SVG Generation Flow:
+##### SVG Generation Flow:
 
 Seed
   │
@@ -323,7 +323,7 @@ Example:
 - Implements transferFrom() and safeTransferFrom()
 - onERC721Received() always reverts
 
-###### Transfer Flow:
+##### Transfer Flow:
 
 User/Contract calls safeTransferFrom() 
   -> Checks approval/owner
@@ -332,7 +332,7 @@ User/Contract calls safeTransferFrom()
   -> Checks recipient code
   -> Reverts if recipient is contract
 
-###### Implications:
+##### Implications:
 - Prevents accidental NFT lock
 - Contracts must handle ERC721 reception elsewhere
 
@@ -349,7 +349,7 @@ Uses swap-and-pop for per-owner arrays to maintain gas efficiency
 
 ======================================================================
 
-## GAS & DEPLOYMENT CONSIDERATIONS
+### GAS & DEPLOYMENT CONSIDERATIONS
 
 - Contract large due to on-chain SVG + metadata
 - Base network supports deployment
@@ -358,7 +358,7 @@ Uses swap-and-pop for per-owner arrays to maintain gas efficiency
 
 ======================================================================
 
-##### SECURITY REVIEW
+### SECURITY REVIEW
 
 Category                   | Result
 -------
@@ -382,7 +382,7 @@ No critical vulnerabilities identified
 
 ======================================================================
 
-#### RISK ASSESSMENT
+### RISK ASSESSMENT
 
 1. Pseudo-Randomness: Suitable for collectibles, not for gambling
 2. Immutability: Any bug is permanent
@@ -393,9 +393,9 @@ No critical vulnerabilities identified
 ======================================================================
 
 
-#### CONCLUSION
+### CONCLUSION
 
- ###### YAMADOGS is:
+ ##### YAMADOGS is:
 
 - Fully on-chain and immutable
 - Safe for minting and transfers
@@ -407,7 +407,7 @@ Deployable on Base network
 
 ======================================================================
 
-#### DISCLAIMER
+### DISCLAIMER
 
 This audit is informational. Interacting with smart contracts carries risk. No contract is guaranteed bug-free.
 
