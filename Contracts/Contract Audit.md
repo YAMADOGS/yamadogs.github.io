@@ -72,7 +72,7 @@ function mint() external payable {
         )
     );
 
-    _mint(msg.sender, id);
+    _safeMint(msg.sender, id);
 
     (bool success,) = TREASURY.call{value: msg.value}("");
     require(success, "TRANSFER_FAIL");
