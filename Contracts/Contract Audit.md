@@ -199,7 +199,7 @@ Uses swap-and-pop for per-owner arrays to maintain gas efficiency
 
 ======================================================================
 
-SECURITY REVIEW
+## SECURITY REVIEW
 
 Category                   | Result
 Reentrancy                 : Safe, state updated first
@@ -215,7 +215,7 @@ No critical vulnerabilities identified
 
 ======================================================================
 
-RISK ASSESSMENT
+## RISK ASSESSMENT
 
 1. Pseudo-Randomness: Suitable for collectibles, not for gambling
 2. Immutability: Any bug is permanent
