@@ -159,11 +159,11 @@ constructor() {
     owner = msg.sender;
 }
 ````
--Owner is immutable.
--No functions exist to:
--Withdraw user NFTs
--Pause minting
--Change metadata or token behavior
+- Owner is immutable.
+- No functions exist to:
+- Withdraw user NFTs
+- Pause minting
+- Change metadata or token behavior
 ##### ✅ Result: Fully trust-minimized contract.
 
 
@@ -171,16 +171,16 @@ constructor() {
 address public constant TREASURY = 0x7c4e9A3bB509A33d6bD5E8C0aA002Fef5171B719;
 ###### ETH goes only to this address.
 
--Owner cannot change it.
--Predictable and safe ETH flow.
+- Owner cannot change it.
+- Predictable and safe ETH flow.
 
 ### Summary of User Wallet Safety
 
--ETH Risk: Only the mint price is taken. No extra deductions.
--NFT Risk: Tokens cannot be stolen or moved without approval.
--Locked NFTs: Contract cannot receive NFTs, so no accidental loss.
--No Admin Backdoors: Immutable owner, no functions to manipulate user funds.
--Treasury Control: Fixed, safe address for ETH collection.
+- ETH Risk: Only the mint price is taken. No extra deductions.
+- NFT Risk: Tokens cannot be stolen or moved without approval.
+- Locked NFTs: Contract cannot receive NFTs, so no accidental loss.
+- No Admin Backdoors: Immutable owner, no functions to manipulate user funds.
+- Treasury Control: Fixed, safe address for ETH collection.
 
 ###### Bottom line: Users interacting with YAMADOGS cannot have their wallets drained or NFTs stolen.
 
@@ -350,23 +350,15 @@ Uses swap-and-pop for per-owner arrays to maintain gas efficiency
 
 Category                   | Result
 -------
-Reentrancy                 : Safe, state updated first
-
-Integer overflow/underflow : Safe (Solidity 0.8+)
-
-Access control             : Public mint, owner immutable
-
-NFT lock risk              : Prevented via revert in onERC721Received
-
-Treasury ETH transfer      : Safe, reverts on failure
-
-External calls             : Minimal, controlled
-
-Contract immutability      : Logic and owner cannot change
-
-Marketplace compatibility  : ERC-721 + Metadata + Enumerable
-
-No critical vulnerabilities identified
+- Reentrancy                 : Safe, state updated first
+- Integer overflow/underflow : Safe (Solidity 0.8+)
+- Access control             : Public mint, owner immutable
+- NFT lock risk              : Prevented via revert in onERC721Received
+- Treasury ETH transfer      : Safe, reverts on failure
+- External calls             : Minimal, controlled
+- Contract immutability      : Logic and owner cannot change
+- Marketplace compatibility  : ERC-721 + Metadata + Enumerable
+- No critical vulnerabilities identified
 
 ======================================================================
 
@@ -386,15 +378,10 @@ No critical vulnerabilities identified
  ##### YAMADOGS is:
 
 - Fully on-chain and immutable
-  
 - Safe for minting and transfers
-  
 - Marketplace compatible
-  
 - Collector-friendly with NFT lock prevention
-  
-- Contract is safe for users. No financial or - NFT risk exists outside normal approved minting or transfers.
-
+- Contract is safe for users. No financial or - NFT risk exists outside normal approved minting or transfers
 - Meets best practices for on-chain generative NFT collections
 - Deployable on Base network
 
