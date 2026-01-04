@@ -175,7 +175,6 @@ address public constant TREASURY = 0x7c4e9A3bB509A33d6bD5E8C0aA002Fef5171B719;
 
 - ETH Risk: Only the mint price is taken. No extra deductions.
 - NFT Risk: Tokens cannot be stolen or moved without approval.
-- Locked NFTs: Contract cannot receive NFTs, so no accidental loss.
 - No Admin Backdoors: Immutable owner, no functions to manipulate user funds.
 - Treasury Control: Fixed, safe address for ETH collection.
 
