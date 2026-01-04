@@ -149,13 +149,14 @@ NFTs cannot be stolen or moved without consent.
 ) external pure returns (bytes4) {
     revert("NO_RECEIVE");
 }
+```
 The contract cannot receive NFTs.
 
 Prevents accidental locking of user tokens.
 
 ## 4️⃣ No Admin Functions / No Backdoors
 
-address public immutable owner;
+```address public immutable owner;
 constructor() {
     owner = msg.sender;
 }
@@ -170,7 +171,7 @@ Pause minting
 
 Change metadata or token behavior
 
-✅ Result: Fully trust-minimized contract.
+### ✅ Result: Fully trust-minimized contract.
 
 
 ## 5️⃣ Treasury is Hardcoded
@@ -206,10 +207,13 @@ ERC-165          : Supported
 ERC-721          : Custom implementation
 ERC-721 Metadata : Supported
 ERC-721 Enumerable : Supported
-
+---
 Design Notes:
+---
 - Custom ERC-721 implementation for gas efficiency
+- 
 - On-chain SVG generation requires mappings for _ownerOf, _balanceOf, _allTokens, _ownedTokens
+- 
 - Supports both global and per-owner enumeration
 
 ======================================================================
@@ -220,7 +224,7 @@ Design Notes:
 - No admin functions (pause, withdraw, upgrade)
 - Metadata and minting logic cannot be changed post-deployment
 
-Implications:
+### Implications:
 - Fully trust-minimized
 - Any bug is permanent
 
@@ -247,11 +251,10 @@ User calls mint() → Checks supply & ETH → Generate seed → _mint() → Forw
 
 Seed Calculation:
 seed = keccak256(tokenId, msg.sender, block.timestamp, block.prevrandao)
-
-Traits:
+---
+##### Traits:
 - Numeric: Ears, Inner Ears, Eyes, Pupils, Nose, Mouth, Hair, Feet
-- Boolean: Fur, EyePatch, Mask
-
+- Boolean: Fur, EyePatch, Mask,
 Traits Mapping Diagram:
 
 Seed -> Traits Struct
@@ -278,7 +281,7 @@ Notes:
 
 All artwork is generated on-chain using Solidity string concatenation
 
-SVG Generation Flow:
+### SVG Generation Flow:
 
 Seed
   │
@@ -319,7 +322,7 @@ Example:
 - Implements transferFrom() and safeTransferFrom()
 - onERC721Received() always reverts
 
-Transfer Flow:
+#### Transfer Flow:
 
 User/Contract calls safeTransferFrom() 
   -> Checks approval/owner
@@ -328,13 +331,13 @@ User/Contract calls safeTransferFrom()
   -> Checks recipient code
   -> Reverts if recipient is contract
 
-Implications:
+#### Implications:
 - Prevents accidental NFT lock
 - Contracts must handle ERC721 reception elsewhere
 
 ======================================================================
 
-ERC-721 ENUMERATION
+## ERC-721 ENUMERATION
 
 Supports:
 - totalSupply()
@@ -357,15 +360,23 @@ Uses swap-and-pop for per-owner arrays to maintain gas efficiency
 ## SECURITY REVIEW
 
 Category                   | Result
+-
 Reentrancy                 : Safe, state updated first
+---
 Integer overflow/underflow : Safe (Solidity 0.8+)
+---
 Access control             : Public mint, owner immutable
+---
 NFT lock risk              : Prevented via revert in onERC721Received
+---
 Treasury ETH transfer      : Safe, reverts on failure
+---
 External calls             : Minimal, controlled
+---
 Contract immutability      : Logic and owner cannot change
+---
 Marketplace compatibility  : ERC-721 + Metadata + Enumerable
-
+---
 No critical vulnerabilities identified
 
 ======================================================================
@@ -383,7 +394,7 @@ No critical vulnerabilities identified
 
 ## CONCLUSION
 
- YAMADOGS is:
+ ###### YAMADOGS is:
 
 - Fully on-chain and immutable
 - Safe for minting and transfers
