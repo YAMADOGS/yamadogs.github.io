@@ -2,7 +2,7 @@
 
 ======================================================================
 
-# PROJECT OVERVIEW
+## PROJECT OVERVIEW
 
 Project Name: YAMADOGS
 Contract Type: ERC-721 Fully On-Chain Generative NFT
