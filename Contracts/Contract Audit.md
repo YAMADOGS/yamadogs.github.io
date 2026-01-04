@@ -82,10 +82,10 @@ function mint() external payable {
 
 #### Analysis:
 
--Users only pay exactly 0.0005 ETH per NFT.
--Sending the wrong ETH amount will revert (WRONG_PRICE).
--ETH is sent only to a fixed, immutable treasury address.
--No other function can take ETH from a user.
+- Users only pay exactly 0.0005 ETH per NFT.
+- Sending the wrong ETH amount will revert (WRONG_PRICE).
+- ETH is sent only to a fixed, immutable treasury address.
+- No other function can take ETH from a user.
 
 ###### ✅ Conclusion: Users cannot lose ETH accidentally.
 
@@ -130,13 +130,10 @@ All transfers require ownership or approval:
 
 ### Analysis:
 
-Users must be owner or approved to transfer.
-
-Transfers to contracts revert if the contract cannot handle ERC721.
-
-NFTs cannot be stolen or moved without consent.
-
-✅ Conclusion: NFT ownership is fully safe.
+- Users must be owner or approved to transfer.
+- Transfers to contracts revert if the contract cannot handle ERC721.
+- NFTs cannot be stolen or moved without consent.
+##### ✅ Conclusion: NFT ownership is fully safe.
 
 ## 3 Contract Cannot Drain NFTs
 ```function onERC721Received(
