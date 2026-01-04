@@ -77,8 +77,10 @@ function mint() external payable {
     (bool success,) = TREASURY.call{value: msg.value}("");
     require(success, "TRANSFER_FAIL");
 }
+`````
+---
 
-Analysis:
+### Analysis:
 
 Users only pay exactly 0.0005 ETH per NFT.
 
@@ -90,7 +92,7 @@ No other function can take ETH from a user.
 
 ✅ Conclusion: Users cannot lose ETH accidentally.
 
-## 2️⃣ Token Transfer Safety
+## 2 Token Transfer Safety
 
 All transfers require ownership or approval:
 
@@ -116,7 +118,7 @@ function transferFrom(address f, address t, uint256 id) public override {
     emit Transfer(f, t, id);
 }
 ## Safe Transfer Check:
-function safeTransferFrom(address f, address t, uint256 id, bytes memory d) public override {
+```function safeTransferFrom(address f, address t, uint256 id, bytes memory d) public override {
     transferFrom(f, t, id);
     if (t.code.length != 0) {
         require(
@@ -126,7 +128,7 @@ function safeTransferFrom(address f, address t, uint256 id, bytes memory d) publ
         );
     }
 }
-
+````
 
 ## Analysis:
 
@@ -138,8 +140,8 @@ NFTs cannot be stolen or moved without consent.
 
 ✅ Conclusion: NFT ownership is fully safe.
 
-## 3️⃣ Contract Cannot Drain NFTs
-function onERC721Received(
+## 3 Contract Cannot Drain NFTs
+```function onERC721Received(
     address,
     address,
     uint256,
@@ -157,7 +159,7 @@ address public immutable owner;
 constructor() {
     owner = msg.sender;
 }
-
+````
 Owner is immutable.
 
 No functions exist to:
@@ -192,11 +194,6 @@ No Admin Backdoors: Immutable owner, no functions to manipulate user funds.
 Treasury Control: Fixed, safe address for ETH collection.
 
 Bottom line: Users interacting with YAMADOGS cannot have their wallets drained or NFTs stolen.
-
-
-
-
-
 
 
 ======================================================================
