@@ -171,7 +171,7 @@ Pause minting
 
 Change metadata or token behavior
 
-###### ✅ Result: Fully trust-minimized contract.
+##### ✅ Result: Fully trust-minimized contract.
 
 
 ## 5 Treasury is Hardcoded
@@ -182,7 +182,7 @@ Owner cannot change it.
 
 Predictable and safe ETH flow.
 
-##### Summary of User Wallet Safety
+### Summary of User Wallet Safety
 
 ETH Risk: Only the mint price is taken. No extra deductions.
 
@@ -358,28 +358,28 @@ Uses swap-and-pop for per-owner arrays to maintain gas efficiency
 
 ======================================================================
 
-## SECURITY REVIEW
+##### SECURITY REVIEW
 
 Category                   | Result
 -------
 Reentrancy                 : Safe, state updated first
------------
+
 Integer overflow/underflow : Safe (Solidity 0.8+)
-------------
+
 Access control             : Public mint, owner immutable
-------------
+
 NFT lock risk              : Prevented via revert in onERC721Received
--------------
+
 Treasury ETH transfer      : Safe, reverts on failure
--------------
+
 External calls             : Minimal, controlled
--------------
+
 Contract immutability      : Logic and owner cannot change
--------------
+
 Marketplace compatibility  : ERC-721 + Metadata + Enumerable
--------------
+
 No critical vulnerabilities identified
--------------
+
 ======================================================================
 
 #### RISK ASSESSMENT
@@ -407,10 +407,10 @@ Deployable on Base network
 
 ======================================================================
 
-## DISCLAIMER
+#### DISCLAIMER
 
 This audit is informational. Interacting with smart contracts carries risk. No contract is guaranteed bug-free.
 
 ======================================================================
 
-##### YAMADOGS — 100% ON-CHAIN. FOREVER.
+#### YAMADOGS — 100% ON-CHAIN. FOREVER.
