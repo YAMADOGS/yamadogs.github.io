@@ -1,4 +1,4 @@
-# YAMADOGS SMART CONTRACT FULL AUDIT WITH DIAGRAMS
+# YAMADOGS SMART CONTRACT FULL AI AUDIT
 
 ======================================================================
 
