@@ -82,21 +82,18 @@ function mint() external payable {
 
 #### Analysis:
 
-Users only pay exactly 0.0005 ETH per NFT.
+-Users only pay exactly 0.0005 ETH per NFT.
+-Sending the wrong ETH amount will revert (WRONG_PRICE).
+-ETH is sent only to a fixed, immutable treasury address.
+-No other function can take ETH from a user.
 
-Sending the wrong ETH amount will revert (WRONG_PRICE).
-
-ETH is sent only to a fixed, immutable treasury address.
-
-No other function can take ETH from a user.
-
-✅ Conclusion: Users cannot lose ETH accidentally.
+###### ✅ Conclusion: Users cannot lose ETH accidentally.
 
 ## 2 Token Transfer Safety
 
 All transfers require ownership or approval:
 
-function transferFrom(address f, address t, uint256 id) public override {
+```function transferFrom(address f, address t, uint256 id) public override {
     address o = ownerOf(id);
     require(o == f, "NOT_OWNER");
     require(t != address(0), "ZERO_ADDRESS");
@@ -117,6 +114,7 @@ function transferFrom(address f, address t, uint256 id) public override {
     delete _tokenApprovals[id];
     emit Transfer(f, t, id);
 }
+```
 ## Safe Transfer Check:
 ```function safeTransferFrom(address f, address t, uint256 id, bytes memory d) public override {
     transferFrom(f, t, id);
@@ -161,40 +159,30 @@ constructor() {
     owner = msg.sender;
 }
 ````
-Owner is immutable.
-
-No functions exist to:
-
-Withdraw user NFTs
-
-Pause minting
-
-Change metadata or token behavior
-
+-Owner is immutable.
+-No functions exist to:
+-Withdraw user NFTs
+-Pause minting
+-Change metadata or token behavior
 ##### ✅ Result: Fully trust-minimized contract.
 
 
 ## 5 Treasury is Hardcoded
 address public constant TREASURY = 0x7c4e9A3bB509A33d6bD5E8C0aA002Fef5171B719;
-ETH goes only to this address.
+###### ETH goes only to this address.
 
-Owner cannot change it.
-
-Predictable and safe ETH flow.
+-Owner cannot change it.
+-Predictable and safe ETH flow.
 
 ### Summary of User Wallet Safety
 
-ETH Risk: Only the mint price is taken. No extra deductions.
+-ETH Risk: Only the mint price is taken. No extra deductions.
+-NFT Risk: Tokens cannot be stolen or moved without approval.
+-Locked NFTs: Contract cannot receive NFTs, so no accidental loss.
+-No Admin Backdoors: Immutable owner, no functions to manipulate user funds.
+-Treasury Control: Fixed, safe address for ETH collection.
 
-NFT Risk: Tokens cannot be stolen or moved without approval.
-
-Locked NFTs: Contract cannot receive NFTs, so no accidental loss.
-
-No Admin Backdoors: Immutable owner, no functions to manipulate user funds.
-
-Treasury Control: Fixed, safe address for ETH collection.
-
-Bottom line: Users interacting with YAMADOGS cannot have their wallets drained or NFTs stolen.
+###### Bottom line: Users interacting with YAMADOGS cannot have their wallets drained or NFTs stolen.
 
 
 ======================================================================
