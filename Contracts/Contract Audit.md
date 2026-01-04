@@ -80,7 +80,7 @@ function mint() external payable {
 `````
 ---
 
-### Analysis:
+#### Analysis:
 
 Users only pay exactly 0.0005 ETH per NFT.
 
@@ -130,7 +130,7 @@ function transferFrom(address f, address t, uint256 id) public override {
 }
 ````
 
-## Analysis:
+### Analysis:
 
 Users must be owner or approved to transfer.
 
@@ -154,7 +154,7 @@ The contract cannot receive NFTs.
 
 Prevents accidental locking of user tokens.
 
-## 4️⃣ No Admin Functions / No Backdoors
+## 4 No Admin Functions / No Backdoors
 
 ```address public immutable owner;
 constructor() {
@@ -171,10 +171,10 @@ Pause minting
 
 Change metadata or token behavior
 
-### ✅ Result: Fully trust-minimized contract.
+###### ✅ Result: Fully trust-minimized contract.
 
 
-## 5️⃣ Treasury is Hardcoded
+## 5 Treasury is Hardcoded
 address public constant TREASURY = 0x7c4e9A3bB509A33d6bD5E8C0aA002Fef5171B719;
 ETH goes only to this address.
 
@@ -182,7 +182,7 @@ Owner cannot change it.
 
 Predictable and safe ETH flow.
 
-## Summary of User Wallet Safety
+##### Summary of User Wallet Safety
 
 ETH Risk: Only the mint price is taken. No extra deductions.
 
@@ -207,9 +207,9 @@ ERC-165          : Supported
 ERC-721          : Custom implementation
 ERC-721 Metadata : Supported
 ERC-721 Enumerable : Supported
----
+--------
 Design Notes:
----
+--------
 - Custom ERC-721 implementation for gas efficiency
 - 
 - On-chain SVG generation requires mappings for _ownerOf, _balanceOf, _allTokens, _ownedTokens
@@ -224,7 +224,7 @@ Design Notes:
 - No admin functions (pause, withdraw, upgrade)
 - Metadata and minting logic cannot be changed post-deployment
 
-### Implications:
+###### Implications:
 - Fully trust-minimized
 - Any bug is permanent
 
@@ -251,8 +251,8 @@ User calls mint() → Checks supply & ETH → Generate seed → _mint() → Forw
 
 Seed Calculation:
 seed = keccak256(tokenId, msg.sender, block.timestamp, block.prevrandao)
----
-##### Traits:
+---------
+###### Traits:
 - Numeric: Ears, Inner Ears, Eyes, Pupils, Nose, Mouth, Hair, Feet
 - Boolean: Fur, EyePatch, Mask,
 Traits Mapping Diagram:
@@ -281,7 +281,7 @@ Notes:
 
 All artwork is generated on-chain using Solidity string concatenation
 
-### SVG Generation Flow:
+###### SVG Generation Flow:
 
 Seed
   │
@@ -308,12 +308,13 @@ Body, Head, Eyes, Pupils, Nose, Mouth, Ears, Hair, Mask, Fur, Feet, Background
 - Image contains Base64-encoded SVG
 
 Example:
-{
+```{
   "name": "YADO #123",
   "description": "YAMADOGS fully on-chain NFT",
   "attributes": [...],
   "image": "data:image/svg+xml;base64,..."
 }
+```
 
 ======================================================================
 
@@ -322,7 +323,7 @@ Example:
 - Implements transferFrom() and safeTransferFrom()
 - onERC721Received() always reverts
 
-#### Transfer Flow:
+###### Transfer Flow:
 
 User/Contract calls safeTransferFrom() 
   -> Checks approval/owner
@@ -331,7 +332,7 @@ User/Contract calls safeTransferFrom()
   -> Checks recipient code
   -> Reverts if recipient is contract
 
-#### Implications:
+###### Implications:
 - Prevents accidental NFT lock
 - Contracts must handle ERC721 reception elsewhere
 
@@ -360,28 +361,28 @@ Uses swap-and-pop for per-owner arrays to maintain gas efficiency
 ## SECURITY REVIEW
 
 Category                   | Result
--
+-------
 Reentrancy                 : Safe, state updated first
----
+-----------
 Integer overflow/underflow : Safe (Solidity 0.8+)
----
+------------
 Access control             : Public mint, owner immutable
----
+------------
 NFT lock risk              : Prevented via revert in onERC721Received
----
+-------------
 Treasury ETH transfer      : Safe, reverts on failure
----
+-------------
 External calls             : Minimal, controlled
----
+-------------
 Contract immutability      : Logic and owner cannot change
----
+-------------
 Marketplace compatibility  : ERC-721 + Metadata + Enumerable
----
+-------------
 No critical vulnerabilities identified
-
+-------------
 ======================================================================
 
-## RISK ASSESSMENT
+#### RISK ASSESSMENT
 
 1. Pseudo-Randomness: Suitable for collectibles, not for gambling
 2. Immutability: Any bug is permanent
@@ -392,7 +393,7 @@ No critical vulnerabilities identified
 ======================================================================
 
 
-## CONCLUSION
+#### CONCLUSION
 
  ###### YAMADOGS is:
 
@@ -412,4 +413,4 @@ This audit is informational. Interacting with smart contracts carries risk. No c
 
 ======================================================================
 
-## YAMADOGS — 100% ON-CHAIN. FOREVER.
+##### YAMADOGS — 100% ON-CHAIN. FOREVER.
