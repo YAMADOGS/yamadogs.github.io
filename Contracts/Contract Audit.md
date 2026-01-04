@@ -386,12 +386,17 @@ No critical vulnerabilities identified
  ##### YAMADOGS is:
 
 - Fully on-chain and immutable
+  
 - Safe for minting and transfers
+  
 - Marketplace compatible
+  
 - Collector-friendly with NFT lock prevention
-Contract is safe for users. No financial or NFT risk exists outside normal approved minting or transfers.
-Meets best practices for on-chain generative NFT collections
-Deployable on Base network
+  
+- Contract is safe for users. No financial or - NFT risk exists outside normal approved minting or transfers.
+
+- Meets best practices for on-chain generative NFT collections
+- Deployable on Base network
 
 ======================================================================
 
