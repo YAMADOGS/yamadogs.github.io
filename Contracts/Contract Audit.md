@@ -2,7 +2,7 @@
 
 ======================================================================
 
-## PROJECT OVERVIEW
+# PROJECT OVERVIEW
 
 Project Name: YAMADOGS
 Contract Type: ERC-721 Fully On-Chain Generative NFT
@@ -10,11 +10,11 @@ Network: Base (EVM / OP Stack)
 Solidity Version: ^0.8.20
 License: MIT
 
-## Official Links:
+# Official Links:
 Website: https://yamadogs.org
 GitHub Pages: https://yamadogs.github.io
 
-## Collection Summary:
+# Collection Summary:
 YAMADOGS is a collection of 2,026 fully on-chain generative NFTs.
 All metadata, traits, and images are generated and stored directly on-chain.
 
@@ -25,7 +25,7 @@ All metadata, traits, and images are generated and stored directly on-chain.
 
 ======================================================================
 
-## CONTRACT SCOPE
+# CONTRACT SCOPE
 
 Covers the complete YAMADOGS.sol contract including:
 
@@ -43,7 +43,7 @@ Covers the complete YAMADOGS.sol contract including:
 
 ======================================================================
 
-## CONTRACT ARCHITECTURE
+# CONTRACT ARCHITECTURE
 
 Standards Implemented:
 
@@ -59,7 +59,7 @@ Design Notes:
 
 ======================================================================
 
-## OWNERSHIP AND ACCESS CONTROL
+# OWNERSHIP AND ACCESS CONTROL
 
 - Owner is immutable at deployment
 - No admin functions (pause, withdraw, upgrade)
@@ -71,7 +71,7 @@ Implications:
 
 ======================================================================
 
-## MINTING LOGIC
+# MINTING LOGIC
 
 Maximum Supply: 2026
 Mint Price: 0.0005 ETH
@@ -88,7 +88,7 @@ User calls mint() → Checks supply & ETH → Generate seed → _mint() → Forw
 
 ======================================================================
 
-## TRAIT GENERATION & RANDOMNESS
+# TRAIT GENERATION & RANDOMNESS
 
 Seed Calculation:
 seed = keccak256(tokenId, msg.sender, block.timestamp, block.prevrandao)
@@ -119,7 +119,7 @@ Notes:
 
 ======================================================================
 
-## ON-CHAIN SVG RENDERING
+# ON-CHAIN SVG RENDERING
 
 All artwork is generated on-chain using Solidity string concatenation
 
@@ -143,7 +143,7 @@ Body, Head, Eyes, Pupils, Nose, Mouth, Ears, Hair, Mask, Fur, Feet, Background
 
 ======================================================================
 
-## METADATA & TOKENURI
+# METADATA & TOKENURI
 
 - Returns Base64-encoded JSON: data:application/json;base64,...
 - Fields: name, description, attributes, image
@@ -159,7 +159,7 @@ Example:
 
 ======================================================================
 
-## TRANSFER FUNCTIONS & SAFETY
+# TRANSFER FUNCTIONS & SAFETY
 
 - Implements transferFrom() and safeTransferFrom()
 - onERC721Received() always reverts
@@ -190,7 +190,7 @@ Uses swap-and-pop for per-owner arrays to maintain gas efficiency
 
 ======================================================================
 
-## GAS & DEPLOYMENT CONSIDERATIONS
+# GAS & DEPLOYMENT CONSIDERATIONS
 
 - Contract large due to on-chain SVG + metadata
 - Base network supports deployment
@@ -226,9 +226,9 @@ RISK ASSESSMENT
 ======================================================================
 
 
-## CONCLUSION
+# CONCLUSION
 
-# YAMADOGS is:
+ YAMADOGS is:
 
 - Fully on-chain and immutable
 - Safe for minting and transfers
@@ -246,4 +246,4 @@ This audit is informational. Interacting with smart contracts carries risk. No c
 
 ======================================================================
 
-## YAMADOGS — 100% ON-CHAIN. FOREVER.
+# YAMADOGS — 100% ON-CHAIN. FOREVER.
