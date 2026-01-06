@@ -12,8 +12,9 @@
 YAMADOGS has **only these official websites**:
 
 - [https://yamadogs.org](https://yamadogs.org)  
-- [https://yamadogs.github.io](https://yamadogs.github.io)  
-
+- [https://yamadogs.github.io](https://yamadogs.github.io)
+- Explorer
+(https://sepolia.etherscan.io/token/0x4378682659304853EbD0146E85CF78EdECaE9647)
 ---
 
 ## 💎 Official Contract Address
