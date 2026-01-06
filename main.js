@@ -37,7 +37,7 @@ function copyContract() {
 }
 
 function copyLink() {
-  navigator.clipboard?.writeText("https://yamadogs.github.io");
+  navigator.clipboard?.writeText("https://yamadogs.org");
   showToast("Link copied! Open inside wallet browser.");
 }
 
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = btn.dataset.url;
     if (url) {
       btn.addEventListener("click", () => {
-        window.open(url, "_blank", "noopener");
+        window.open(url, "_blank", "noopener,noreferrer");
       });
     }
   });
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const viewSourceBtn = document.getElementById("viewSourceBtn");
   if (viewSourceBtn) {
     viewSourceBtn.addEventListener("click", () => {
-      window.open("https://github.com/YAMADOGS/yamadogs.github.io", "_blank", "noopener");
+      window.open("https://github.com/YAMADOGS/yamadogs.github.io", "_blank", "noopener,noreferrer");
     });
   }
   

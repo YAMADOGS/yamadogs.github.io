@@ -4,18 +4,36 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="
-default-src 'self';
+default-src 'none';
 script-src 'self';
-font-src 'self';
 style-src 'self';
 img-src 'self';
+font-src 'self';
 connect-src 'self' https://ethereum-sepolia-rpc.publicnode.com;
-frame-ancestors 'none';
 base-uri 'none';
-object-src 'none';
 form-action 'none';
-frame-src 'none';   
+object-src 'none';
+frame-src 'none';
+frame-ancestors 'none';
+upgrade-insecure-requests;
+block-all-mixed-content;
 ">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="Permissions-Policy" content="
+clipboard-read=(self),
+clipboard-write=(self),
+geolocation=(),
+camera=(),
+microphone=(),
+payment=(),
+usb=(),
+hid=(),
+serial=(),
+xr-spatial-tracking=()
+">
+
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="icon" type="image/png" sizes="1024x1024" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
@@ -36,8 +54,8 @@ frame-src 'none';
 <meta name="description" content="YAMADOGS NFT is a collection of 2,026 fully on-chain generative NFT collectibles, where 100% of the metadata and images live directly on the blockchain. ❌ No IPFS ❌ No external servers ❌ No private hosting ✅ Pure on-chain permanence Once deployed, YAMADOGS exists as long as the blockchain exists.">
 
 <link rel="stylesheet" href="styles.css">
-<script src="ethers.umd.min.js"></script>
-<script src="main.js"></script>
+<script src="ethers.umd.min.js"integrity="sha384-Htz1SE4Sl5aitpvFgr2j0sfsGUIuSXI6t8hEyrlQ93zflEF3a29bH2AvkUROUw7J crossorigin="anonymous"></script>
+<script src="main.js" defer></script>
 </head>
 <body>
 <!-- ===============================
@@ -67,25 +85,24 @@ frame-src 'none';
   <div class="mint-toast-body">
     <h1>WARNING!</h1>
     <p>
-<b>Yo pups!</b>🐾 Don’t get lost in the pack! Always fetch YAMADOGS from the official den:
+<b>Yo pups!</b>🐾 Don’t get lost in the pack! Always fetch YAMADOGS from the official den:</p>
  <p>
- 🌐 yamadogs.org
+ 🌐 <b>yamadogs.org</b>
 </p><p>
- 🌐yamadogs.github.io
+ 🌐<b>yamadogs.github.io</b>
  </p>
-    </p>
    
-    ⚠️ YAMADOGS is NOT financial advice!
-
-YAMADOGS was created purely for fun and as a tribute to the long-lost, legendary breed: Yamainu.
-
-💥 DO NOT MINT OR BUY if you’re chasing quick profits or flipping opportunities!
-
-This project was built by me, solo, over months, for true collectors — people who love dogs and respect the art of collecting.
-
-💀 The risk of losing money here is real. If your only goal is profit, this is NOT for you.
-
-🐶 If you simply love collecting, holding, and enjoying YAMADOGS — welcome aboard!
+   <p> <b>⚠️ YAMADOGS is NOT financial advice!</b></p>
+<p>
+YAMADOGS was created purely for fun and as a tribute to the long-lost, legendary breed: Yamainu.</p>
+<p>
+💥 DO NOT MINT OR BUY if you’re chasing quick profits or flipping opportunities!</p>
+<p>
+This project was built by me, solo, over months, for true collectors — people who love dogs and respect the art of collecting.</p>
+<p>
+💀 The risk of losing money here is real. If your only goal is profit, this is NOT for you.</p>
+<p>
+🐶 If you simply love collecting, holding, and enjoying YAMADOGS — welcome aboard!</p>
 </div>
 </div>
 <div class="ui">
@@ -98,11 +115,12 @@ This project was built by me, solo, over months, for true collectors — people 
 <div class="security-warning">
   <h1>WARNING!</h1>
   <div class="security-warning">
-<p></b>Yo pack!</b> 🐾 Stay sharp and don’t sniff the wrong trail! ⚡</p>
+<p><b>Yo pack!</b> 🐾 Stay sharp and don’t sniff the wrong trail! ⚡</p>
 <p>Only roam these official YAMADOGS paths:</p>
-<p></b>🌐 yamadogs.org</b></p>
-<p></b>🌐 yamadogs.github.io</b></p>
-<p><a href="https://sepolia.etherscan.io/token/0x4378682659304853EbD0146E85CF78EdECaE9647">EXPLORER</a></p>
+<p><b>🌐 yamadogs.org</b></p>
+<p><b>🌐 yamadogs.github.io</b></p>
+<p><a href="https://sepolia.etherscan.io/token/0x4378682659304853EbD0146E85CF78EdECaE9647"target="_blank"
+   rel="noopener noreferrer">EXPLORER</a></p>
 <p>Sniff-test time! 👃 Double-check the URL you’re on—if it ain’t one of these, don’t click or connect your wallet!</p>
 </div>
 <div class="security-warning">
@@ -162,7 +180,7 @@ For Mobile users if Wallet Connect dont Pop up after you click just Open the web
 <button id="mintBtn">MINT YAMADOGS NFT</button>
 
 <div class="link-buttons">
-  <button data-url="https://pancakeswap.com">Magic Eden</button>
+  <button data-url="/">Magic Eden</button>
   <button data-url="https://testnet.rarible.com/collection/0x4378682659304853ebd0146e85cf78edecae9647/items">OPENSEA</button>
 </div>
 
@@ -173,7 +191,7 @@ Your YAMADOGS NFT lives entirely on the blockchain — no external storage, no I
 Completely ownerless, admin-less… like a wild dog roaming free in the forest, owned by no one, keep by no one.</p>
 </div>
 <div class="faq-wrapper">
-<p>FAQ</p>
+<h2>FAQ</h2>
   <div class="faq-item">
     <div class="faq-question">What is YAMADOGS?</div>
     <div class="faq-answer">
@@ -272,11 +290,11 @@ But I put my heart and soul into creating YAMADOGS — and that part is real. �
      aria-label="X">
     <img src="x.png" alt="X"></a>
   <a class="social-link"
-     href="https://telegram.com"
+     href="https://discord.gg/eKm2VPU2bW"
      target="_blank"
      rel="noopener"
-     aria-label="Telegram">
-    <img src="telegram.png" alt="Telegram"></a>
+     aria-label="Discord">
+    <img src="discord.png" alt="Discord"></a>
 </div>
 <div class="site-footer">
   © 2025 YAMADOGS — MIT License<br>
