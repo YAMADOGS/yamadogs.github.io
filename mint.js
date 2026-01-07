@@ -228,44 +228,58 @@ altLinkEl?.addEventListener("click", copyAltLink);
   let provider, signer, contract;
 
   async function connectWallet() {
-    if (!window.ethereum) {
-  showToast("⚠️ Please install MetaMask or a compatible wallet.");
-  setMintStatus("Wallet not detected", "#ff6b6b"); 
-  return;
+  setMintStatus("Connecting wallet...");
+
+  try {
+    // Create WalletConnect provider
+    const providerWC = await WalletConnectProvider.init({
+      projectId: "a7c181734d5ca63216f66c568dcf2bb1", // your Project ID
+      chains: [11155111], // Sepolia
+      showQrModal: true,
+    });
+
+    await providerWC.connect();
+
+    // Use ethers.js with WalletConnect
+    provider = new ethers.providers.Web3Provider(providerWC);
+    signer = provider.getSigner();
+    const address = await signer.getAddress();
+
+    if (walletAddressEl) walletAddressEl.textContent = `Wallet: ${address}`;
+
+    contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+    connectBtn?.setAttribute("disabled", true);
+    mintBtn?.removeAttribute("disabled");
+
+    setMintStatus("Wallet connected");
+    updateMintCounter();
+
+    // Listen for accounts change
+    providerWC.on("accountsChanged", (accounts) => {
+      if (accounts.length > 0) {
+        walletAddressEl.textContent = `Wallet: ${accounts[0]}`;
+      } else {
+        walletAddressEl.textContent = "Wallet disconnected";
+        mintBtn.setAttribute("disabled", true);
+        connectBtn.removeAttribute("disabled");
+      }
+    });
+
+    // Listen for disconnect
+    providerWC.on("disconnect", () => {
+      walletAddressEl.textContent = "Wallet disconnected";
+      mintBtn.setAttribute("disabled", true);
+      connectBtn.removeAttribute("disabled");
+    });
+
+  } catch (err) {
+    console.error("WalletConnect error:", err);
+    setMintStatus("Wallet connection failed", "#ff6b6b");
+    showToast("⚠️ Wallet connection failed", "error");
+  }
 }
 
-
-    try {
-      setMintStatus("Connecting wallet...");
-
-      await window.ethereum.request({ method: "eth_requestAccounts" });
-
-      provider = new ethers.providers.Web3Provider(window.ethereum);
-
-      const network = await provider.getNetwork();
-      if (network.chainId !== 11155111) { 
-        showToast("Please switch to Base Chain");
-        setMintStatus("Wrong network", "#ff6b6b");
-        return;
-      }
-
-      signer = provider.getSigner();
-      const address = await signer.getAddress();
-      if (walletAddressEl) walletAddressEl.textContent = `Wallet: ${address}`;
-
-      contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-
-      connectBtn?.setAttribute("disabled", true);
-      mintBtn?.removeAttribute("disabled");
-
-      setMintStatus("Wallet connected");
-      updateMintCounter();
-
-    } catch (err) {
-      console.error("Connect error:", err);
-      setMintStatus("Wallet connection failed", "#ff6b6b");
-    }
-  }
   
 function openSepoliaNFT(tokenId) {
   const url = `https://sepolia.etherscan.io/token/${CONTRACT_ADDRESS}?a=${tokenId}`;
