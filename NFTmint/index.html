@@ -5,19 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="
 default-src 'none';
-script-src 'self' https://unpkg.com;
+script-src 'self';
 style-src 'self';
 img-src 'self';
 font-src 'self';
-connect-src
-  'self'
-  https://ethereum-sepolia-rpc.publicnode.com
-  https://*.walletconnect.com
-  wss://*.walletconnect.com;
+connect-src 'self' https://ethereum-sepolia-rpc.publicnode.com;
 base-uri 'none';
 form-action 'none';
 object-src 'none';
-frame-src https://*.walletconnect.com;
+frame-src 'none';
 frame-ancestors 'none';
 upgrade-insecure-requests;
 block-all-mixed-content;
@@ -80,8 +76,6 @@ Don’t get tricked—always double-check that you’re on the official website 
 </div>
 
   <button id="connectBtn">Connect Wallet</button>
-<button id="walletConnectBtn">WalletConnect</button>
-
   <div id="walletAddress" style="margin-top:6px;font-size:10px;"></div>
   <button id="mintBtn" disabled>Mint</button>
   <div id="mintStatus" style="margin-top:12px;font-size:10px;"></div>
@@ -119,10 +113,7 @@ Welcome to the pack—let the wag-worthy journeys begin! 🚀</strong>
   </div>
 </div>
 <script src="/ethers.umd.min.js" integrity="sha384-Htz1SE4Sl5aitpvFgr2j0sfsGUIuSXI6t8hEyrlQ93zflEF3a29bH2AvkUROUw7J" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@walletconnect/ethereum-provider/dist/index.umd.js"></script>
-<script type="module" src="https://unpkg.com/@web3modal/standalone@2.10.5/dist/index.min.js"></script>
 <script src="/mint.js" defer></script>
-
 
 </body>
 </html>
