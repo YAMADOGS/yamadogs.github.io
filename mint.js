@@ -226,7 +226,8 @@ altLinkEl?.addEventListener("click", copyAltLink);
   /* =======================
      CONNECT WALLET
   ======================= */
-  let provider, signer, contract, wcProvider;
+  let provider, signer, contract, wcProvider, web3Modal;
+
 
   async function connectWallet() {
     if (!window.ethereum) {
@@ -267,42 +268,58 @@ altLinkEl?.addEventListener("click", copyAltLink);
       setMintStatus("Wallet connection failed", "#ff6b6b");
     }
   }
-  
+
+async function initWeb3Modal() {
+  // Initialize Web3Modal
+  web3Modal = new window.Web3Modal.default({
+    projectId: "a7c181734d5ca63216f66c568dcf2bb1", // WalletConnect Project ID
+    walletConnectVersion: 2, // use WalletConnect v2
+    theme: "dark", // optional
+    standaloneChains: [11155111], // Sepolia
+  });
+}
+
+// Call this once on page load
+initWeb3Modal();
+
 async function connectWalletConnect() {
   try {
+    // If window.ethereum exists (MetaMask Mobile or desktop), use it
+    if (window.ethereum) {
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      signer = provider.getSigner();
+      const address = await signer.getAddress();
+      walletAddressEl.textContent = `Wallet: ${address}`;
+      contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+      connectBtn.disabled = true;
+      mintBtn.disabled = false;
+      setMintStatus("Wallet connected via MetaMask");
+      updateMintCounter();
+      return;
+    }
+
     setMintStatus("Opening WalletConnect...");
 
-    wcProvider = await window.EthereumProvider.init({
-      projectId: "a7c181734d5ca63216f66c568dcf2bb1", // REQUIRED
-      chains: [11155111], // Sepolia
-      rpcMap: {
-        11155111: RPC_URL
-      },
-      showQrModal: true
-    });
-
-    await wcProvider.connect();
-
-    provider = new ethers.providers.Web3Provider(wcProvider);
+    // Open wallet selection modal
+    provider = await web3Modal.connect();
+    provider = new ethers.providers.Web3Provider(provider);
     signer = provider.getSigner();
-
     const address = await signer.getAddress();
     walletAddressEl.textContent = `Wallet: ${address}`;
-
     contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
     connectBtn.disabled = true;
     mintBtn.disabled = false;
-
     setMintStatus("WalletConnect connected");
     updateMintCounter();
-
   } catch (err) {
-    console.error("WalletConnect error:", err);
+    console.error("WalletConnect/Web3Modal error:", err);
     setMintStatus("WalletConnect failed", "#ff6b6b");
     showToast("❌ WalletConnect failed", "error");
   }
 }
+
 
 function openSepoliaNFT(tokenId) {
   const url = `https://sepolia.etherscan.io/token/${CONTRACT_ADDRESS}?a=${tokenId}`;
