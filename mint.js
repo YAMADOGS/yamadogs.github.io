@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
   "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 ];
 
-  
 function launchConfetti() {
   if (document.querySelector(".confetti-canvas")) return;
 
@@ -52,13 +51,9 @@ function launchConfetti() {
     ctx.translate(x, y);
     ctx.rotate(rotation);
     ctx.fillStyle = COLOR;
-
-    // Main pad
     ctx.beginPath();
     ctx.arc(0, 0, size, 0, Math.PI * 2);
     ctx.fill();
-
-    // Toe pads
     const toeOffset = size * 0.9;
     const toeSize = size * 0.45;
 
@@ -130,7 +125,6 @@ function launchConfetti() {
   animate();
 }
 
-
   /* =======================
      DOM ELEMENTS
   ======================= */
@@ -195,7 +189,6 @@ function copyAltLink() {
 
 altLinkEl?.addEventListener("click", copyAltLink);
 
-
   /* =======================
      UPDATE MINT COUNTER
   ======================= */
@@ -233,8 +226,6 @@ altLinkEl?.addEventListener("click", copyAltLink);
   setMintStatus("Wallet not detected", "#ff6b6b"); 
   return;
 }
-
-
     try {
       setMintStatus("Connecting wallet...");
 
@@ -279,13 +270,11 @@ function showMintingOverlay() {
   overlay.style.display = "flex";
   void overlay.offsetWidth;
 
-  document.body.classList.add("blurred"); // add blur
-
+  document.body.classList.add("blurred"); 
   const logo = overlay.querySelector(".minting-logo");
   if (logo) {
-    logo.classList.add("yamadogsJump"); // full jump+squeeze
+    logo.classList.add("yamadogsJump"); 
   }
-
   const bar = overlay.querySelector(".progress-bar");
   if (bar) {
     bar.style.width = "0%";
@@ -294,27 +283,22 @@ function showMintingOverlay() {
     bar.style.animation = "progressAnim 1.5s linear forwards";
   }
 }
-
 function hideMintingOverlay() {
   const overlay = document.getElementById("mintingOverlay");
   if (!overlay) return;
 
   overlay.style.display = "none";
-  document.body.classList.remove("blurred"); // remove blur
+  document.body.classList.remove("blurred"); 
 
   const logo = overlay.querySelector(".minting-logo");
   if (logo) logo.classList.remove("yamadogsJump");
 }
-
-
 
 function hideMintingOverlay() {
   const overlay = document.getElementById("mintingOverlay");
   if (!overlay) return;
   overlay.style.display = "none";               
   document.body.classList.remove("minting-active");
-
-  // Remove jump animation
   const logo = overlay.querySelector(".minting-logo");
   if (logo) logo.classList.remove("jump-active");
 }
@@ -326,35 +310,21 @@ function hideMintingOverlay() {
   if (!contract) return;
 
   mintBtn?.setAttribute("disabled", true);
-  setMintStatus("Waiting for wallet confirmation..."); // step 1: user confirms in wallet
-
+  setMintStatus("Waiting for wallet confirmation..."); 
   try {
-    // Send transaction (wallet popup)
     const tx = await contract.mint({
       value: ethers.utils.parseEther(MINT_PRICE)
     });
-
-    // ✅ step 2: show minting animation AFTER wallet confirmed
     showMintingOverlay();
     setMintStatus("Minting YAMADOGS...");
-
-    // Wait for blockchain confirmation
     const receipt = await tx.wait();
-
-    // ✅ step 3: hide overlay when mint is confirmed
     hideMintingOverlay();
-
-    // Find tokenId from Transfer event
     const transferEvent = receipt.events?.find(
       e => e.event === "Transfer" && e.args?.from === ethers.constants.AddressZero
     );
     const tokenId = transferEvent?.args?.tokenId?.toString();
-
-    // Update counter & status
     updateMintCounter();
     setMintStatus("Mint successful!");
-
-    // Show toast
     if (tokenId) {
       showToast(`
         🎉 Mint success! Your YAMADOGS is now part of the pack and ready for some pup-tastic journeys!🐾<b>YAMADOGS #${tokenId}</b><br>
@@ -386,7 +356,6 @@ function hideMintingOverlay() {
   }
 }
 
-
   /* =======================
      VIEW SOURCE BUTTON
   ======================= */
@@ -394,16 +363,11 @@ function hideMintingOverlay() {
     window.open("https://github.com/YAMADOGS/yamadogs.github.io", "_blank", "noopener,noreferrer");
   });
 
-
-
   /* =======================
      EVENT LISTENERS
   ======================= */
   connectBtn?.addEventListener("click", connectWallet);
   mintBtn?.addEventListener("click", mintNFT);
-  
-// Ensure overlay is hidden initially
 hideMintingOverlay();
-
 
 });
