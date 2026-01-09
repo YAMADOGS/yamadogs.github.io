@@ -85,32 +85,36 @@ document.getElementById("connectWalletBtn").addEventListener("click", async () =
 
 // --------------------- RENDER NFT ---------------------
 async function loadUserNFTs() {
-  unstakedNFTs = [];
-  stakedNFTs = [];
-  selectedUnstaked = [];
-  selectedStaked = [];
+  try {
+    unstakedNFTs = [];
+    stakedNFTs = [];
 
-  const balance = await nftContract.balanceOf(userAddress);
-  for (let i = 0; i < balance; i++) {
-    const tokenId = (await nftContract.tokenOfOwnerByIndex(userAddress, i)).toString();
-    const isStaked = await stakingContract.userStaked(userAddress, tokenId);
+    const balance = (await nftContract.balanceOf(userAddress)).toNumber();
 
-    let uri = await nftContract.tokenURI(tokenId);
-    // Handle base64 JSON
-    if (uri.startsWith("data:application/json;base64,")) {
-      const json = JSON.parse(atob(uri.split(",")[1]));
-      uri = json.image;
+    for (let i = 0; i < balance; i++) {
+      const tokenId = await nftContract.tokenOfOwnerByIndex(userAddress, i);
+      const isStaked = await stakingContract.userStaked(userAddress, tokenId);
+
+      let uri = await nftContract.tokenURI(tokenId);
+      if (uri.startsWith("data:application/json;base64,")) {
+        const json = JSON.parse(atob(uri.split(",")[1]));
+        uri = json.image;
+      }
+
+      (isStaked ? stakedNFTs : unstakedNFTs).push({
+        tokenId: tokenId.toString(),
+        uri
+      });
     }
 
-    const nftData = { tokenId, uri };
-    if (isStaked) stakedNFTs.push(nftData);
-    else unstakedNFTs.push(nftData);
+    renderNFTs();
+    updateTotalRewards();
+
+  } catch (err) {
+    console.error("NFT load failed:", err);
   }
-
-  renderNFTs();
-await updateTotalRewards();
-
 }
+
 
 function renderNFTs() {
   const unstakeContainer = document.getElementById("unstakedNFTs");
