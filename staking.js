@@ -178,10 +178,21 @@ async function connectWallet() {
 async function renderNFT(tokenId, container, isStaked) {
     try {
         const tokenURI = await nftContractRO.tokenURI(tokenId);
-        const img = document.createElement("img");
-        img.src = tokenURI; // assumes URL or base64
-        img.style.width = "120px";
-        img.style.height = "120px";
+
+// 1️⃣ parse base64 JSON to get image
+let imageURI;
+if (tokenURI.startsWith("data:application/json")) {
+    const json = JSON.parse(atob(tokenURI.split(",")[1]));
+    imageURI = json.image; // THIS IS THE SVG
+} else {
+    imageURI = tokenURI; // fallback in case of URL
+}
+
+const img = document.createElement("img");
+img.src = imageURI;
+img.style.width = "120px";
+img.style.height = "120px";
+
 
         const card = document.createElement("div");
         card.className = "nft-card";
@@ -213,85 +224,41 @@ async function renderNFT(tokenId, container, isStaked) {
 // Load user NFTs
 // =====================
 async function loadUserNFTs() {
-if (loadingNFTs) return;       // <-- Prevent concurrent execution
+    if (loadingNFTs) return;
     loadingNFTs = true;
     logToPage("Loading user NFTs...");
-    const unstakedTokenIds = [];
-    const stakedTokenIds = [];
 
-    try {
-        const nftBalance = (await nftContractRO.balanceOf(userAddress)).toNumber();
-        logToPage("NFT balance: " + nftBalance);
+    const unstakedContainer = document.getElementById("unstakedNFTs");
+    const stakedContainer = document.getElementById("stakedNFTs");
+    unstakedContainer.innerHTML = "";
+    stakedContainer.innerHTML = "";
 
-        document.getElementById("unstakedNFTs").innerHTML = "";
-        document.getElementById("stakedNFTs").innerHTML = "";
+    const totalSupply = (await nftContractRO.totalSupply()).toNumber();
+    let totalPending = ethers.BigNumber.from(0);
 
-for (let i = 0; i < nftBalance; i++) {
-    const tokenId = await nftContractRO.tokenOfOwnerByIndex(userAddress, i);
-    const isStaked = await stakingContractRO.userStaked(userAddress, tokenId);
+    for (let tokenId = 1; tokenId <= totalSupply; tokenId++) {
+        try {
+            // Check if this token belongs to user (unstaked) or staked
+            const isStaked = await stakingContractRO.userStaked(userAddress, tokenId);
+            let owner = await nftContractRO.ownerOf(tokenId);
 
-    if (isStaked) stakedTokenIds.push(tokenId);
-    else unstakedTokenIds.push(tokenId);
-}
-
-// Render unstaked NFTs
-for (const tokenId of unstakedTokenIds) {
-    await renderNFT(tokenId, document.getElementById("unstakedNFTs"), false);
-}
-
-// Render staked NFTs and calculate total rewards
-let totalPending = ethers.BigNumber.from(0);
-for (const tokenId of stakedTokenIds) {
-    await renderNFT(tokenId, document.getElementById("stakedNFTs"), true);
-    const pending = await stakingContractRO.pending(tokenId);
-    totalPending = totalPending.add(pending);
-}
-
-// Update total rewards for connected wallet
-document.getElementById("totalRewards").textContent = ethers.utils.formatEther(totalPending);
-
-    } catch (err) {
-        logToPage("NFT load failed: " + err.message, true);
-    }
-}
-
-// =====================
-// Update global stats
-// =====================
-async function updateGlobalStats() {
-    try {
-        const year = await stakingContractRO.currentYear();
-        const apy = await stakingContractRO.currentAPY();
-        const totalStaked = await stakingContractRO.totalStaked();
-        const totalYam = await stakingContractRO.totalMinted();
-        const remainingPool = await stakingContractRO.remainingEmission(year);
-        const startTime = await stakingContractRO.startTime();
-
-        document.getElementById("currentAPY").textContent = apy.toString();
-        document.getElementById("totalStakedNFTs").textContent = totalStaked.toString();
-        document.getElementById("totalMintedYAM").textContent = ethers.utils.formatEther(totalYam);
-        document.getElementById("remainingEmission").textContent = ethers.utils.formatEther(remainingPool);
-
-        // Halving calculation
-        const now = Math.floor(Date.now() / 1000);
-        const secondsPerYear = 365 * 24 * 60 * 60;
-        const halvingTime = Number(startTime) + (year + 1) * secondsPerYear;
-        const remaining = halvingTime - now;
-
-        if (remaining > 0) {
-            const days = Math.floor(remaining / 86400);
-            const hours = Math.floor((remaining % 86400) / 3600);
-            const mins = Math.floor((remaining % 3600) / 60);
-            const secs = remaining % 60;
-            document.getElementById("halvingCountdown").textContent =
-                `${days}d ${hours}h ${mins}m ${secs}s`;
-        } else {
-            document.getElementById("halvingCountdown").textContent = "Halving passed";
+            // If staked, owner = staking contract
+            if (isStaked) {
+                await renderNFT(tokenId, stakedContainer, true);
+                const pending = await stakingContractRO.pending(tokenId);
+                totalPending = totalPending.add(pending);
+            } else if (owner.toLowerCase() === userAddress.toLowerCase()) {
+                await renderNFT(tokenId, unstakedContainer, false);
+            }
+        } catch (err) {
+            console.error("Error loading tokenId", tokenId, err);
         }
-    } catch (err) {
-        logToPage("Failed to update global stats: " + err.message, true);
     }
+
+    document.getElementById("totalRewards").textContent = ethers.utils.formatEther(totalPending);
+    loadingNFTs = false;
 }
+
 
 setInterval(() => {
     if (stakingContractRO) updateGlobalStats();
