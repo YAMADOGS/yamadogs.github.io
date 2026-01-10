@@ -924,6 +924,16 @@ section,
 .nftContainer::-webkit-scrollbar {
   width: 6px;
 }
+.nft-card {
+    transition: transform 0.1s ease;  /* smooth quick scaling */
+    cursor: pointer;
+}
+
+.nft-card:active {
+    transform: scale(1.03);           /* tiny enlarge when tapped */
+}
+
+
 .nftContainer::-webkit-scrollbar-thumb {
   background: #ffb703;
   border-radius: 3px;
@@ -937,5 +947,18 @@ section,
 }
 #stakeBtn, #unstakeBtn {
   transition: transform 0.2s;
+}
+
+button {
+    transition: transform 0.1s ease;  /* smooth and quick */
+    outline: none;                    /* remove default focus/transparent effect */
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(1.05);           /* tiny enlarge on click */
+}
+.nft-card, button {
+    -webkit-tap-highlight-color: transparent; /* prevents the gray overlay on mobile */
 }
 
