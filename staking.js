@@ -58,6 +58,9 @@ async function connectWallet() {
     await provider.send("eth_requestAccounts", []);
     signer = provider.getSigner();
     userAddress = await signer.getAddress();
+document.getElementById("walletAddress").textContent =
+  userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
+
     logToPage("Wallet connected: " + userAddress);
 
     // Read-only contracts
@@ -66,6 +69,10 @@ async function connectWallet() {
 
     // Signer contract
     stakingContract = new ethers.Contract(stakingContractAddress, stakingABI, signer);
+  stakingContractRO.removeAllListeners();
+   stakingContractRO.on("Staked", loadUserNFTs);
+   stakingContractRO.on("Unstaked", loadUserNFTs);
+   stakingContractRO.on("Claimed", loadUserNFTs);
 
     document.getElementById("stakeBtn").disabled = false;
     document.getElementById("unstakeBtn").disabled = false;
@@ -88,52 +95,74 @@ async function loadUserNFTs() {
     const nftBalance = (await nftContractRO.balanceOf(userAddress)).toNumber();
     logToPage("NFT balance: " + nftBalance);
 
-    const nftContainer = document.getElementById("nftContainer");
-    if (nftContainer) nftContainer.innerHTML = "";
+    // Clear containers
+    document.getElementById("unstakedNFTs").innerHTML = "";
+    document.getElementById("stakedNFTs").innerHTML = "";
+
+    let totalPending = ethers.BigNumber.from(0);
 
     for (let i = 0; i < nftBalance; i++) {
-      try {
-        const tokenId = await nftContractRO.tokenOfOwnerByIndex(userAddress, i);
-        const isStaked = await stakingContractRO.userStaked(userAddress, tokenId);
-        const tokenURI = await nftContractRO.tokenURI(tokenId);
+      const tokenId = await nftContractRO.tokenOfOwnerByIndex(userAddress, i);
+      const isStaked = await stakingContractRO.userStaked(userAddress, tokenId);
+      const tokenURI = await nftContractRO.tokenURI(tokenId);
+logToPage("TokenURI: " + tokenURI);
 
-        logToPage(`Token #${i} ID: ${tokenId.toString()} - Staked: ${isStaked}`);
+      const container = isStaked
+        ? document.getElementById("stakedNFTs")
+        : document.getElementById("unstakedNFTs");
 
-        const nftDiv = document.createElement("div");
-        nftDiv.style.border = "1px solid #ccc";
-        nftDiv.style.margin = "5px";
-        nftDiv.style.padding = "5px";
+      const card = document.createElement("div");
+      card.className = "nft-card";
 
-        const img = document.createElement("img");
-        img.src = tokenURI.startsWith("data:") ? tokenURI : "https://via.placeholder.com/150";
-        img.width = 150;
-        img.height = 150;
+      const img = document.createElement("img");
 
-        const info = document.createElement("div");
-        info.textContent = `Token ID: ${tokenId.toString()} - ${isStaked ? "Staked" : "Not staked"}`;
+   if (tokenURI.startsWith("data:application/json")) {
+  const json = JSON.parse(atob(tokenURI.split(",")[1]));
+  img.src = json.image; // SVG or base64 image
+  }  else {
+  img.src = tokenURI; // direct SVG or data:image
+  }
 
-        nftDiv.appendChild(img);
-        nftDiv.appendChild(info);
-        if (nftContainer) nftContainer.appendChild(nftDiv);
+   img.loading = "lazy";
 
-        if (isStaked) {
-          const reward = await stakingContractRO.pending(tokenId);
-          logToPage(`Token #${i} pending reward: ${ethers.utils.formatEther(reward)} YAM`);
-        }
-      } catch (nftErr) {
-        logToPage(`NFT render error at index ${i}: ${nftErr.message}`, true);
+
+      const label = document.createElement("div");
+      label.textContent = `Token #${tokenId.toString()}`;
+
+      card.appendChild(img);
+      card.appendChild(label);
+
+      // If staked → show pending rewards
+      if (isStaked) {
+        const pending = await stakingContractRO.pending(tokenId);
+        totalPending = totalPending.add(pending);
+
+        const reward = document.createElement("div");
+        reward.textContent =
+          ethers.utils.formatEther(pending) + " YAM";
+        reward.style.fontSize = "12px";
+        reward.style.opacity = "0.8";
+
+        card.appendChild(reward);
       }
+
+      container.appendChild(card);
     }
+
+    // === TOTAL REWARDS ===
+    document.getElementById("totalRewards").textContent =
+      ethers.utils.formatEther(totalPending);
+
   } catch (err) {
     logToPage("NFT load failed: " + err.message, true);
   }
 }
 
+
 // =====================
 // Update global stats
 // =====================
 async function updateGlobalStats() {
-  logToPage("Loading global stats...");
   try {
     const year = await stakingContractRO.currentYear();
     const apy = await stakingContractRO.currentAPY();
@@ -141,14 +170,27 @@ async function updateGlobalStats() {
     const totalYam = await stakingContractRO.totalMinted();
     const remainingPool = await stakingContractRO.remainingEmission(year);
 
-    logToPage("Current APY: " + apy.toString());
-    logToPage("Total NFTs Staked: " + totalStaked.toString());
-    logToPage("Total YAM Minted: " + ethers.utils.formatEther(totalYam));
-    logToPage("Remaining Reward Pool: " + ethers.utils.formatEther(remainingPool));
+    // === WRITE TO DOM ===
+    document.getElementById("currentAPY").textContent = apy.toString();
+    document.getElementById("totalStakedNFTs").textContent = totalStaked.toString();
+    document.getElementById("totalMintedYAM").textContent =
+      ethers.utils.formatEther(totalYam);
+    document.getElementById("remainingEmission").textContent =
+      ethers.utils.formatEther(remainingPool);
+
   } catch (err) {
-    logToPage("Failed to load global stats: " + err.message, true);
+    logToPage("Failed to update global stats: " + err.message, true);
   }
+  
+
 }
+
+setInterval(() => {
+  if (stakingContractRO) {
+    updateGlobalStats();
+  }
+}, 15000);
+
 
 // =====================
 // Hook up buttons
