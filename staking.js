@@ -106,13 +106,44 @@ async function loadUserNFTs() {
         uri
       });
     }
+    
+// Assuming MAX_SUPPLY is known
+const MAX_SUPPLY = 2026; // replace with actual max supply
 
+for (let tokenId = 1; tokenId <= MAX_SUPPLY; tokenId++) {
+  const isStaked = await stakingContract.userStaked(userAddress, tokenId);
+  if (isStaked) {
+    let uri = await nftContract.tokenURI(tokenId);
+    stakedNFTs.push({ tokenId: tokenId.toString(), uri });
+  }
+}
+
+    
     renderNFTs();
     updateTotalRewards();
 
   } catch (err) {
     console.error("NFT load failed:", err);
   }
+}
+
+function renderOnChainNFT(div, tokenURI) {
+  if (!tokenURI.startsWith("data:")) return;
+
+  const meta = JSON.parse(atob(tokenURI.split(",")[1]));
+  const svgBase64 = meta.image.split(",")[1];
+  const svg = atob(svgBase64);
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "nft-svg"; // add CSS to size it properly
+  wrapper.innerHTML = svg;
+
+  // Add token ID below SVG
+  const idDiv = document.createElement("div");
+  idDiv.innerText = `ID: ${meta.id || 'unknown'}`;
+  wrapper.appendChild(idDiv);
+
+  div.appendChild(wrapper);
 }
 
 
@@ -125,7 +156,7 @@ function renderNFTs() {
   unstakedNFTs.forEach(nft => {
     const div = document.createElement("div");
     div.className = "nft-item";
-    div.innerHTML = `<img src="${nft.uri}" alt="NFT ${nft.tokenId}"><div>ID: ${nft.tokenId}</div>`;
+    renderOnChainNFT(div, nft.uri);
     div.addEventListener("click", () => {
       div.classList.toggle("active");
       if (selectedUnstaked.includes(nft.tokenId))
@@ -140,22 +171,32 @@ document.getElementById("claimAllBtn").disabled = selectedStaked.length === 0;
   });
 
   stakedNFTs.forEach(nft => {
-    const div = document.createElement("div");
-    div.className = "nft-item";
-    div.innerHTML = `<img src="${nft.uri}" alt="NFT ${nft.tokenId}"><div>ID: ${nft.tokenId}</div><div class="reward">Loading...</div>`;
-    stakedContainer.appendChild(div);
-    updateNFTReward(div, nft.tokenId);
-    div.addEventListener("click", () => {
-      div.classList.toggle("active");
-      if (selectedStaked.includes(nft.tokenId))
-        selectedStaked = selectedStaked.filter(id => id !== nft.tokenId);
-      else selectedStaked.push(nft.tokenId);
-      document.getElementById("stakeBtn").disabled = selectedUnstaked.length === 0;
-     document.getElementById("unstakeBtn").disabled = selectedStaked.length === 0;
-      document.getElementById("claimAllBtn").disabled = selectedStaked.length === 0;
+  const div = document.createElement("div");
+  div.className = "nft-item";
 
-    });
+  // Use on-chain SVG renderer
+  renderOnChainNFT(div, nft.uri);
+
+  const rewardDiv = document.createElement("div");
+  rewardDiv.className = "reward";
+  rewardDiv.innerText = "Loading...";
+  div.appendChild(rewardDiv);
+
+  stakedContainer.appendChild(div);
+  updateNFTReward(div, nft.tokenId);
+
+  div.addEventListener("click", () => {
+    div.classList.toggle("active");
+    if (selectedStaked.includes(nft.tokenId))
+      selectedStaked = selectedStaked.filter(id => id !== nft.tokenId);
+    else selectedStaked.push(nft.tokenId);
+
+    document.getElementById("stakeBtn").disabled = selectedUnstaked.length === 0;
+    document.getElementById("unstakeBtn").disabled = selectedStaked.length === 0;
+    document.getElementById("claimAllBtn").disabled = selectedStaked.length === 0;
   });
+});
+
 }
 
 async function updateNFTReward(div, tokenId){
@@ -238,22 +279,26 @@ document.getElementById("claimAllBtn").addEventListener("click", async () => {
 // --------------------- GLOBAL STATS ---------------------
 async function loadGlobalStats() {
   const apy = await stakingContract.currentAPY();
-  const totalStaked = await stakingContract.totalStakedNFTs();
-  const totalMinted = await stakingContract.totalMintedYAM();
-const year = await stakingContract.currentYear();
+const totalStaked = await stakingContract.totalStakedNFTs();
+const totalMinted = await stakingContract.totalMintedYAM();
+
+// Convert BigNumber to number
+const yearBN = await stakingContract.currentYear();
+const year = yearBN.toNumber();
 const remaining = await stakingContract.remainingEmission(year);
 
-  document.getElementById("remainingEmission").innerText =
-  ethers.utils.formatEther(remaining);
+document.getElementById("currentAPY").innerText = apy.toString();
+document.getElementById("totalStakedNFTs").innerText = totalStaked.toString();
+document.getElementById("totalMintedYAM").innerText = ethers.utils.formatEther(totalMinted);
+document.getElementById("remainingEmission").innerText = ethers.utils.formatEther(remaining);
 
-  document.getElementById("currentAPY").innerText = apy.toString();
-  document.getElementById("totalStakedNFTs").innerText = totalStaked.toString();
-  document.getElementById("totalMintedYAM").innerText = ethers.utils.formatEther(totalMinted);
 }
+
 
 // --------------------- HALVING COUNTDOWN ---------------------
 async function startHalvingCountdown() {
-  const startTime = await stakingContract.startTime();
+  const startTimeBN = await stakingContract.startTime();
+const startTime = startTimeBN.toNumber();
   const halvingPeriod = 365*24*3600;
   setInterval(() => {
     const now = Math.floor(Date.now()/1000);
