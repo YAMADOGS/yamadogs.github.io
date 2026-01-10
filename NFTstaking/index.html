@@ -10,7 +10,8 @@
 
 <meta http-equiv="Content-Security-Policy" content="
 default-src 'none';
-script-src 'self';
+script-src 'self' 'unsafe-eval';
+
 style-src 'self';
 img-src 'self' data:;
 font-src 'self';
@@ -29,13 +30,15 @@ block-all-mixed-content;
 
 <div class="title-wrapper">
   <img src="/logo.png" alt="YAMADOGS Logo" class="title-logo">
-  <h1>YAMADOGS Staking2</h1>
+  <h1>YAMADOGS test3</h1>
 </div>
+<div class="card">
 <div class="wallet-box">
   <button id="connectWalletBtn">Connect Wallet</button>
   <div class="wallet-address">
     Wallet: <span id="walletAddress">Not connected</span>
   </div>
+</div>
 </div>
 
 
