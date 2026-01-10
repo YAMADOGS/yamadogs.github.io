@@ -98,7 +98,7 @@ async function loadUserNFTs() {
       let uri = await nftContract.tokenURI(tokenId);
       if (uri.startsWith("data:application/json;base64,")) {
         const json = JSON.parse(atob(uri.split(",")[1]));
-        uri = json.image;
+        uri = json.image; // on-chain image
       }
 
       (isStaked ? stakedNFTs : unstakedNFTs).push({
@@ -106,19 +106,7 @@ async function loadUserNFTs() {
         uri
       });
     }
-    
-// Assuming MAX_SUPPLY is known
-const MAX_SUPPLY = 2026; // replace with actual max supply
 
-for (let tokenId = 1; tokenId <= MAX_SUPPLY; tokenId++) {
-  const isStaked = await stakingContract.userStaked(userAddress, tokenId);
-  if (isStaked) {
-    let uri = await nftContract.tokenURI(tokenId);
-    stakedNFTs.push({ tokenId: tokenId.toString(), uri });
-  }
-}
-
-    
     renderNFTs();
     updateTotalRewards();
 
@@ -126,6 +114,7 @@ for (let tokenId = 1; tokenId <= MAX_SUPPLY; tokenId++) {
     console.error("NFT load failed:", err);
   }
 }
+
 
 function renderOnChainNFT(div, tokenURI) {
   if (!tokenURI.startsWith("data:")) return;
