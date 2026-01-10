@@ -891,7 +891,7 @@ section,
 }
 
 .nft-card {
-  width: calc(90px / 3);   /* 3x smaller */
+  width: calc(270px / 3);   /* 3x smaller */
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
