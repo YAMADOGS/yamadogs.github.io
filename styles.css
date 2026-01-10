@@ -962,3 +962,28 @@ button:active {
     -webkit-tap-highlight-color: transparent; /* prevents the gray overlay on mobile */
 }
 
+/* Global Stats Values */
+#totalRewards,
+#pendingRewards,
+#currentAPY,
+#halvingCountdown,
+#totalStakedNFTs,
+#totalMintedYAM,
+#remainingEmission {
+    font-size: 14px;               /* smaller text */
+    color: #3fe0c3;                /* mint blue */
+    font-weight: bold;              /* optional: makes numbers pop */
+    overflow: hidden;               /* prevents text overflow */
+    text-overflow: ellipsis;       /* adds ... if text too long */
+    white-space: nowrap;            /* keep on one line */
+    padding: 2px 4px;               /* space around numbers */
+    display: inline-block;
+    max-width: 100%;                /* ensures it doesn’t exceed container */
+    box-sizing: border-box;         /* includes padding in width */
+}
+#totalRewards:hover,
+#pendingRewards:hover,
+#currentAPY:hover {
+    transform: scale(1.05);
+    transition: transform 0.15s ease;
+}
