@@ -127,7 +127,7 @@ const nftABI = [
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
-  }
+  },
   
   {
     "inputs": [],
