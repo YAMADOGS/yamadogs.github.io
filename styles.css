@@ -866,3 +866,69 @@ section,
   font-size: clamp(10px, 1.2vw, 14px);
 }
 
+.nft-svg {
+  width: 150px;
+  height: 150px;
+  border: 1px solid #ccc;
+  margin: 5px;
+  display: inline-block;
+}
+.nft-svg svg {
+  width: 100%;
+  height: 100%;
+}
+
+.nftContainer {
+  max-height: 300px; /* limit container height */
+  overflow-y: auto;  /* vertical scroll */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  padding: 8px;
+  background: #111;
+  border: 2px solid #000;
+}
+
+.nft-card {
+  width: calc(90px / 3);   /* 3x smaller */
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid #ffb703; /* visible border */
+  padding: 4px;
+  background: #222;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.nft-card img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.nft-card div {
+  font-size: 8px;
+  margin-top: 2px;
+  text-align: center;
+  color: #fff;
+}
+.nftContainer::-webkit-scrollbar {
+  width: 6px;
+}
+.nftContainer::-webkit-scrollbar-thumb {
+  background: #ffb703;
+  border-radius: 3px;
+}
+#unstakedNFTs img.active,
+#stakedNFTs img.active {
+  transform: scale(1.2);
+  border: 2px solid #FFD700; /* golden border */
+  transition: transform 0.2s, border 0.2s;
+  z-index: 10; /* bring to front */
+}
+#stakeBtn, #unstakeBtn {
+  transition: transform 0.2s;
+}
+
