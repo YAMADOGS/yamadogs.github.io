@@ -128,7 +128,25 @@ const nftABI = [
     "stateMutability": "nonpayable",
     "type": "function"
   }
+  
+  {
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "index", "type": "uint256" }],
+    "name": "tokenByIndex",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
 ];
+
 
 
 
@@ -149,12 +167,13 @@ async function connectWallet() {
 
         // Read-only contracts
         stakingContractRO = new ethers.Contract(stakingContractAddress, stakingABI, provider);
-        nftContractRO = new ethers.Contract(nftAddress, nftABI, provider);
-
         // Signer contract
         stakingContract = new ethers.Contract(stakingContractAddress, stakingABI, signer);
-    window.nftContract = new ethers.Contract(nftAddress, nftABI, signer);
-    nftContract = window.nftContract;
+// NFT contracts (read-only and signer)
+nftContractRO = new ethers.Contract(nftAddress, nftABI, provider);
+nftContract = new ethers.Contract(nftAddress, nftABI, signer);
+window.nftContract = nftContract; // optional, for global access
+
           
         // Event listeners
         stakingContractRO.removeAllListeners();
