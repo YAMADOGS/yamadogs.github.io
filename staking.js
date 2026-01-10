@@ -147,6 +147,55 @@ const nftABI = [
   }
 ];
 
+// =====================
+// Global Stats
+// =====================
+async function updateGlobalStats() {
+    try {
+        if (!stakingContractRO) return;
+
+        // APY
+        const apy = await stakingContractRO.currentAPY();
+        document.getElementById("currentAPY").textContent =
+            (apy.toNumber() / 100).toFixed(2);
+
+        // Year & Halving
+        const currentYear = await stakingContractRO.currentYear();
+        const YEAR = await stakingContractRO.YEAR();
+        const startTime = await stakingContractRO.startTime();
+
+        const nextHalvingTime =
+            startTime.add(YEAR.mul(currentYear.add(1)));
+
+        const now = Math.floor(Date.now() / 1000);
+        let secondsLeft = nextHalvingTime.toNumber() - now;
+        if (secondsLeft < 0) secondsLeft = 0;
+
+        const days = Math.floor(secondsLeft / 86400);
+        const hours = Math.floor((secondsLeft % 86400) / 3600);
+        const mins = Math.floor((secondsLeft % 3600) / 60);
+
+        document.getElementById("halvingCountdown").textContent =
+            `${days}d ${hours}h ${mins}m`;
+
+        // Totals
+        const totalStaked = await stakingContractRO.totalStaked();
+        const totalMinted = await stakingContractRO.totalMinted();
+        const remaining = await stakingContractRO.remainingEmission(currentYear);
+
+        document.getElementById("totalStakedNFTs").textContent =
+            totalStaked.toString();
+
+        document.getElementById("totalMintedYAM").textContent =
+            ethers.utils.formatEther(totalMinted);
+
+        document.getElementById("remainingEmission").textContent =
+            ethers.utils.formatEther(remaining);
+
+    } catch (err) {
+        logToPage("Global stats error: " + err.message, true);
+    }
+}
 
 
 

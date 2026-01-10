@@ -891,20 +891,27 @@ section,
 }
 
 .nft-card {
-  width: calc(270px / 3);   /* 3x smaller */
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 2px solid #ffb703; /* visible border */
+  width: calc(270px / 3);
   padding: 4px;
+  border: 3px solid #ffb703;
+  border-image: repeating-linear-gradient(
+    90deg,
+    #000 0 6px,
+    transparent 6px 10px
+  ) 3;
+
   background: #222;
   box-shadow: 2px 2px 0 #000;
+
+  box-sizing: border-box; /* 🔥 THIS IS THE FIX */
 }
+
 
 .nft-card img {
   width: 100%;
   height: auto;
+  max-width: 100%;
+  box-sizing: border-box;
   object-fit: contain;
 }
 
