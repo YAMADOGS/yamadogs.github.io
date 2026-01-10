@@ -197,6 +197,31 @@ async function updateGlobalStats() {
     }
 }
 
+// =====================
+// Pending Rewards
+// =====================
+async function updatePendingRewards() {
+    try {
+        if (!stakingContractRO || !userAddress) return;
+
+        const stakedContainer = document.getElementById("stakedNFTs");
+        const tokenIds = Array.from(stakedContainer.children).map(
+            c => Number(c.dataset.tokenId)
+        );
+
+        if (tokenIds.length === 0) {
+            document.getElementById("pendingRewards").textContent = "0";
+            return;
+        }
+
+        const result = await stakingContractRO.pendingBatch(tokenIds);
+        const totalPending = ethers.utils.formatEther(result.total);
+
+        document.getElementById("pendingRewards").textContent = totalPending;
+    } catch (err) {
+        logToPage("Pending rewards error: " + err.message, true);
+    }
+}
 
 
 // =====================
@@ -237,6 +262,7 @@ window.nftContract = nftContract; // optional, for global access
         logToPage("Contracts instantiated");
         await loadUserNFTs();
         await updateGlobalStats();
+        await updatePendingRewards();
     } catch (err) {
         logToPage("Wallet connection failed: " + err.message, true);
     }
@@ -324,6 +350,7 @@ async function loadUserNFTs() {
     }
 
     document.getElementById("totalRewards").textContent = ethers.utils.formatEther(totalPending);
+    await updatePendingRewards();
     loadingNFTs = false;
 }
 
@@ -387,6 +414,7 @@ document.getElementById("stakeBtn").addEventListener("click", async () => {
         selectedNFT = null;
 
         await loadUserNFTs();
+        await updatePendingRewards();
         document.getElementById("stakeBtn").disabled = true;
 
     } catch (err) {
@@ -408,6 +436,7 @@ document.getElementById("unstakeBtn")?.addEventListener("click", async () => {
         selectedNFT.classList.remove("active");
         selectedNFT = null;
         await loadUserNFTs();
+        await updatePendingRewards();
         document.getElementById("unstakeBtn").disabled = true;
     } catch (err) {
         logToPage("Unstake failed: " + err.message, true);
@@ -429,7 +458,12 @@ document.getElementById("claimAllBtn")?.addEventListener("click", async () => {
 
         // ✅ Refresh user's NFTs
         await loadUserNFTs();
+        await updatePendingRewards();
     } catch (err) {
         logToPage("ClaimAll failed: " + err.message, true);
     }
 });
+// Auto-update pending rewards every 30 seconds
+setInterval(() => {
+    if (stakingContractRO) updatePendingRewards();
+}, 30000);
