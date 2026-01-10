@@ -1,317 +1,158 @@
-// --------------------- DEBUG LOG PANEL ---------------------
-function logToPage(...args) {
-  const logDiv = document.getElementById("debugLogs") || (() => {
-    const div = document.createElement("div");
-    div.id = "debugLogs";
-    div.style.cssText = `
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      max-height: 200px;
-      overflow-y: auto;
-      background: rgba(0,0,0,0.85);
-      color: #0f0;
-      font-family: monospace;
-      font-size: 12px;
-      padding: 5px;
-      z-index: 9999;
-    `;
-    document.body.appendChild(div);
-    return div;
-  })();
+// staking.js
 
-  logDiv.innerText += args.join(" ") + "\n";
-  logDiv.scrollTop = logDiv.scrollHeight; // auto-scroll
+// =====================
+// Utility function to log to page
+// =====================
+function logToPage(message, isError = false) {
+  let logContainer = document.getElementById("debugLog");
+  if (!logContainer) {
+    logContainer = document.createElement("div");
+    logContainer.id = "debugLog";
+    logContainer.style.cssText = "position:fixed;bottom:0;left:0;width:100%;max-height:200px;overflow:auto;background:#111;color:#0f0;font-family:monospace;font-size:12px;padding:5px;z-index:9999;";
+    document.body.appendChild(logContainer);
+  }
+  const entry = document.createElement("div");
+  entry.textContent = message;
+  if (isError) entry.style.color = "#f00";
+  logContainer.appendChild(entry);
+  logContainer.scrollTop = logContainer.scrollHeight;
 }
 
-// --------------------- RPC & Contracts ---------------------
-const RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
-const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
-let signer, userAddress;
+// =====================
+// Global variables
+// =====================
+let provider;
+let signer;
+let userAddress;
+let stakingContract;
+let stakingContractRO;
+let nftContract;
+let nftContractRO;
 
 const stakingContractAddress = "0x8AC5f61bCe8D3b0766ADD7392F30aA254b285221";
 const nftAddress = "0x4378682659304853EbD0146E85CF78EdECaE9647";
 
-// Simplified ABIs (same as your original)
-const nftABI = [ /* ... copy your nftABI here ... */ ];
-const stakingABI = [ /* ... copy your stakingABI here ... */ ];
+// ABIs (replace with your full ABIs)
+const stakingABI = [ {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Claimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Staked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Unstaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"yam","type":"address"}],"name":"YamSet","type":"event"},{"inputs":[],"name":"BASE_YEARLY_EMISSION","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_PER_NFT_PER_YEAR","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_SUPPLY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"YEAR","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"year","type":"uint256"}],"name":"baseEmission","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"claim","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256[]","name":"tokenIds","type":"uint256[]"}],"name":"claimAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"currentAPY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"currentYear","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"emittedPerYear","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lastProcessedYear","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"nft","outputs":[{"internalType":"contract IERC721","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"pending","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256[]","name":"tokenIds","type":"uint256[]"}],"name":"pendingBatch","outputs":[{"internalType":"uint256","name":"total","type":"uint256"},{"internalType":"uint256[]","name":"perNFT","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"year","type":"uint256"}],"name":"remainingEmission","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"rollover","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_yam","type":"address"}],"name":"setYam","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"stake","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalMinted","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalMintedYAM","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalStaked","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalStakedNFTs","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"unstake","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"userStaked","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"yam","outputs":[{"internalType":"contract IYAMAINU","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"yamSet","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"year","type":"uint256"}],"name":"yearlyEmission","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"} ];
+const nftABI = [ {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"MAX_SUPPLY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MINT_PRICE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"TREASURY","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"s","type":"address"},{"internalType":"uint256","name":"id","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"o","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"o","type":"address"},{"internalType":"address","name":"op","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"mint","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"o","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"f","type":"address"},{"internalType":"address","name":"t","type":"address"},{"internalType":"uint256","name":"id","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"f","type":"address"},{"internalType":"address","name":"t","type":"address"},{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"bytes","name":"d","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"op","type":"address"},{"internalType":"bool","name":"a","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"ownerAddress","type":"address"},{"internalType":"uint256","name":"index","type":"uint256"}],"name":"tokenOfOwnerByIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"f","type":"address"},{"internalType":"address","name":"t","type":"address"},{"internalType":"uint256","name":"id","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"} ];
 
-let stakingContract, nftContract;
-let unstakedNFTs = [], stakedNFTs = [];
-let selectedUnstaked = [], selectedStaked = [];
-
-// --------------------- INITIAL BUTTON DISABLE ---------------------
-document.addEventListener("DOMContentLoaded", () => {
+// =====================
+// On page load
+// =====================
+document.addEventListener("DOMContentLoaded", async () => {
   logToPage("DOM fully loaded, disabling buttons...");
   document.getElementById("stakeBtn").disabled = true;
   document.getElementById("unstakeBtn").disabled = true;
   document.getElementById("claimAllBtn").disabled = true;
 });
 
-// --------------------- WALLET CONNECT ---------------------
-document.getElementById("connectWalletBtn").addEventListener("click", async () => {
-  logToPage("Connect Wallet clicked...");
-  if (window.ethereum) {
-    const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
-    const network = await web3Provider.getNetwork();
-    logToPage("Network chainId:", network.chainId);
-    if (network.chainId !== 11155111) {
-      alert("Please switch to Sepolia network");
-      logToPage("Wallet not on Sepolia, aborting connection.");
-      return;
-    }
+// =====================
+// Connect Wallet
+// =====================
+async function connectWallet() {
+  try {
+    if (!window.ethereum) throw new Error("No wallet detected");
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    signer = provider.getSigner();
+    userAddress = await signer.getAddress();
+    logToPage("Wallet connected: " + userAddress);
 
-    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    userAddress = accounts[0];
-    signer = web3Provider.getSigner();
-    logToPage("Wallet connected:", userAddress);
+    // Read-only contracts for fetching data
+    stakingContractRO = new ethers.Contract(stakingContractAddress, stakingABI, provider);
+    nftContractRO = new ethers.Contract(nftAddress, nftABI, provider);
 
-    // Attach contracts
+    // Signer contract for transactions
     stakingContract = new ethers.Contract(stakingContractAddress, stakingABI, signer);
-    nftContract = new ethers.Contract(nftAddress, nftABI, signer);
-    logToPage("Contracts instantiated");
 
-    document.getElementById("walletAddress").innerText = userAddress;
     document.getElementById("stakeBtn").disabled = false;
     document.getElementById("unstakeBtn").disabled = false;
     document.getElementById("claimAllBtn").disabled = false;
 
-    // Load NFTs and stats
+    logToPage("Contracts instantiated");
     await loadUserNFTs();
-    await loadGlobalStats();
-    startHalvingCountdown();
-  } else {
-    alert("Please install MetaMask!");
-    logToPage("window.ethereum not found, MetaMask required");
+    await updateGlobalStats();
+  } catch (err) {
+    logToPage("Wallet connection failed: " + err.message, true);
   }
-});
+}
 
-// --------------------- LOAD USER NFTs ---------------------
+// =====================
+// Load user NFTs
+// =====================
 async function loadUserNFTs() {
+  logToPage("Loading user NFTs...");
   try {
-    logToPage("Loading user NFTs...");
-    unstakedNFTs = [];
-    stakedNFTs = [];
+    const nftBalance = (await nftContractRO.balanceOf(userAddress)).toNumber();
+    logToPage("NFT balance for rewards check: " + nftBalance);
 
-    const balanceBN = await nftContract.balanceOf(userAddress);
-    const balance = balanceBN.toNumber();
-    logToPage("NFT balance:", balance);
+    const nftContainer = document.getElementById("nftContainer");
+    if (nftContainer) nftContainer.innerHTML = "";
 
-    for (let i = 0; i < balance; i++) {
-      const tokenId = await nftContract.tokenOfOwnerByIndex(userAddress, i);
-      const isStaked = await stakingContract.userStaked(userAddress, tokenId);
-      let uri = await nftContract.tokenURI(tokenId);
-      if (uri.startsWith("data:application/json;base64,")) {
-        const json = JSON.parse(atob(uri.split(",")[1]));
-        uri = json.image;
+    for (let i = 0; i < nftBalance; i++) {
+      try {
+        const tokenId = await nftContractRO.tokenOfOwnerByIndex(userAddress, i);
+        const isStaked = await stakingContractRO.userStaked(userAddress, tokenId);
+        const tokenURI = await nftContractRO.tokenURI(tokenId);
+
+        logToPage(`Token #${i} ID: ${tokenId.toString()} - Staked: ${isStaked}`);
+
+        // Render NFT image
+        const nftDiv = document.createElement("div");
+        nftDiv.style.border = "1px solid #ccc";
+        nftDiv.style.margin = "5px";
+        nftDiv.style.padding = "5px";
+
+        const img = document.createElement("img");
+        img.src = tokenURI.startsWith("data:") ? tokenURI : "https://via.placeholder.com/150";
+        img.width = 150;
+        img.height = 150;
+
+        const info = document.createElement("div");
+        info.textContent = `Token ID: ${tokenId.toString()} - ${isStaked ? "Staked" : "Not staked"}`;
+
+        nftDiv.appendChild(img);
+        nftDiv.appendChild(info);
+        if (nftContainer) nftContainer.appendChild(nftDiv);
+
+        // Pending rewards
+        if (isStaked) {
+          const reward = await stakingContractRO.pending(userAddress, tokenId);
+          logToPage(`Token #${i} pending reward: ${ethers.utils.formatEther(reward)} YAM`);
+        }
+      } catch (nftErr) {
+        logToPage(`NFT render error at index ${i}: ${nftErr.message}`, true);
       }
-
-      (isStaked ? stakedNFTs : unstakedNFTs).push({ tokenId: tokenId.toString(), uri });
-
-      logToPage(`Token #${i} ID: ${tokenId.toString()} Staked: ${isStaked} URI:`, uri);
-
-      if (isStaked) await updateNFTRewardForDebug(tokenId);
     }
-
-    renderNFTs();
-    updateTotalRewards();
-    logToPage("Finished loading NFTs");
   } catch (err) {
-    logToPage("NFT load failed:", err.message || err);
+    logToPage("NFT load failed: " + err.message, true);
   }
 }
 
-// --------------------- UPDATE INDIVIDUAL NFT REWARD ---------------------
-async function updateNFTRewardForDebug(tokenId) {
+// =====================
+// Update global stats
+// =====================
+async function updateGlobalStats() {
+  logToPage("Loading global stats...");
   try {
-    const reward = await stakingContract.pending(userAddress, tokenId);
-    logToPage(`Pending reward for Token ID ${tokenId}:`, ethers.utils.formatEther(reward), "YAM");
+    const apy = await stakingContractRO.currentAPY();
+    const totalStaked = await stakingContractRO.totalStaked();
+    const totalYam = await stakingContractRO.totalMinted();
+    const remainingPool = await stakingContractRO.remainingRewardPool();
+
+    logToPage("Current APY: " + apy.toString());
+    logToPage("Total NFTs Staked: " + totalStaked.toString());
+    logToPage("Total YAM Minted: " + ethers.utils.formatEther(totalYam));
+    logToPage("Remaining Reward Pool: " + ethers.utils.formatEther(remainingPool));
   } catch (err) {
-    logToPage(`Failed to get reward for Token ID ${tokenId}:`, err.message || err);
+    logToPage("Failed to load global stats: " + err.message, true);
   }
 }
 
-// --------------------- UPDATE TOTAL REWARDS ---------------------
-async function updateTotalRewards() {
-  if (!stakedNFTs.length) {
-    document.getElementById("totalRewards").innerText = "0";
-    return;
-  }
-
-  let total = ethers.BigNumber.from(0);
-  for (const nft of stakedNFTs) {
-    const reward = await stakingContract.pending(userAddress, nft.tokenId);
-    total = total.add(reward);
-  }
-  document.getElementById("totalRewards").innerText = ethers.utils.formatEther(total);
-}
-
-// --------------------- BUTTON ACTIONS ---------------------
-document.getElementById("stakeBtn").addEventListener("click", async () => {
-  if (!selectedUnstaked.length) return;
-  const btn = document.getElementById("stakeBtn");
-  btn.disabled = true;
-  logToPage("Staking selected tokens:", selectedUnstaked);
-  try {
-    const tx = await stakingContract.stake(selectedUnstaked);
-    await tx.wait();
-    logToPage("Stake transaction confirmed");
-    await loadUserNFTs();
-  } catch (err) {
-    logToPage("Stake failed:", err.message || err);
-  }
-  btn.disabled = false;
-});
-
-document.getElementById("unstakeBtn").addEventListener("click", async () => {
-  if (!selectedStaked.length) return;
-  const btn = document.getElementById("unstakeBtn");
-  btn.disabled = true;
-  logToPage("Unstaking selected tokens:", selectedStaked);
-  try {
-    const tx = await stakingContract.unstake(selectedStaked);
-    await tx.wait();
-    logToPage("Unstake transaction confirmed");
-    await loadUserNFTs();
-  } catch (err) {
-    logToPage("Unstake failed:", err.message || err);
-  }
-  btn.disabled = false;
-});
-
-document.getElementById("claimAllBtn").addEventListener("click", async () => {
-  if (!selectedStaked.length) return;
-  const btn = document.getElementById("claimAllBtn");
-  btn.disabled = true;
-  logToPage("Claiming rewards for selected tokens:", selectedStaked);
-  try {
-    const tx = await stakingContract.claimAll(selectedStaked);
-    await tx.wait();
-    logToPage("ClaimAll transaction confirmed");
-    await loadUserNFTs();
-  } catch (err) {
-    logToPage("ClaimAll failed:", err.message || err);
-  }
-  btn.disabled = false;
-});
-
-// --------------------- RENDER NFT ON PAGE ---------------------
-function renderOnChainNFT(div, tokenURI) {
-  if (!tokenURI.startsWith("data:")) return;
-
-  const meta = JSON.parse(atob(tokenURI.split(",")[1]));
-  const svgBase64 = meta.image.split(",")[1];
-  const svg = atob(svgBase64);
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "nft-svg";
-  wrapper.innerHTML = svg;
-
-  const idDiv = document.createElement("div");
-  idDiv.innerText = `ID: ${meta.id || 'unknown'}`;
-  wrapper.appendChild(idDiv);
-
-  div.appendChild(wrapper);
-}
-
-function renderNFTs() {
-  const unstakeContainer = document.getElementById("unstakedNFTs");
-  const stakedContainer = document.getElementById("stakedNFTs");
-  unstakeContainer.innerHTML = "";
-  stakedContainer.innerHTML = "";
-
-  unstakedNFTs.forEach(nft => {
-    const div = document.createElement("div");
-    div.className = "nft-item";
-    renderOnChainNFT(div, nft.uri);
-    div.addEventListener("click", () => {
-      div.classList.toggle("active");
-      if (selectedUnstaked.includes(nft.tokenId))
-        selectedUnstaked = selectedUnstaked.filter(id => id !== nft.tokenId);
-      else selectedUnstaked.push(nft.tokenId);
-
-      document.getElementById("stakeBtn").disabled = selectedUnstaked.length === 0;
-      document.getElementById("unstakeBtn").disabled = selectedStaked.length === 0;
-      document.getElementById("claimAllBtn").disabled = selectedStaked.length === 0;
-    });
-    unstakeContainer.appendChild(div);
-  });
-
-  stakedNFTs.forEach(nft => {
-    const div = document.createElement("div");
-    div.className = "nft-item";
-    renderOnChainNFT(div, nft.uri);
-
-    const rewardDiv = document.createElement("div");
-    rewardDiv.className = "reward";
-    rewardDiv.innerText = "Loading...";
-    div.appendChild(rewardDiv);
-
-    div.addEventListener("click", () => {
-      div.classList.toggle("active");
-      if (selectedStaked.includes(nft.tokenId))
-        selectedStaked = selectedStaked.filter(id => id !== nft.tokenId);
-      else selectedStaked.push(nft.tokenId);
-
-      document.getElementById("stakeBtn").disabled = selectedUnstaked.length === 0;
-      document.getElementById("unstakeBtn").disabled = selectedStaked.length === 0;
-      document.getElementById("claimAllBtn").disabled = selectedStaked.length === 0;
-    });
-
-    stakedContainer.appendChild(div);
-    updateNFTRewardForDebug(nft.tokenId);
-  });
-}
-
-// --------------------- GLOBAL STATS ---------------------
-async function loadGlobalStats() {
-  try {
-    logToPage("Loading global stats...");
-    const apy = await stakingContract.currentAPY();
-    const totalStaked = await stakingContract.totalStakedNFTs();
-    const totalMinted = await stakingContract.totalMintedYAM();
-    const yearBN = await stakingContract.currentYear();
-    const year = yearBN.toNumber();
-    const remaining = await stakingContract.remainingEmission(year);
-
-    document.getElementById("currentAPY").innerText = apy.toString();
-    document.getElementById("totalStakedNFTs").innerText = totalStaked.toString();
-    document.getElementById("totalMintedYAM").innerText = ethers.utils.formatEther(totalMinted);
-    document.getElementById("remainingEmission").innerText = ethers.utils.formatEther(remaining);
-
-    logToPage("Global stats loaded: APY", apy.toString(), "Total Staked:", totalStaked.toString());
-  } catch (err) {
-    logToPage("Failed to load global stats:", err.message || err);
-  }
-}
-
-// --------------------- HALVING COUNTDOWN ---------------------
-async function startHalvingCountdown() {
-  try {
-    const startTimeBN = await stakingContract.startTime();
-    const startTime = startTimeBN.toNumber();
-    const halvingPeriod = 365*24*3600;
-
-    setInterval(() => {
-      const now = Math.floor(Date.now()/1000);
-      const yearsPassed = Math.floor((now - startTime) / halvingPeriod);
-      const nextHalving = startTime + (yearsPassed + 1) * halvingPeriod;
-
-      const diff = nextHalving - now;
-      const days = Math.floor(diff/86400);
-      const hours = Math.floor((diff%86400)/3600);
-      const mins = Math.floor((diff%3600)/60);
-      const secs = diff%60;
-      document.getElementById("halvingCountdown").innerText = `${days}d ${hours}h ${mins}m ${secs}s`;
-    }, 1000);
-
-    setInterval(() => {
-      if (stakedNFTs.length) updateTotalRewards();
-    }, 10000);
-
-    logToPage("Halving countdown started");
-  } catch (err) {
-    logToPage("Halving countdown error:", err.message || err);
-  }
-}
+// =====================
+// Hook up buttons
+// =====================
+document.getElementById("connectWalletBtn")?.addEventListener("click", connectWallet);
+document.getElementById("stakeBtn")?.addEventListener("click", () => logToPage("Stake clicked"));
+document.getElementById("unstakeBtn")?.addEventListener("click", () => logToPage("Unstake clicked"));
+document.getElementById("claimAllBtn")?.addEventListener("click", () => logToPage("Claim All clicked"));
