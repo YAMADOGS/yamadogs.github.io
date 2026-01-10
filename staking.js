@@ -27,6 +27,8 @@ let stakingContract;
 let stakingContractRO;
 let nftContractRO;
 let selectedNFT = null;
+let nftContract;
+
 
 const stakingContractAddress = "0x8AC5f61bCe8D3b0766ADD7392F30aA254b285221";
 const nftAddress = "0x4378682659304853EbD0146E85CF78EdECaE9647";
@@ -60,6 +62,7 @@ async function connectWallet() {
 
         // Signer contract
         stakingContract = new ethers.Contract(stakingContractAddress, stakingABI, signer);
+          nftContract = new ethers.Contract(nftAddress, nftABI, signer);
 
         // Event listeners
         stakingContractRO.removeAllListeners();
@@ -67,8 +70,8 @@ async function connectWallet() {
         stakingContractRO.on("Unstaked", async () => await loadUserNFTs());
         stakingContractRO.on("Claimed", async () => await loadUserNFTs());
 
-        document.getElementById("stakeBtn").disabled = false;
-        document.getElementById("unstakeBtn").disabled = false;
+        document.getElementById("stakeBtn").disabled = true;
+        document.getElementById("unstakeBtn").disabled = true;
         document.getElementById("claimAllBtn").disabled = false;
 
         logToPage("Contracts instantiated");
@@ -140,7 +143,7 @@ async function loadUserNFTs() {
                 selectedNFT = img;
                 img.classList.add("active");
 
-                const containerId = img.parentElement.id;
+                const containerId = img.closest("#unstakedNFTs, #stakedNFTs")?.id;
                 document.getElementById("stakeBtn").disabled = containerId !== "unstakedNFTs";
                 document.getElementById("unstakeBtn").disabled = containerId !== "stakedNFTs";
 
@@ -215,7 +218,12 @@ setInterval(() => {
 }, 15000);
 
 // Click anywhere to deselect NFT
-document.body.addEventListener("click", () => {
+document.body.addEventListener("click", (e) => {
+    if (
+        e.target.closest(".nft-card") ||
+        e.target.closest("button")
+    ) return;
+
     if (selectedNFT) {
         selectedNFT.classList.remove("active");
         selectedNFT = null;
@@ -224,27 +232,50 @@ document.body.addEventListener("click", () => {
     }
 });
 
+
 // =====================
 // Hook up buttons
 // =====================
 document.getElementById("connectWalletBtn")?.addEventListener("click", connectWallet);
 
-document.getElementById("stakeBtn")?.addEventListener("click", async () => {
+document.getElementById("stakeBtn").addEventListener("click", async () => {
     if (!selectedNFT) return;
+
     const tokenId = Number(selectedNFT.dataset.tokenId);
+
     try {
+      document.getElementById("stakeBtn").disabled = true;
+
+        // 1️⃣ CHECK APPROVAL
+        const approved = await nftContract.getApproved(tokenId);
+        if (approved.toLowerCase() !== stakingContractAddress.toLowerCase()) {
+            logToPage("Approving NFT...");
+            const approveTx = await nftContract.approve(
+                stakingContractAddress,
+                tokenId
+            );
+            await approveTx.wait();
+        }
+
+        // 2️⃣ STAKE
         const tx = await stakingContract.stake(tokenId);
-        logToPage("Transaction sent: " + tx.hash);
+        logToPage("Staking tx: " + tx.hash);
         await tx.wait();
-        logToPage("Staking complete!");
+
+        logToPage("NFT staked!");
         selectedNFT.classList.remove("active");
         selectedNFT = null;
+
         await loadUserNFTs();
         document.getElementById("stakeBtn").disabled = true;
+
     } catch (err) {
+      document.getElementById("stakeBtn").disabled = false;
+
         logToPage("Stake failed: " + err.message, true);
     }
 });
+
 
 document.getElementById("unstakeBtn")?.addEventListener("click", async () => {
     if (!selectedNFT) return;
