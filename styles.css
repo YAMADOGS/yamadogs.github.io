@@ -987,3 +987,11 @@ button:active {
     transform: scale(1.05);
     transition: transform 0.15s ease;
 }
+
+/* Transaction progress text */
+.tx-progress {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #3fe0c3; /* mint blue */
+  min-height: 14px; /* prevents layout jump */
+}
