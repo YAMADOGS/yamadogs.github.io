@@ -264,7 +264,7 @@ const remaining = await getRemainingYam(tokenId);
 
 let remainingYamFormatted = ethers.utils.formatUnits(remaining, 18); 
 remainingYamFormatted = parseFloat(remainingYamFormatted).toFixed(2);
-remainingYamDiv.textContent = `Remaining YAM: ${remainingYamFormatted}`;
+remainingYamDiv.textContent = `YAM: ${remainingYamFormatted}`;
 
             } catch (err) {
                 console.error("Error updating Remaining YAM for tokenId", tokenId, err);
@@ -373,7 +373,7 @@ async function renderNFT(tokenId, container, isStaked) {
 let remainingYamFormatted = ethers.utils.formatUnits(remaining, 18);
 remainingYamFormatted = parseFloat(remainingYamFormatted).toFixed(2);
 
-remainingYamDiv.textContent = `Remaining YAM: ${remainingYamFormatted}`;
+remainingYamDiv.textContent = ` YAM: ${remainingYamFormatted}`;
 
     } catch (err) {
         console.error("Error rendering NFT tokenId", tokenId, err);
