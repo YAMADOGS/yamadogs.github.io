@@ -198,7 +198,6 @@ async function updateGlobalStats() {
     }
 }
 
-
 // =====================
 // Pending Rewards
 // =====================
@@ -230,7 +229,7 @@ async function updatePendingRewards() {
 // Connect Wallet
 // =====================
 async function connectWallet() {
-    setProgress("walletProgress", "Checking wallet...");
+    showProgress("walletProgress", "Wallet connected ✅", 5000);
 
     try {
         if (!window.ethereum) {
@@ -313,7 +312,6 @@ img.style.height = "120px";
     }
 }
 
-
 // =====================
 // Load user NFTs
 // =====================
@@ -358,7 +356,6 @@ setInterval(() => {
     if (stakingContractRO) updateGlobalStats();
 }, 15000);
 
-// Click anywhere to deselect NFT
 document.body.addEventListener("click", (e) => {
     if (
         e.target.closest(".nft-card") ||
@@ -386,21 +383,21 @@ document.getElementById("stakeBtn").addEventListener("click", async () => {
 
     try {
         showProgress("stakeProgress", "Waiting for wallet confirmation...");
-        document.getElementById("stakeBtn").disabled = true;
+document.getElementById("stakeBtn").disabled = true;
 
-        const approved = await nftContract.getApproved(tokenId);
+const approved = await nftContract.getApproved(tokenId);
 
-        if (approved.toLowerCase() !== stakingContractAddress.toLowerCase()) {
-            setProgress("stakeProgress", "Approving YAMADOGS NFT...");
-            const approveTx = await nftContract.approve(stakingContractAddress, tokenId);
-            await approveTx.wait();
-        }
+if (approved.toLowerCase() !== stakingContractAddress.toLowerCase()) {
+    showProgress("stakeProgress", "Approving YAMADOGS NFT...");
+    const approveTx = await nftContract.approve(stakingContractAddress, tokenId);
+    await approveTx.wait();
+}
 
-        setProgress("stakeProgress", "Staking YAMADOGS NFT...");
-        const tx = await stakingContract.stake(tokenId);
-        await tx.wait();
+showProgress("stakeProgress", "Staking YAMADOGS NFT...");
+const tx = await stakingContract.stake(tokenId);
+await tx.wait();
 
-        showProgress("stakeProgress", "Staking successful ✅", 5000);
+showProgress("stakeProgress", "Staking successful ✅", 5000);
 
         selectedNFT.classList.remove("active");
         selectedNFT = null;
@@ -428,8 +425,7 @@ document.getElementById("unstakeBtn").addEventListener("click", async () => {
         const tx = await stakingContract.unstake(tokenId);
         await tx.wait();
 
-        setProgress("unstakeProgress", "Unstaking successful ✅");
-
+        showProgress("unstakeProgress", "Unstaking successful ✅", 5000);
         selectedNFT.classList.remove("active");
         selectedNFT = null;
 
@@ -437,7 +433,7 @@ document.getElementById("unstakeBtn").addEventListener("click", async () => {
         await updatePendingRewards();
 
     } catch (err) {
-        setProgress("unstakeProgress", "Transaction failed ❌");
+        showProgress("unstakeProgress", "Transaction failed ❌", 6000);
         document.getElementById("unstakeBtn").disabled = false;
     }
 });
@@ -453,16 +449,14 @@ document.getElementById("claimAllBtn").addEventListener("click", async () => {
         );
 
         if (tokenIds.length === 0) {
-            setProgress("claimProgress", "No rewards to claim");
+            showProgress("claimProgress", "No rewards to claim ℹ️", 4000);
             return;
         }
-
         setProgress("claimProgress", "Claiming $YAM...");
         const tx = await stakingContract.claimAll(tokenIds);
         await tx.wait();
 
-        setProgress("claimProgress", "Claim successful ✅");
-
+        showProgress("claimProgress", "Claim successful ✅", 5000);
         await loadUserNFTs();
         await updatePendingRewards();
 
