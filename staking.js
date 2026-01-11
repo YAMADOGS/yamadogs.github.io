@@ -12,6 +12,17 @@ let selectedNFT = null;
 let nftContract;
 let loadingNFTs = false;
 
+async function getRemainingYam(tokenId) {
+    try {
+        if (!stakingContractRO) return ethers.BigNumber.from(0);
+        const pendingReward = await stakingContractRO.pending(tokenId);
+        return pendingReward;
+    } catch (err) {
+        console.error("Error fetching remaining YAM for NFT", tokenId, err);
+        return ethers.BigNumber.from(0);
+    }
+}
+
 
 function setProgress(id, text) {
   const el = document.getElementById(id);
@@ -224,6 +235,30 @@ async function updatePendingRewards() {
     }
 }
 
+async function updateNFTYam() {
+    const containers = [
+        document.getElementById("stakedNFTs"),
+        document.getElementById("unstakedNFTs")
+    ];
+
+    for (const container of containers) {
+        if (!container) continue;
+
+        for (const card of container.children) {
+            const tokenId = Number(card.dataset.tokenId);
+            const remainingYamDiv = card.querySelector(".remaining-yam");
+            if (!remainingYamDiv) continue;
+
+            try {
+                const remaining = await getRemainingYam(tokenId);
+                remainingYamDiv.textContent = `Remaining YAM: ${ethers.utils.formatEther(remaining)}`;
+            } catch (err) {
+                console.error("Error updating Remaining YAM for tokenId", tokenId, err);
+            }
+        }
+    }
+}
+
 
 // =====================
 // Connect Wallet
@@ -261,6 +296,10 @@ async function connectWallet() {
         await loadUserNFTs();
         await updateGlobalStats();
         await updatePendingRewards();
+        
+       setInterval(() => {
+       if (stakingContractRO) updateNFTYam();
+        }, 10000);
 
     } catch (err) {
         setProgress("walletProgress", "Wallet connection failed ❌");
@@ -272,32 +311,40 @@ async function renderNFT(tokenId, container, isStaked) {
     try {
         const tokenURI = await nftContractRO.tokenURI(tokenId);
 
-// 1️⃣ parse base64 JSON to get image
-let imageURI;
-if (tokenURI.startsWith("data:application/json")) {
-    const json = JSON.parse(atob(tokenURI.split(",")[1]));
-    imageURI = json.image; // THIS IS THE SVG
-} else {
-    imageURI = tokenURI; // fallback in case of URL
-}
+        // Parse image from tokenURI
+        let imageURI;
+        if (tokenURI.startsWith("data:application/json")) {
+            const json = JSON.parse(atob(tokenURI.split(",")[1]));
+            imageURI = json.image;
+        } else {
+            imageURI = tokenURI;
+        }
 
-const img = document.createElement("img");
-img.src = imageURI;
-img.style.width = "120px";
-img.style.height = "120px";
-
-
+        // Create NFT card
         const card = document.createElement("div");
         card.className = "nft-card";
         card.dataset.tokenId = tokenId;
         card.style.cssText = "display:inline-block;margin:5px;padding:5px;border:1px solid #333;cursor:pointer;text-align:center;";
+
+        // 1️⃣ Remaining YAM (above image)
+        const remainingYamDiv = document.createElement("div");
+        remainingYamDiv.className = "remaining-yam";
+        remainingYamDiv.textContent = "Loading YAM...";
+        card.appendChild(remainingYamDiv);
+
+        // 2️⃣ NFT Image
+        const img = document.createElement("img");
+        img.src = imageURI;
+        img.style.width = "120px";
+        img.style.height = "120px";
         card.appendChild(img);
 
+        // 3️⃣ Token ID (below image)
         const label = document.createElement("div");
         label.textContent = "ID: " + tokenId;
         card.appendChild(label);
 
-        // Highlight on click
+        // 4️⃣ Highlight on click
         card.addEventListener("click", () => {
             if (selectedNFT) selectedNFT.classList.remove("active");
             card.classList.add("active");
@@ -307,8 +354,12 @@ img.style.height = "120px";
         });
 
         container.appendChild(card);
+
+        // 5️⃣ Fetch and display remaining YAM for this NFT
+        const remaining = await getRemainingYam(tokenId);
+        remainingYamDiv.textContent = `Remaining YAM: ${ethers.utils.formatEther(remaining)}`;
     } catch (err) {
-        
+        console.error("Error rendering NFT tokenId", tokenId, err);
     }
 }
 
