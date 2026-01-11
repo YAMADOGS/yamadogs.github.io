@@ -1015,3 +1015,10 @@ button:active {
   box-shadow: 2px 2px 0 #000;
 }
 
+.remaining-yam {
+    margin-bottom: 4px;       /* space between YAM and image */
+    font-weight: bold;
+    font-size: 13px;
+    color: green;
+}
+
