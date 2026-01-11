@@ -23,6 +23,12 @@ function clearProgress(id) {
   if (el) el.textContent = "";
 }
 
+function showProgress(id, text, autoClearMs = 0) {
+  setProgress(id, text);
+  if (autoClearMs > 0) {
+    setTimeout(() => clearProgress(id), autoClearMs);
+  }
+}
 
 
 
@@ -379,7 +385,7 @@ document.getElementById("stakeBtn").addEventListener("click", async () => {
     const tokenId = Number(selectedNFT.dataset.tokenId);
 
     try {
-        setProgress("stakeProgress", "Waiting for wallet confirmation...");
+        showProgress("stakeProgress", "Waiting for wallet confirmation...");
         document.getElementById("stakeBtn").disabled = true;
 
         const approved = await nftContract.getApproved(tokenId);
@@ -394,7 +400,7 @@ document.getElementById("stakeBtn").addEventListener("click", async () => {
         const tx = await stakingContract.stake(tokenId);
         await tx.wait();
 
-        setProgress("stakeProgress", "Staking successful ✅");
+        showProgress("stakeProgress", "Staking successful ✅", 5000);
 
         selectedNFT.classList.remove("active");
         selectedNFT = null;
