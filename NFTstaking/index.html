@@ -35,6 +35,8 @@ block-all-mixed-content;
 <div class="card">
 <div class="wallet-box">
   <button id="connectWalletBtn">Connect Wallet</button>
+<div id="walletProgress" class="tx-progress"></div>
+
   <div class="wallet-address">
     Wallet: <span id="walletAddress">Not connected</span>
   </div>
@@ -68,6 +70,8 @@ block-all-mixed-content;
     <h2>Your Unstaked NFTs</h2>
     <div class="nftContainer" id="unstakedNFTs"></div>
     <button id="stakeBtn">Stake Selected</button>
+<div id="stakeProgress" class="tx-progress"></div>
+
   </div>
 
   <!-- STAKED NFTs -->
@@ -78,8 +82,11 @@ block-all-mixed-content;
     <span id="pendingRewards">0</span>
     </div>
     <p>Total Rewards: <span id="totalRewards">0</span> YAM <button id="claimAllBtn">Claim All</button></p>
+      <div id="claimProgress" class="tx-progress"></div>
     <div class="nftContainer" id="stakedNFTs"></div>
     <button id="unstakeBtn">Unstake Selected</button>
+    <div id="unstakeProgress" class="tx-progress"></div>
+
   </div>
 
 </div>
