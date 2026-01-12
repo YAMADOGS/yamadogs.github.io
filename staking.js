@@ -196,60 +196,107 @@ const stakingABI = [
 
 const nftABI = [
   {
-    "inputs": [{ "internalType": "address", "name": "owner", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "o", "type": "address" }
+    ],
     "name": "balanceOf",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "address", "name": "ownerAddress", "type": "address" },
       { "internalType": "uint256", "name": "index", "type": "uint256" }
     ],
     "name": "tokenOfOwnerByIndex",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }],
-    "name": "tokenURI",
-    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }],
-    "name": "ownerOf",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }],
-    "name": "getApproved",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "operator", "type": "address" },
-      { "internalType": "bool", "name": "approved", "type": "bool" }
+      { "internalType": "uint256", "name": "id", "type": "uint256" }
     ],
-    "name": "setApprovalForAll",
+    "name": "tokenURI",
+    "outputs": [
+      { "internalType": "string", "name": "", "type": "string" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "id", "type": "uint256" }
+    ],
+    "name": "ownerOf",
+    "outputs": [
+      { "internalType": "address", "name": "o", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "id", "type": "uint256" }
+    ],
+    "name": "getApproved",
+    "outputs": [
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "s", "type": "address" },
+      { "internalType": "uint256", "name": "id", "type": "uint256" }
+    ],
+    "name": "approve",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "owner", "type": "address" },
-      { "internalType": "address", "name": "operator", "type": "address" }
+      { "internalType": "address", "name": "o", "type": "address" },
+      { "internalType": "address", "name": "op", "type": "address" }
     ],
     "name": "isApprovedForAll",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [
+      { "internalType": "bool", "name": "", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "op", "type": "address" },
+      { "internalType": "bool", "name": "a", "type": "bool" }
+    ],
+    "name": "setApprovalForAll",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  
+  {
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "index", "type": "uint256" }],
+    "name": "tokenByIndex",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   }
@@ -439,35 +486,40 @@ async function loadUserNFTs() {
     unstakedContainer.innerHTML = "";
     stakedContainer.innerHTML = "";
 
-    const totalSupply = (await nftContractRO.totalSupply()).toNumber();
     let totalPending = ethers.BigNumber.from(0);
 
-    for (let tokenId = 1; tokenId <= totalSupply; tokenId++) {
-        try {
+    try {
+        const totalSupply = await nftContractRO.totalSupply();
+
+        for (let tokenId = 1; tokenId <= totalSupply.toNumber(); tokenId++) {
+          
             const isStaked = await stakingContractRO.userStaked(userAddress, tokenId);
 
             if (isStaked) {
-                // ✅ DO NOT call ownerOf() for staked NFTs
                 await renderNFT(tokenId, stakedContainer, true);
 
                 const pending = await stakingContractRO.pending(tokenId);
                 totalPending = totalPending.add(pending);
-            } else {
+                continue;
+            }
+            try {
                 const owner = await nftContractRO.ownerOf(tokenId);
-
                 if (owner.toLowerCase() === userAddress.toLowerCase()) {
                     await renderNFT(tokenId, unstakedContainer, false);
                 }
+            } catch (_) {
             }
-        } catch (err) {
-            console.warn("Skipping tokenId", tokenId);
         }
+
+        document.getElementById("totalRewards").textContent =
+            ethers.utils.formatEther(totalPending);
+
+        await updatePendingRewards();
+
+    } catch (err) {
+        console.error("loadUserNFTs failed", err);
     }
 
-    document.getElementById("totalRewards").textContent =
-        ethers.utils.formatEther(totalPending);
-
-    await updatePendingRewards();
     loadingNFTs = false;
 }
 
