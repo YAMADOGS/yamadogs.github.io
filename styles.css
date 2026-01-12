@@ -1036,7 +1036,7 @@ button:active {
   justify-content: center;
   padding: 8px;
   background: #111;
-  border: 2px solid #000;
+  border: 2px solid #ffb703;
 }
 
 /* Scrollbar */
@@ -1086,14 +1086,18 @@ button:active {
 }
 
 .nft-card .remaining-yam {
-    font-size: 4px;
-    font-weight: none;
-    color: #3fe0c3;
-    text-align: center;
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: clip;
+  width: 100%;
+  max-width: 100%;
+  font-size: clamp(3px, 1.8vw, 9px); 
+  line-height: 1.2;
+  text-align: center;
+  color: #3fe0c3;
+  font-weight: bold;
+  white-space: normal;     
+  word-break: break-word;   
+  overflow-wrap: anywhere;   
+  padding: 2px 2px;
+  box-sizing: border-box;
 }
 
 
