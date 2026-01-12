@@ -1019,8 +1019,8 @@ button:active {
 .remaining-yam {
     margin-bottom: 4px;       /* space between YAM and image */
     font-weight: bold;
-    font-size: 10px;
-    color: #3fe0c3;
+    font-size: 4px;
+    color: #f4fbff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
