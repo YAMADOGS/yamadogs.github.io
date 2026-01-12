@@ -529,7 +529,31 @@ card.appendChild(progressBar);
         try {
     await loadMaxYAMPerNFTThisYear();
 
-const remaining = await stakingContractRO.remainingPerNFTThisYear(tokenId);
+await loadMaxYAMPerNFTThisYear();
+let remainingNum;
+let progress = 0;
+if (isStaked) {
+    const remaining = await stakingContractRO.remainingPerNFTThisYear(tokenId);
+    remainingNum = Number(ethers.utils.formatEther(remaining));
+
+    if (maxYAMPerNFTThisYear > 0) {
+        progress = ((maxYAMPerNFTThisYear - remainingNum) / maxYAMPerNFTThisYear) * 100;
+    }
+} else {
+    remainingNum = maxYAMPerNFTThisYear;
+    progress = 0;
+}
+
+progress = Math.min(100, Math.max(0, progress));
+
+remainingDiv.textContent =
+    `${remainingNum.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    })} $YAM`;
+
+progressFill.style.width = `${progress.toFixed(2)}%`;
+
 
 const remainingNum = Number(ethers.utils.formatEther(remaining));
 const maxNum = maxYAMPerNFTThisYear;
