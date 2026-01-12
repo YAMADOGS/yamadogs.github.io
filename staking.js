@@ -372,14 +372,16 @@ async function updateNFTYam() {
         if (!container) continue;
         for (const card of container.children) {
             const tokenId = Number(card.dataset.tokenId);
-            const remainingYamDiv = card.querySelector(".remaining-yam");
-            if (!remainingYamDiv) continue;
+            const remainingDiv = card.querySelector(".remaining-yam");
+            if (!remainingDiv) continue;
             try {
-                const remaining = await nftContractRO.remainingPerNFTThisYear(tokenId);
-          remainingDiv.textContent =
-        `${Number(ethers.utils.formatEther(remaining)).toFixed(2)} YAM`;
+                const remaining = await stakingContractRO.remainingPerNFTThisYear(tokenId); // ✅ correct contract
+                // Format with 2 decimals and commas for big numbers
+                const formatted = Number(ethers.utils.formatEther(remaining)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                remainingDiv.textContent = `${formatted} $YAM`;
             } catch (err) {
                 console.error("Error updating Remaining YAM for tokenId", tokenId, err);
+                remainingDiv.textContent = "0.00 $YAM";
             }
         }
     }
