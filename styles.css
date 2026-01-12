@@ -1137,7 +1137,7 @@ button:active {
 .yam-progress-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #FFD700, #FFD700);
+  background: linear-gradient(90deg, #FFD700, #000);
   transition: width 0.6s ease;
 }
 
