@@ -1034,3 +1034,39 @@ button:active {
     color: #3fe0c3;
 }
 
+.nft-card {
+  width: 90px; /* adjust size */
+  padding: 4px;
+  border: 3px solid #ffb703;
+  border-image: repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 3;
+  background: #222;
+  box-shadow: 2px 2px 0 #000;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 4px;
+}
+
+.nft-card img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  margin: 2px 0;
+}
+
+.nft-card .remaining-yam {
+  font-size: 10px;
+  font-weight: bold;
+  color: #3fe0c3;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.nft-card .token-id {
+  font-size: 8px;
+  color: #fff;
+  text-align: center;
+  margin-top: 2px;
+}
+
