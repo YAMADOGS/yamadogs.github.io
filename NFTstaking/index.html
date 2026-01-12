@@ -85,6 +85,31 @@ block-all-mixed-content;
     <div class="nftContainer" id="stakedNFTs"></div>
     <button id="unstakeBtn">Unstake Selected</button>
     <div id="unstakeProgress" class="tx-progress"></div>
+    
+<div class="query-box">
+
+  <div class="query-input-row">
+    <button id="queryNFTBtn">Query</button>
+
+    <span class="query-label">TYPE NFT ID:</span>
+
+    <input
+      type="number"
+      id="queryTokenId"
+      placeholder="e.g. 2"
+      min="0"
+    />
+  </div>
+
+  <div class="query-result-row">
+    <div class="query-token" id="queryResultToken">—</div>
+    <div class="query-yam" id="queryResultYAM">—</div>
+  </div>
+
+  <div id="queryStatus" class="tx-progress"></div>
+
+</div>
+
 
   </div>
 
