@@ -1034,35 +1034,78 @@ button:active {
     color: #3fe0c3;
 }
 
+/* NFT Container */
+.nftContainer {
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  padding: 8px;
+  background: #111;
+  border: 2px solid #000;
+}
+
+/* Scrollbar */
+.nftContainer::-webkit-scrollbar {
+  width: 6px;
+}
+.nftContainer::-webkit-scrollbar-thumb {
+  background: #ffb703;
+  border-radius: 3px;
+}
+
+/* Individual NFT Card */
 .nft-card {
-  width: 90px; /* adjust size */
+  width: 90px;
   padding: 4px;
+  background: #222;
   border: 3px solid #ffb703;
   border-image: repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 3;
-  background: #222;
   box-shadow: 2px 2px 0 #000;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 4px;
+  cursor: pointer;
+  transition: transform 0.1s ease;
 }
 
+.nft-card:active {
+  transform: scale(1.03);
+}
+
+/* NFT Image inside Card */
 .nft-card img {
   width: 100%;
   height: auto;
   object-fit: contain;
   margin: 2px 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+#unstakedNFTs img.active,
+#stakedNFTs img.active {
+  transform: scale(1.2);
+  border: 2px solid #FFD700; /* golden border */
+  z-index: 10;
+}
+
+/* Remaining YAM display above NFT image */
 .nft-card .remaining-yam {
   font-size: 10px;
   font-weight: bold;
   color: #3fe0c3;
   text-align: center;
   margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* Token ID below NFT image */
 .nft-card .token-id {
   font-size: 8px;
   color: #fff;
@@ -1070,3 +1113,18 @@ button:active {
   margin-top: 2px;
 }
 
+/* Desktop scaling (hover) */
+@media (hover: hover) {
+  .nft-card:hover img {
+    transform: scale(2.5);
+    z-index: 20;
+    box-shadow: 6px 6px 0 #000;
+  }
+}
+
+/* Mobile tap active */
+.nft-card img.active {
+  transform: scale(2.5);
+  z-index: 20;
+  box-shadow: 6px 6px 0 #000;
+}
