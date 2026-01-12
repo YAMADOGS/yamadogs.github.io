@@ -69,7 +69,7 @@ async function fetchRemainingYAMBatch(tokenIds) {
 
 function initPublicProvider() {
     publicProvider = new ethers.providers.JsonRpcProvider(
-        "https://sepolia.drpc.org" 
+        "https://ethereum-sepolia-rpc.publicnode.com" 
 
     );
 
