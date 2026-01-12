@@ -1054,7 +1054,7 @@ button:active {
   padding: 4px;
   background: #222;
   border: 3px solid #ffb703;
-  border-image: repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 3;
+  border-image: repeating-linear-gradient(90deg,#ffb703 0 6px,transparent 6px 10px) 3;
   box-shadow: 2px 2px 0 #000;
   box-sizing: border-box;
   display: flex;
@@ -1123,4 +1123,20 @@ button:active {
   transform: scale(2.5);
   z-index: 20;
   box-shadow: 6px 6px 0 #000;
+}
+
+.yam-progress {
+  width: 90%;
+  height: 8px;
+  background: #222;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 6px auto 4px;
+}
+
+.yam-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00ff88, #00ccff);
+  transition: width 0.6s ease;
 }
