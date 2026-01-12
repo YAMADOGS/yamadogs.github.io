@@ -241,33 +241,38 @@ async function loadUserNFTs() {
 
     const unstakedContainer = document.getElementById("unstakedNFTs");
     const stakedContainer = document.getElementById("stakedNFTs");
+
     unstakedContainer.innerHTML = "";
     stakedContainer.innerHTML = "";
 
     const totalSupply = (await nftContractRO.totalSupply()).toNumber();
     let totalPending = ethers.BigNumber.from(0);
 
-    const nftPromises = [];
     for (let tokenId = 1; tokenId <= totalSupply; tokenId++) {
         try {
             const isStaked = await stakingContractRO.userStaked(userAddress, tokenId);
-            const owner = await nftContractRO.ownerOf(tokenId);
 
             if (isStaked) {
-                const { pending } = await batchFetchNFTData(tokenId);
+                // ✅ DO NOT call ownerOf() for staked NFTs
+                await renderNFT(tokenId, stakedContainer, true);
+
+                const pending = await stakingContractRO.pending(tokenId);
                 totalPending = totalPending.add(pending);
-                nftPromises.push(renderNFT(tokenId, stakedContainer, true));
-            } else if (owner.toLowerCase() === userAddress.toLowerCase()) {
-                nftPromises.push(renderNFT(tokenId, unstakedContainer, false));
+            } else {
+                const owner = await nftContractRO.ownerOf(tokenId);
+
+                if (owner.toLowerCase() === userAddress.toLowerCase()) {
+                    await renderNFT(tokenId, unstakedContainer, false);
+                }
             }
         } catch (err) {
-            console.error("Error loading tokenId", tokenId, err);
+            console.warn("Skipping tokenId", tokenId);
         }
     }
 
-    await Promise.all(nftPromises);
+    document.getElementById("totalRewards").textContent =
+        ethers.utils.formatEther(totalPending);
 
-    document.getElementById("totalRewards").textContent = ethers.utils.formatEther(totalPending);
     await updatePendingRewards();
     loadingNFTs = false;
 }
