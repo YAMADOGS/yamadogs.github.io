@@ -60,7 +60,7 @@ function initPublicProvider() {
 // =====================
 // Contract Addresses
 // =====================
-const stakingContractAddress = "0xA2bEf7A4b780eB16B52c81D169AB04783E5cA139";
+const stakingContractAddress = "0x552BdB7b104433C2F6C1B315f46462ABeC3Ec238";
 const nftAddress = "0x4378682659304853EbD0146E85CF78EdECaE9647";
 
 // =====================
