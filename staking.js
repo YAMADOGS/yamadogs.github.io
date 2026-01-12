@@ -11,6 +11,7 @@ let nftContract;
 let selectedNFT = null;
 let loadingNFTs = false;
 let maxYAMPerNFTThisYear = null;
+let nftRemainingYAMCache = {}; 
 
 
 // =====================
@@ -49,6 +50,18 @@ async function loadMaxYAMPerNFTThisYear() {
     maxYAMPerNFTThisYear =
         Number(ethers.utils.formatEther(totalEmission)) /
         totalSupply.toNumber();
+}
+
+async function fetchRemainingYAMBatch(tokenIds) {
+    if (!stakingContractRO) return [];
+
+    try {
+        const remainingBNArray = await stakingContractRO.currentRemainingBatch(tokenIds);
+        return remainingBNArray.map(amount => Number(ethers.utils.formatEther(amount)));
+    } catch (err) {
+        console.error("Failed to fetch remaining YAM batch:", err);
+        return tokenIds.map(() => 0);
+    }
 }
 
 
@@ -206,7 +219,22 @@ const stakingABI = [
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
-  }
+  },
+  
+{
+    "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }],
+    "name": "currentRemainingYAM",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+},
+{
+    "inputs": [{ "internalType": "uint256[]", "name": "tokenIds", "type": "uint256[]" }],
+    "name": "currentRemainingBatch",
+    "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
+    "stateMutability": "view",
+    "type": "function"
+}
 ];
 
 const nftABI = [
@@ -399,36 +427,28 @@ async function updateNFTYam() {
     for (const container of containers) {
         if (!container) continue;
 
-        for (const card of container.children) {
-            const tokenId = Number(card.dataset.tokenId);
+        const tokenIds = Array.from(container.children).map(c => Number(c.dataset.tokenId));
+        const remainingArray = await fetchRemainingYAMBatch(tokenIds);
+
+        for (let i = 0; i < container.children.length; i++) {
+            const card = container.children[i];
+            const tokenId = tokenIds[i];
+            const remainingNum = remainingArray[i];
+            nftRemainingYAMCache[tokenId] = remainingNum;
             const remainingDiv = card.querySelector(".remaining-yam");
             const progressFill = card.querySelector(".yam-progress-fill");
 
             if (!remainingDiv || !progressFill) continue;
 
-            try {
-                const remaining = await stakingContractRO.remainingPerNFTThisYear(tokenId);
-                const remainingNum = Number(ethers.utils.formatEther(remaining));
-                const maxNum = maxYAMPerNFTThisYear;
-
-                let progress = 0;
-                if (maxNum > 0) {
-                    progress = ((maxNum - remainingNum) / maxNum) * 100;
-                }
-
-                progress = Math.min(100, Math.max(0, progress));
-
-                remainingDiv.textContent =
-                    `${remainingNum.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    })} $YAM`;
-
-                progressFill.style.width = `${progress.toFixed(2)}%`;
-
-            } catch (err) {
-                console.error("Progress update failed", tokenId, err);
+            const maxNum = maxYAMPerNFTThisYear;
+            let progress = 0;
+            if (maxNum > 0) {
+                progress = ((maxNum - remainingNum) / maxNum) * 100;
             }
+            progress = Math.min(100, Math.max(0, progress));
+
+            remainingDiv.textContent = `${remainingNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $YAM`;
+            progressFill.style.width = `${progress.toFixed(2)}%`;
         }
     }
 }
@@ -529,39 +549,17 @@ card.appendChild(progressBar);
         try {
     await loadMaxYAMPerNFTThisYear();
 
-await loadMaxYAMPerNFTThisYear();
-let remainingNum;
-let progress = 0;
-if (isStaked) {
-    const remaining = await stakingContractRO.remainingPerNFTThisYear(tokenId);
-    remainingNum = Number(ethers.utils.formatEther(remaining));
+const remaining = await stakingContractRO.remainingPerNFTThisYear(tokenId);
 
-    if (maxYAMPerNFTThisYear > 0) {
-        progress = ((maxYAMPerNFTThisYear - remainingNum) / maxYAMPerNFTThisYear) * 100;
-    }
-} else {
-    remainingNum = maxYAMPerNFTThisYear;
-    progress = 0;
-}
+const remainingNum = Number(
+    ethers.utils.formatEther(await stakingContractRO.currentRemainingYAM(tokenId))
+);
 
-progress = Math.min(100, Math.max(0, progress));
-
-remainingDiv.textContent =
-    `${remainingNum.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    })} $YAM`;
-
-progressFill.style.width = `${progress.toFixed(2)}%`;
-
-
-const remainingNum = Number(ethers.utils.formatEther(remaining));
-const maxNum = maxYAMPerNFTThisYear;
+const maxNum = maxYAMPerNFTThisYear || remainingNum;
 let progress = 0;
 if (maxNum > 0) {
     progress = ((maxNum - remainingNum) / maxNum) * 100;
 }
-
 progress = Math.min(100, Math.max(0, progress));
 
 remainingDiv.textContent =
