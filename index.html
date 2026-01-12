@@ -2,12 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YAMADOGS NFT Staking</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="/styles.css">
+
 <meta http-equiv="Content-Security-Policy" content="
 default-src 'none';
-script-src 'self';
+script-src 'self' 'unsafe-eval';
+
 style-src 'self';
-img-src 'self';
+img-src 'self' data:;
 font-src 'self';
 connect-src 'self' https://ethereum-sepolia-rpc.publicnode.com;
 base-uri 'none';
@@ -18,284 +24,74 @@ frame-ancestors 'none';
 upgrade-insecure-requests;
 block-all-mixed-content;
 ">
-<meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-<meta http-equiv="X-Frame-Options" content="DENY">
-<meta http-equiv="Permissions-Policy" content="
-clipboard-read=(self),
-clipboard-write=(self),
-geolocation=(),
-camera=(),
-microphone=(),
-payment=(),
-usb=(),
-hid=(),
-serial=(),
-xr-spatial-tracking=()
-">
-<link rel="icon" href="/favicon.ico">
-<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png">
-<link rel="apple-touch-icon" href="/favicon-192.png">
 
-<title>YAMADOGS NFT</title>
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "YAMADOGS NFT",
-  "url": "https://yamadogs.org",
-  "logo": "https://yamadogs.org/favicon-192.png"
-}
-</script>
-
-
-<meta name="description" content="YAMADOGS NFT is a collection of 2,026 fully on-chain generative NFT collectibles, where 100% of the metadata and images live directly on the blockchain. ❌ No IPFS ❌ No external servers ❌ No private hosting ✅ Pure on-chain permanence Once deployed, YAMADOGS exists as long as the blockchain exists.">
-
-<link rel="stylesheet" href="styles.css">
-<script src="ethers.umd.min.js" integrity="sha384-Htz1SE4Sl5aitpvFgr2j0sfsGUIuSXI6t8hEyrlQ93zflEF3a29bH2AvkUROUw7J" crossorigin="anonymous"></script>
-<script src="main.js" defer></script>
 </head>
 <body>
-<!-- ===============================
-     STARTUP INTRO (7s)
-=============================== -->
-<div id="startupIntro">
-  <div class="intro-center">
-
-    <img src="intro.svg" class="intro-logo" alt="YAMADOGS NFT">
-
-    <div class="intro-progress">
-      <div class="intro-progress-bar" id="introProgressBar"></div>
-    </div>
-
-    <h1 class="intro-title">YAMADOGS</h1>
-
-  </div>
-</div>
-<div class="sun"></div>
-<div class="cloud c1"></div>
-<div class="cloud c2"></div>
-
-<!-- PAGE LOAD NOTIFICATION -->
-<div class="toast-overlay" id="pageLoadOverlay"></div>
-<div class="mint-toast show" id="pageLoadNotification">
-  <button id="closePageLoad" title="Close">✖</button>
-  <div class="mint-toast-body">
-    <h2>WARNING!</h2>
-    <p>
-<b>Yo pups!</b>🐾 Don’t get lost in the pack! Always fetch YAMADOGS from the official den:</p>
- <p>
- 🌐 <b>yamadogs.org</b>
- 🌐<b>yamadogs.github.io</b>
- </p>
-   <p> <b>⚠️ YAMADOGS is NOT financial advice!</b>
-YAMADOGS was created purely for fun and as a tribute to the long-lost, legendary breed: Yamainu.
-💥 <b>DO NOT MINT OR BUY</b> if you’re chasing quick profits or flipping opportunities!
-This project was built by me, solo, over months, for true collectors — people who love dogs and respect the art of collecting.
-💀 The risk of losing money here is real. If your only goal is profit, this is NOT for you.
-🐶 If you simply love collecting, holding, and enjoying YAMADOGS — welcome aboard!</p>
-</div>
-</div>
-<div class="ui">
 
 <div class="title-wrapper">
-  <img src="logo.svg" class="title-logo" alt="YAMADOGS LOGO">
-  <h1>YAMADOGS NFT</h1>
+  <img src="/logo.png" alt="YAMADOGS Logo" class="title-logo">
+  <h1>YAMADOGS test5</h1>
 </div>
-
-<div class="security-warning">
-  <h2>WARNING!</h2>
-  <div class="security-warning">
-<p><b>Yo pack!</b> 🐾 Stay sharp and don’t sniff the wrong trail! ⚡</p>
-<p>Only roam these official YAMADOGS paths:</p>
-<p><b>🌐 yamadogs.org</b></p>
-<p><b>🌐 yamadogs.github.io</b></p>
-<p><a href="https://sepolia.etherscan.io/token/0x4378682659304853EbD0146E85CF78EdECaE9647" target="_blank"
-   rel="noopener noreferrer">EXPLORER</a></p>
-<p>Sniff-test time! 👃 Double-check the URL you’re on—if it ain’t one of these, don’t click or connect your wallet!</p>
-</div>
-<div class="security-warning">
-⚠️ Always double-check the contract address, legends! Everything is open-source—Website, Minting Site, NFT Contract. References at the bottom page. 🐾
-</div>
-
-</div>
-
 <div class="card">
-  <h2>Fully On-chain</h2>
-  <h2>YAMADOGS NFT</h2>
+<div class="wallet-box">
+  <button id="connectWalletBtn">Connect Wallet</button>
+<div id="walletProgress" class="tx-progress" style="margin-top:12px"></div>
+  <div class="wallet-address">
+    Wallet: <span id="walletAddress">Not connected</span>
+  </div>
+</div>
+</div>
+
+
+<div class="security-warning">
+⚠️ APY is not guaranteed. Always claim your rewards. Staking contract is fully ownerless, and YAM token has no guaranteed value. You are responsible for your own staking decisions.
+</div>
+
 <div class="contract-wrapper">
-  <span class="contract-label">TAP to copy Contract Address:</span>
- <span class="contract-address">0x4378682659304853EbD0146E85CF78EdECaE9647</span>
+  <div class="contract-label">Staking Contract:</div>
+  <div class="contract-address">0x8AC5f61bCe8D3b0766ADD7392F30aA254b285221</div>
 </div>
-<div class="security-warning">
-<p>Mint price: <b>0.0005 ETH </b></p>
-</div>
-  <h3>MAX SUPPLY</h3>
-  <p class="nft-supply">
-    <span id="minted">Loading...</span> / 2026
-  </p>
-<!-- NFT IMAGE CONTAINER -->
-<div class="nft-container">
+
+<div class="ui">
+
+  <!-- LIVE STATS -->
   <div class="card">
-  <h3>Fierce YAMADOGS</h3>
-<div class="security-warning">
-Think you’ve got the chops to snag a fiercest YAMADOGS? Only the luckiest pups make the pack! 🐾
-</div>
-  <img src="nft1.svg" alt="YAMADOGS NFT">
-  <img src="nft2.svg" alt="YAMADOGS NFT">
-  <img src="nft3.svg" alt="YAMADOGS NFT">
-  <img src="nft4.svg" alt="YAMADOGS NFT">
-  <img src="nft5.svg" alt="YAMADOGS NFT">
-  <img src="nft6.svg" alt="YAMADOGS NFT">
-  <img src="nft7.svg" alt="YAMADOGS NFT">
-  <img src="nft8.svg" alt="YAMADOGS NFT">
-  <img src="nft9.svg" alt="YAMADOGS NFT">
-  <img src="nft10.svg" alt="YAMADOGS NFT">
-  <img src="nft11.svg" alt="YAMADOGS NFT">
-  <img src="nft12.svg" alt="YAMADOGS NFT">
-  <img src="nft13.svg" alt="YAMADOGS NFT">
-  <img src="nft14.svg" alt="YAMADOGS NFT">
-  <img src="nft15.svg" alt="YAMADOGS NFT">
-  <img src="nft16.svg" alt="YAMADOGS NFT">
+    <h2>Global Stats</h2>
+    <p>Current APY: <span id="currentAPY">Loading...</span>%</p>
+    <p>Next Halving In: <span id="halvingCountdown">Loading...</span></p>
+    <p>Total NFTs Staked: <span id="totalStakedNFTs">0</span></p>
+    <p>Total YAM Minted: <span id="totalMintedYAM">0</span></p>
+    <p>Remaining Reward Pool: <span id="remainingEmission">0</span></p>
   </div>
-</div>
-</div>
 
+  <!-- UNSTAKED NFTs -->
+  <div class="card">
+    <h2>Your Unstaked NFTs</h2>
+    <div class="nftContainer" id="unstakedNFTs"></div>
+    <button id="stakeBtn">Stake Selected</button>
+<div id="stakeProgress" class="tx-progress"></div>
 
+  </div>
 
-<div class="copy-box">📱 
-<h3>Mobile Users</h3>
-For Mobile users if Wallet Connect dont Pop up after you click just Open the website link inside your wallet built-in browser: TAP to copy<br>
-<div class="copy-link">yamadogs.org</div>
-
-<button id="mintBtn">MINT YAMADOGS NFT</button>
-
-<div class="link-buttons">
-  <button data-url="/">Magic Eden</button>
-  <button data-url="https://testnet.rarible.com/collection/0x4378682659304853ebd0146e85cf78edecae9647/items">OPENSEA</button>
-</div>
-
-
-<div class="description">
-  <p>Images and metadata? Fully on-chain.
-Your YAMADOGS NFT lives entirely on the blockchain — no external storage, no IPFS, no central servers.
-Completely ownerless, admin-less… like a wild dog roaming free in the forest, owned by no one, keep by no one.</p>
-</div>
-<div class="faq-wrapper">
-<h2>FAQ</h2>
-  <div class="faq-item">
-    <div class="faq-question">What is YAMADOGS?</div>
-    <div class="faq-answer">
-      YAMADOGS is a collection of 2,026 fully on-chain generative NFT collectibles, where 100% of the metadata and images live directly on the blockchain. ❌ No IPFS ❌ No external servers ❌ No private hosting ✅ Pure on-chain permanence Once deployed, YAMADOGS exists as long as the blockchain exists.
+  <!-- STAKED NFTs -->
+  <div class="card">
+    <h2>Staked NFTs</h2>
+   <div class="stats-row">
+    <span>Pending Rewards:</span>
+    <span id="pendingRewards">0</span>
     </div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-question">The Story Behind YAMADOGS 🐕</div>
-    <div class="faq-answer">
-      <p>You’re probably asking: “What’s the story behind YAMADOGS?”</p>
-<p>Well… apparently everything needs a story these days, right? 😅
-</p><p>
-Honestly? Nothing fancy. I just love dogs. And when I create something, it’s gotta be my most loved and obsessed project—so obviously it had to be dogs.
-</p><p>
-Now, sure… there are already tons of dog NFTs out there. Same names, same vibes, same… blah blah blah. I didn’t want that. So I went on a quest: a noble, heroic, slightly obsessive quest to find a dog name that nobody else had claimed. 🕵️‍♂️🐶
-</p><p>
-It wasn’t easy. I scrolled, searched, and stared into the void of recycled dog names. 🤣
-</p><p>
-Then I stumbled upon a blog about an extinct Japanese dog breed called Yamainu. Ancient, mysterious… and kinda sad because they went extinct. Hmmmm… Japanese, I like it. Sad story… also kind of poetic. Life is harsh sometimes.
-</p><p>
-I thought about naming it Yamainu, but nah… someone might have already snatched that. Then I tried YAMADOG—but that’s a motorcycle brand 😎.
-</p><p>
-Finally, it hit me: my project isn’t a single dog… it’s a whole collection of dog art. Why not just call it YAMADOGS?
-</p><p>
-I searched. Nothing pops up. Zero. Nada. Perfect.
-And just like that… YAMADOGS was born. 🎉🐾</p>
-    </div>
+    <p> <button id="claimAllBtn">Claim All</button></p>
+      <div id="claimProgress" class="tx-progress"></div>
+    <div class="nftContainer" id="stakedNFTs"></div>
+    <button id="unstakeBtn">Unstake Selected</button>
+    <div id="unstakeProgress" class="tx-progress"></div>
+
   </div>
 
-  <div class="faq-item">
-    <div class="faq-question">Roadmap</div>
-    <div class="faq-answer">
-      Roadmap? Nah, we don’t chase lines on paper. 🐕
-YAMADOGS live for the journey, sniffing, exploring, and enjoying every step.
-    </div>
-  </div>
-</div>
 </div>
 
-<div class="copy-toast" id="toast">Copied!</div>
+<script src="/ethers.umd.min.js" integrity="sha384-Htz1SE4Sl5aitpvFgr2j0sfsGUIuSXI6t8hEyrlQ93zflEF3a29bH2AvkUROUw7J" crossorigin="anonymous"></script>
+<script src="/staking.js" defer></script>
 
-<div class="copy-box">
-  <h1>Creator</h1>
-  <div class="description">
-<p>I’m the creator of YAMADOGS.
-You can call me <b>Yami.</b></p>
-
-<p>Where did I come from?
-You don’t need to know. 😉
-
-I value my privacy, but I still wanted to build something real.
-That’s why YAMADOGS is fully ownerless and fully open-source.
-No admin. No control. No strings. Once it exists, it’s free to roam.
-
-Did I create this to make money?
-Maybe. Yeah.
-But honestly… I don’t even know if anyone will mint a YAMADOGS. 😂
-
-I’m not famous.
-I’m not a known name in the NFTverse.
-So why collect something made by a nobody?
-
-Good question.
-
-Will YAMADOGS go mainstream?
-Probably not.
-But one thing is certain: I created YAMADOGS — and that will never change.
-
-Does YAMADOGS have something others don’t?
-On‑chain NFTs?
-Generative art?
-Decentralization?
-Blah blah blah.
-
-Let’s be real — none of that is new.
-Everything is a remix. I’m not special, and I won’t pretend to be.
-
-My only goal?
-For one real collector to notice the work.
-Even a single mint — if it comes from someone who truly appreciates it — is more than enough for me.
-
-I am nobody.
-My work might be worthless.
-
-But I put my heart and soul into creating YAMADOGS — and that part is real. 🐶</p>
-  </div>
-<div class="download-logo">
-  <p>Download the YAMADOGS Logo:</p>
-  <button id="downloadSvg">Download SVG</button>
-  <button id="downloadPng">Download PNG</button>
-<div class="social-footer">
-  <a class="social-link"
-     href="https://x.com/yamadogsnft?t=kxBAtJNzp2U-sXy9Pg-hbA&s=09"
-     target="_blank"
-     rel="noopener"
-     aria-label="X">
-    <img src="x.png" alt="X"></a>
-  <a class="social-link"
-     href="https://discord.gg/eKm2VPU2bW"
-     target="_blank"
-     rel="noopener"
-     aria-label="Discord">
-    <img src="discord.png" alt="Discord"></a>
-</div>
-<div class="site-footer">
-  © 2025 YAMADOGS — MIT License<br>
-  This website is open-source and permissionless.<br>
-  <button id="viewSourceBtn">VIEW SOURCE CODE</button>
-</div>
-</div>
-</div>
-</div>
 </body>
 </html>
