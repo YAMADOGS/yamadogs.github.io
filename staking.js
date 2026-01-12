@@ -1,6 +1,5 @@
-
 // =====================
-// Global variables
+// Global Variables
 // =====================
 let provider;
 let signer;
@@ -8,51 +7,41 @@ let userAddress;
 let stakingContract;
 let stakingContractRO;
 let nftContractRO;
-let selectedNFT = null;
 let nftContract;
+let selectedNFT = null;
 let loadingNFTs = false;
 
 // =====================
-// Helper: get remaining YAM per NFT
+// Utility Functions
 // =====================
-async function getRemainingYam(tokenId) {
-    try {
-        if (!stakingContractRO) return ethers.BigNumber.from(0);
-
-        const maxPerNFT = await stakingContractRO.MAX_PER_NFT_PER_YEAR();  // 20M per year
-        const currentYear = await stakingContractRO.currentYear();
-        const totalClaimed = await stakingContractRO.emittedPerYear(currentYear, tokenId);
-
-        // Remaining = max - claimed
-        const remaining = maxPerNFT.sub(totalClaimed);
-
-        return remaining;
-    } catch (err) {
-        console.error("Error fetching remaining YAM for NFT", tokenId, err);
-        return ethers.BigNumber.from(0);
-    }
-}
-
 function setProgress(id, text) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = text;
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
 }
 
 function clearProgress(id) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = "";
+    const el = document.getElementById(id);
+    if (el) el.textContent = "";
 }
 
 function showProgress(id, text, autoClearMs = 0) {
-  setProgress(id, text);
-  if (autoClearMs > 0) {
-    setTimeout(() => clearProgress(id), autoClearMs);
-  }
+    setProgress(id, text);
+    if (autoClearMs > 0) setTimeout(() => clearProgress(id), autoClearMs);
 }
 
+async function batchFetchNFTData(tokenId) {
+    const [tokenURI, pending, remaining] = await Promise.all([
+        nftContractRO.tokenURI(tokenId),
+        stakingContractRO.pending(tokenId),
+        stakingContractRO.remainingPerNFTThisYear(tokenId)
+    ]);
+    return { tokenURI, pending, remaining };
+}
 
-
-const stakingContractAddress = "0x8AC5f61bCe8D3b0766ADD7392F30aA254b285221";
+// =====================
+// Contract Addresses
+// =====================
+const stakingContractAddress = "0xA2bEf7A4b780eB16B52c81D169AB04783E5cA139";
 const nftAddress = "0x4378682659304853EbD0146E85CF78EdECaE9647";
 
 // =====================
@@ -61,113 +50,18 @@ const nftAddress = "0x4378682659304853EbD0146E85CF78EdECaE9647";
 const stakingABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Claimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Staked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Unstaked","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"yam","type":"address"}],"name":"YamSet","type":"event"},{"inputs":[],"name":"BASE_YEARLY_EMISSION","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_PER_NFT_PER_YEAR","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MAX_SUPPLY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"YEAR","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"year","type":"uint256"}],"name":"baseEmission","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"claim","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256[]","name":"tokenIds","type":"uint256[]"}],"name":"claimAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"currentAPY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"currentYear","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"emittedPerYear","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lastProcessedYear","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"nft","outputs":[{"internalType":"contract IERC721","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"pending","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256[]","name":"tokenIds","type":"uint256[]"}],"name":"pendingBatch","outputs":[{"internalType":"uint256","name":"total","type":"uint256"},{"internalType":"uint256[]","name":"perNFT","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"year","type":"uint256"}],"name":"remainingEmission","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_yam","type":"address"}],"name":"setYam","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"stake","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalMinted","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalStaked","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"unstake","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"userStaked","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
 
 const nftABI = [
-  {
-    "inputs": [
-      { "internalType": "address", "name": "o", "type": "address" }
-    ],
-    "name": "balanceOf",
-    "outputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "ownerAddress", "type": "address" },
-      { "internalType": "uint256", "name": "index", "type": "uint256" }
-    ],
-    "name": "tokenOfOwnerByIndex",
-    "outputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "id", "type": "uint256" }
-    ],
-    "name": "tokenURI",
-    "outputs": [
-      { "internalType": "string", "name": "", "type": "string" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "id", "type": "uint256" }
-    ],
-    "name": "ownerOf",
-    "outputs": [
-      { "internalType": "address", "name": "o", "type": "address" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "id", "type": "uint256" }
-    ],
-    "name": "getApproved",
-    "outputs": [
-      { "internalType": "address", "name": "", "type": "address" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "s", "type": "address" },
-      { "internalType": "uint256", "name": "id", "type": "uint256" }
-    ],
-    "name": "approve",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "o", "type": "address" },
-      { "internalType": "address", "name": "op", "type": "address" }
-    ],
-    "name": "isApprovedForAll",
-    "outputs": [
-      { "internalType": "bool", "name": "", "type": "bool" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "address", "name": "op", "type": "address" },
-      { "internalType": "bool", "name": "a", "type": "bool" }
-    ],
-    "name": "setApprovalForAll",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  
-  {
-    "inputs": [],
-    "name": "totalSupply",
-    "outputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "index", "type": "uint256" }],
-    "name": "tokenByIndex",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  }
+  { "inputs": [ { "internalType": "address", "name": "o", "type": "address" } ], "name": "balanceOf", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "internalType": "address", "name": "ownerAddress", "type": "address" }, { "internalType": "uint256", "name": "index", "type": "uint256" } ], "name": "tokenOfOwnerByIndex", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "internalType": "uint256", "name": "id", "type": "uint256" } ], "name": "tokenURI", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "internalType": "uint256", "name": "id", "type": "uint256" } ], "name": "ownerOf", "outputs": [ { "internalType": "address", "name": "o", "type": "address" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "internalType": "uint256", "name": "id", "type": "uint256" } ], "name": "getApproved", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "internalType": "address", "name": "s", "type": "address" }, { "internalType": "uint256", "name": "id", "type": "uint256" } ], "name": "approve", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+  { "inputs": [ { "internalType": "address", "name": "o", "type": "address" }, { "internalType": "address", "name": "op", "type": "address" } ], "name": "isApprovedForAll", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "internalType": "address", "name": "op", "type": "address" }, { "internalType": "bool", "name": "a", "type": "bool" } ], "name": "setApprovalForAll", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+  { "inputs": [], "name": "totalSupply", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "internalType": "uint256", "name": "index", "type": "uint256" } ], "name": "tokenByIndex", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" },
+  { "inputs": [ { "internalType": "uint256", "name": "tokenId", "type": "uint256" } ], "name": "remainingPerNFTThisYear", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }
 ];
-
 // =====================
 // Global Stats
 // =====================
@@ -177,44 +71,32 @@ async function updateGlobalStats() {
 
         // APY
         const apy = await stakingContractRO.currentAPY();
-        document.getElementById("currentAPY").textContent =
-            (apy.toNumber() / 100).toFixed(2);
+        document.getElementById("currentAPY").textContent = (apy.toNumber() / 100).toFixed(2);
 
-        // Year & Halving
+        // Halving Countdown
         const currentYear = await stakingContractRO.currentYear();
         const YEAR = await stakingContractRO.YEAR();
         const startTime = await stakingContractRO.startTime();
-
-        const nextHalvingTime =
-            startTime.add(YEAR.mul(currentYear.add(1)));
-
+        const nextHalvingTime = startTime.add(YEAR.mul(currentYear.add(1)));
         const now = Math.floor(Date.now() / 1000);
         let secondsLeft = nextHalvingTime.toNumber() - now;
         if (secondsLeft < 0) secondsLeft = 0;
-
         const days = Math.floor(secondsLeft / 86400);
         const hours = Math.floor((secondsLeft % 86400) / 3600);
         const mins = Math.floor((secondsLeft % 3600) / 60);
-
-        document.getElementById("halvingCountdown").textContent =
-            `${days}d ${hours}h ${mins}m`;
+        document.getElementById("halvingCountdown").textContent = `${days}d ${hours}h ${mins}m`;
 
         // Totals
         const totalStaked = await stakingContractRO.totalStaked();
         const totalMinted = await stakingContractRO.totalMinted();
         const remaining = await stakingContractRO.remainingEmission(currentYear);
 
-        document.getElementById("totalStakedNFTs").textContent =
-            totalStaked.toString();
-
-        document.getElementById("totalMintedYAM").textContent =
-            ethers.utils.formatEther(totalMinted);
-
-        document.getElementById("remainingEmission").textContent =
-            ethers.utils.formatEther(remaining);
+        document.getElementById("totalStakedNFTs").textContent = totalStaked.toString();
+        document.getElementById("totalMintedYAM").textContent = ethers.utils.formatEther(totalMinted);
+        document.getElementById("remainingEmission").textContent = ethers.utils.formatEther(remaining);
 
     } catch (err) {
-        
+        console.error("Error updating global stats", err);
     }
 }
 
@@ -226,9 +108,7 @@ async function updatePendingRewards() {
         if (!stakingContractRO || !userAddress) return;
 
         const stakedContainer = document.getElementById("stakedNFTs");
-        const tokenIds = Array.from(stakedContainer.children).map(
-            c => Number(c.dataset.tokenId)
-        );
+        const tokenIds = Array.from(stakedContainer.children).map(c => Number(c.dataset.tokenId));
 
         if (tokenIds.length === 0) {
             document.getElementById("pendingRewards").textContent = "0";
@@ -237,35 +117,26 @@ async function updatePendingRewards() {
 
         const result = await stakingContractRO.pendingBatch(tokenIds);
         const totalPending = ethers.utils.formatEther(result.total);
-
         document.getElementById("pendingRewards").textContent = totalPending;
     } catch (err) {
-        
+        console.error("Error updating pending rewards", err);
     }
 }
 
+// =====================
+// Update Remaining YAM per NFT
+// =====================
 async function updateNFTYam() {
-    const containers = [
-        document.getElementById("stakedNFTs"),
-        document.getElementById("unstakedNFTs")
-    ];
-
+    const containers = [document.getElementById("stakedNFTs"), document.getElementById("unstakedNFTs")];
     for (const container of containers) {
         if (!container) continue;
-
         for (const card of container.children) {
             const tokenId = Number(card.dataset.tokenId);
             const remainingYamDiv = card.querySelector(".remaining-yam");
             if (!remainingYamDiv) continue;
-
             try {
-
-const remaining = await getRemainingYam(tokenId);
-
-let remainingYamFormatted = ethers.utils.formatUnits(remaining, 18); 
-remainingYamFormatted = parseFloat(remainingYamFormatted).toFixed(2);
-remainingYamDiv.textContent = `YAM: ${remainingYamFormatted}`;
-
+                const remaining = await stakingContractRO.remainingPerNFTThisYear(tokenId);
+                remainingYamDiv.textContent = `${Number(ethers.utils.formatEther(remaining)).toFixed(2)} YAM`;
             } catch (err) {
                 console.error("Error updating Remaining YAM for tokenId", tokenId, err);
             }
@@ -278,8 +149,6 @@ remainingYamDiv.textContent = `YAM: ${remainingYamFormatted}`;
 // Connect Wallet
 // =====================
 async function connectWallet() {
-    showProgress("walletProgress", "Wallet connected ✅", 5000);
-
     try {
         if (!window.ethereum) {
             setProgress("walletProgress", "Wallet not detected ❌");
@@ -290,18 +159,14 @@ async function connectWallet() {
 
         provider = new ethers.providers.Web3Provider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
-
         signer = provider.getSigner();
         userAddress = await signer.getAddress();
 
         setProgress("walletProgress", "Wallet connected ✅");
-
-        document.getElementById("walletAddress").textContent =
-            userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
+        document.getElementById("walletAddress").textContent = userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
 
         stakingContractRO = new ethers.Contract(stakingContractAddress, stakingABI, provider);
         stakingContract = new ethers.Contract(stakingContractAddress, stakingABI, signer);
-
         nftContractRO = new ethers.Contract(nftAddress, nftABI, provider);
         nftContract = new ethers.Contract(nftAddress, nftABI, signer);
 
@@ -310,78 +175,65 @@ async function connectWallet() {
         await loadUserNFTs();
         await updateGlobalStats();
         await updatePendingRewards();
-        
-       setInterval(() => {
-       if (stakingContractRO) updateNFTYam();
+
+        setInterval(() => {
+            if (stakingContractRO) updateNFTYam();
         }, 10000);
 
     } catch (err) {
         setProgress("walletProgress", "Wallet connection failed ❌");
-    }
-}
-
-
-async function renderNFT(tokenId, container, isStaked) {
-    try {
-        const tokenURI = await nftContractRO.tokenURI(tokenId);
-
-        // Parse image from tokenURI
-        let imageURI;
-        if (tokenURI.startsWith("data:application/json")) {
-            const json = JSON.parse(atob(tokenURI.split(",")[1]));
-            imageURI = json.image;
-        } else {
-            imageURI = tokenURI;
-        }
-
-        // Create NFT card
-        const card = document.createElement("div");
-        card.className = "nft-card";
-        card.dataset.tokenId = tokenId;
-        card.style.cssText = "display:inline-block;margin:5px;padding:5px;border:1px solid #333;cursor:pointer;text-align:center;";
-
-        // 1️⃣ Remaining YAM (above image)
-        const remainingYamDiv = document.createElement("div");
-        remainingYamDiv.className = "remaining-yam";
-        remainingYamDiv.textContent = "Loading YAM...";
-        card.appendChild(remainingYamDiv);
-
-        // 2️⃣ NFT Image
-        const img = document.createElement("img");
-        img.src = imageURI;
-        img.style.width = "120px";
-        img.style.height = "120px";
-        card.appendChild(img);
-
-        // 3️⃣ Token ID (below image)
-        const label = document.createElement("div");
-        label.textContent = "ID: " + tokenId;
-        card.appendChild(label);
-
-        // 4️⃣ Highlight on click
-        card.addEventListener("click", () => {
-            if (selectedNFT) selectedNFT.classList.remove("active");
-            card.classList.add("active");
-            selectedNFT = card;
-            document.getElementById("stakeBtn").disabled = isStaked;
-            document.getElementById("unstakeBtn").disabled = !isStaked;
-        });
-
-        container.appendChild(card);
-        const remaining = await getRemainingYam(tokenId);
-
-let remainingYamFormatted = ethers.utils.formatUnits(remaining, 18);
-remainingYamFormatted = parseFloat(remainingYamFormatted).toFixed(2);
-
-remainingYamDiv.textContent = ` YAM: ${remainingYamFormatted}`;
-
-    } catch (err) {
-        console.error("Error rendering NFT tokenId", tokenId, err);
+        console.error(err);
     }
 }
 
 // =====================
-// Load user NFTs
+//Render NFTs
+// =====================
+async function renderNFT(tokenId, container, isStaked) {
+    try {
+        const tokenURI = await nftContractRO.tokenURI(tokenId);
+        const base64JSON = tokenURI.split(",")[1];
+        const jsonStr = atob(base64JSON);
+        const metadata = JSON.parse(jsonStr);
+        const card = document.createElement("div");
+        card.className = "nft-card";
+        card.dataset.tokenId = tokenId;
+
+        const remainingDiv = document.createElement("div");
+        remainingDiv.className = "remaining-yam";
+        remainingDiv.textContent = "Loading...";
+        card.appendChild(remainingDiv);
+
+        const img = document.createElement("img");
+        img.src = metadata.image; // base64 image
+        img.alt = metadata.name || `NFT #${tokenId}`;
+        img.className = "nft-image";
+        card.appendChild(img);
+
+        const idDiv = document.createElement("div");
+        idDiv.className = "token-id";
+        idDiv.textContent = `#${tokenId}`;
+        card.appendChild(idDiv);
+
+        card.addEventListener("click", () => {
+            if (selectedNFT) selectedNFT.classList.remove("active");
+            selectedNFT = card;
+            card.classList.add("active");
+            document.getElementById("stakeBtn").disabled = isStaked;
+            document.getElementById("unstakeBtn").disabled = !isStaked;
+        });
+        container.appendChild(card);
+        const remaining = await stakingContractRO.remainingPerNFTThisYear(tokenId);
+        remainingDiv.textContent = `${Number(ethers.utils.formatEther(remaining)).toFixed(2)} YAM`;
+
+    } catch (err) {
+        console.error("Error rendering NFT", tokenId, err);
+    }
+}
+
+
+// =====================
+// Load User NFTs
 // =====================
 async function loadUserNFTs() {
     if (loadingNFTs) return;
@@ -395,41 +247,36 @@ async function loadUserNFTs() {
     const totalSupply = (await nftContractRO.totalSupply()).toNumber();
     let totalPending = ethers.BigNumber.from(0);
 
+    const nftPromises = [];
     for (let tokenId = 1; tokenId <= totalSupply; tokenId++) {
         try {
-            // Check if this token belongs to user (unstaked) or staked
             const isStaked = await stakingContractRO.userStaked(userAddress, tokenId);
-            let owner = await nftContractRO.ownerOf(tokenId);
+            const owner = await nftContractRO.ownerOf(tokenId);
 
-            // If staked, owner = staking contract
             if (isStaked) {
-                await renderNFT(tokenId, stakedContainer, true);
-                const pending = await stakingContractRO.pending(tokenId);
+                const { pending } = await batchFetchNFTData(tokenId);
                 totalPending = totalPending.add(pending);
+                nftPromises.push(renderNFT(tokenId, stakedContainer, true));
             } else if (owner.toLowerCase() === userAddress.toLowerCase()) {
-                await renderNFT(tokenId, unstakedContainer, false);
+                nftPromises.push(renderNFT(tokenId, unstakedContainer, false));
             }
         } catch (err) {
             console.error("Error loading tokenId", tokenId, err);
         }
     }
 
+    await Promise.all(nftPromises);
+
     document.getElementById("totalRewards").textContent = ethers.utils.formatEther(totalPending);
     await updatePendingRewards();
     loadingNFTs = false;
 }
 
-
-setInterval(() => {
-    if (stakingContractRO) updateGlobalStats();
-}, 15000);
-
+// =====================
+// Click Outside NFT to Deselect
+// =====================
 document.body.addEventListener("click", (e) => {
-    if (
-        e.target.closest(".nft-card") ||
-        e.target.closest("button")
-    ) return;
-
+    if (e.target.closest(".nft-card") || e.target.closest("button")) return;
     if (selectedNFT) {
         selectedNFT.classList.remove("active");
         selectedNFT = null;
@@ -438,91 +285,77 @@ document.body.addEventListener("click", (e) => {
     }
 });
 
-
 // =====================
-// Hook up buttons
+// Hook Up Buttons
 // =====================
 document.getElementById("connectWalletBtn")?.addEventListener("click", connectWallet);
 
 document.getElementById("stakeBtn").addEventListener("click", async () => {
     if (!selectedNFT) return;
-
     const tokenId = Number(selectedNFT.dataset.tokenId);
-
     try {
         showProgress("stakeProgress", "Waiting for wallet confirmation...");
-document.getElementById("stakeBtn").disabled = true;
+        document.getElementById("stakeBtn").disabled = true;
 
-const approved = await nftContract.getApproved(tokenId);
+        const approved = await nftContract.getApproved(tokenId);
+        if (approved.toLowerCase() !== stakingContractAddress.toLowerCase()) {
+            showProgress("stakeProgress", "Approving NFT...");
+            await (await nftContract.approve(stakingContractAddress, tokenId)).wait();
+        }
 
-if (approved.toLowerCase() !== stakingContractAddress.toLowerCase()) {
-    showProgress("stakeProgress", "Approving YAMADOGS NFT...");
-    const approveTx = await nftContract.approve(stakingContractAddress, tokenId);
-    await approveTx.wait();
-}
+        showProgress("stakeProgress", "Staking NFT...");
+        await (await stakingContract.stake(tokenId)).wait();
 
-showProgress("stakeProgress", "Staking YAMADOGS NFT...");
-const tx = await stakingContract.stake(tokenId);
-await tx.wait();
-
-showProgress("stakeProgress", "Staking successful ✅", 5000);
-
+        showProgress("stakeProgress", "Staking successful ✅", 5000);
         selectedNFT.classList.remove("active");
         selectedNFT = null;
-
         await loadUserNFTs();
         await updatePendingRewards();
 
     } catch (err) {
         setProgress("stakeProgress", "Transaction failed ❌");
         document.getElementById("stakeBtn").disabled = false;
+        console.error(err);
     }
 });
 
-
 document.getElementById("unstakeBtn").addEventListener("click", async () => {
     if (!selectedNFT) return;
-
     const tokenId = Number(selectedNFT.dataset.tokenId);
-
     try {
         setProgress("unstakeProgress", "Waiting for wallet confirmation...");
         document.getElementById("unstakeBtn").disabled = true;
 
-        setProgress("unstakeProgress", "Unstaking YAMADOGS NFT...");
-        const tx = await stakingContract.unstake(tokenId);
-        await tx.wait();
+        setProgress("unstakeProgress", "Unstaking NFT...");
+        await (await stakingContract.unstake(tokenId)).wait();
 
         showProgress("unstakeProgress", "Unstaking successful ✅", 5000);
         selectedNFT.classList.remove("active");
         selectedNFT = null;
-
         await loadUserNFTs();
         await updatePendingRewards();
 
     } catch (err) {
         showProgress("unstakeProgress", "Transaction failed ❌", 6000);
         document.getElementById("unstakeBtn").disabled = false;
+        console.error(err);
     }
 });
-
 
 document.getElementById("claimAllBtn").addEventListener("click", async () => {
     try {
         setProgress("claimProgress", "Waiting for wallet confirmation...");
 
         const stakedContainer = document.getElementById("stakedNFTs");
-        const tokenIds = Array.from(stakedContainer.children).map(
-            c => Number(c.dataset.tokenId)
-        );
+        const tokenIds = Array.from(stakedContainer.children).map(c => Number(c.dataset.tokenId));
 
         if (tokenIds.length === 0) {
             showProgress("claimProgress", "No rewards to claim ℹ️", 4000);
             return;
         }
+
         setProgress("claimProgress", "Claiming $YAM...");
-        const tx = await stakingContract.claimAll(tokenIds);
-        await tx.wait();
+        await (await stakingContract.claimAll(tokenIds)).wait();
 
         showProgress("claimProgress", "Claim successful ✅", 5000);
         await loadUserNFTs();
@@ -530,10 +363,17 @@ document.getElementById("claimAllBtn").addEventListener("click", async () => {
 
     } catch (err) {
         setProgress("claimProgress", "Transaction failed ❌");
+        console.error(err);
     }
 });
 
-// Auto-update pending rewards every 30 seconds
+// =====================
+// Auto Updates
+// =====================
 setInterval(() => {
     if (stakingContractRO) updatePendingRewards();
 }, 30000);
+
+setInterval(() => {
+    if (stakingContractRO) updateGlobalStats();
+}, 15000);
