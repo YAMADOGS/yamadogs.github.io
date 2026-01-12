@@ -30,12 +30,11 @@ function showProgress(id, text, autoClearMs = 0) {
 }
 
 async function batchFetchNFTData(tokenId) {
-    const [tokenURI, pending, remaining] = await Promise.all([
+    const [tokenURI, remaining] = await Promise.all([
         nftContractRO.tokenURI(tokenId),
-        stakingContractRO.pending(tokenId),
-        stakingContractRO.remainingPerNFTThisYear(tokenId)
+        stakingContractRO.remainingPerNFTThisYear(tokenId) 
     ]);
-    return { tokenURI, pending, remaining };
+    return { tokenURI, remaining }; 
 }
 
 // =====================
@@ -430,6 +429,14 @@ async function connectWallet() {
 }
 
 // =====================
+// Helper Functions
+// =====================
+function formatYAM(value) {
+    let formatted = ethers.utils.formatUnits(value, 18); 
+    return parseFloat(formatted).toFixed(2);          
+}
+
+// =====================
 //Render NFTs
 // =====================
 async function renderNFT(tokenId, container, isStaked) {
@@ -466,8 +473,13 @@ async function renderNFT(tokenId, container, isStaked) {
             document.getElementById("unstakeBtn").disabled = !isStaked;
         });
         container.appendChild(card);
-        const remaining = await stakingContractRO.remainingPerNFTThisYear(tokenId);
-        remainingDiv.textContent = `${Number(ethers.utils.formatEther(remaining)).toFixed(2)} YAM`;
+        try {
+    const remaining = await stakingContractRO.remainingPerNFTThisYear(tokenId);
+    remainingDiv.textContent = `${formatYAM(remaining)} $YAM`;
+    } catch (err) {
+    console.error("Error fetching remaining YAM for tokenId", tokenId, err);
+    remainingDiv.textContent = "0.00 $YAM";
+    }
 
     } catch (err) {
         console.error("Error rendering NFT", tokenId, err);

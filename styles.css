@@ -1032,6 +1032,9 @@ button:active {
     font-weight: bold;
     font-size: 10px;
     color: #3fe0c3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* NFT Container */
@@ -1093,17 +1096,17 @@ button:active {
   z-index: 10;
 }
 
-/* Remaining YAM display above NFT image */
 .nft-card .remaining-yam {
-  font-size: 10px;
-  font-weight: bold;
-  color: #3fe0c3;
-  text-align: center;
-  margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    font-size: 10px;
+    font-weight: bold;
+    color: #3fe0c3;
+    text-align: center;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
 }
+
 
 /* Token ID below NFT image */
 .nft-card .token-id {
