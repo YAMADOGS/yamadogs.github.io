@@ -1020,7 +1020,7 @@ button:active {
     margin-bottom: 4px;       /* space between YAM and image */
     font-weight: bold;
     font-size: 4px;
-    color: #f4fbff;
+    color: #3fe0c3;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1086,8 +1086,8 @@ button:active {
 }
 
 .nft-card .remaining-yam {
-    font-size: 10px;
-    font-weight: bold;
+    font-size: 4px;
+    font-weight: none;
     color: #3fe0c3;
     text-align: center;
     margin-bottom: 4px;
