@@ -58,18 +58,12 @@ async function fetchRemainingYAMBatch(tokenIds) {
     if (!stakingContractRO) return [];
 
     try {
-        const remainingBNArray =
-            await stakingContractRO.currentRemainingBatch(tokenIds);
-
-        return remainingBNArray.map(bn =>
-            Number(ethers.utils.formatEther(bn))
-        );
+        // Use our helper function
+        const remainingArray = await getRemainingBatch(tokenIds);
+        return remainingArray;
     } catch (err) {
         console.error("Failed to fetch remaining YAM batch:", err);
-
-        return tokenIds.map(id =>
-            nftRemainingYAMCache[id] ?? maxYAMPerNFTThisYear ?? 0
-        );
+        return tokenIds.map(id => nftRemainingYAMCache[id] ?? maxYAMPerNFTThisYear ?? 0);
     }
 }
 
@@ -92,11 +86,32 @@ function initPublicProvider() {
     );
 }
 
+async function getRemainingYAM(tokenId) {
+    if (!stakingContractRO) return 0;
+    const remainingBN = await stakingContractRO.currentRemainingYAM(tokenId);
+    return Number(ethers.utils.formatEther(remainingBN));
+}
+
+async function getRemainingBatch(tokenIds) {
+    if (!stakingContractRO) return [];
+    const remainingBNArray = await stakingContractRO.currentRemainingBatch(tokenIds);
+    return remainingBNArray.map(bn => Number(ethers.utils.formatEther(bn)));
+}
+
+async function getBatchNFTData(tokenIds) {
+    if (!stakingContractRO) return { pendingRewards: [], remainingCaps: [] };
+    const [pendingRewardsBN, remainingCapsBN] = await stakingContractRO.batchNFTData(tokenIds);
+    const pendingRewards = pendingRewardsBN.map(bn => Number(ethers.utils.formatEther(bn)));
+    const remainingCaps = remainingCapsBN.map(bn => Number(ethers.utils.formatEther(bn)));
+    return { pendingRewards, remainingCaps };
+}
+
+
 
 // =====================
 // Contract Addresses
 // =====================
-const stakingContractAddress = "0x552BdB7b104433C2F6C1B315f46462ABeC3Ec238";
+const stakingContractAddress = "0x54B0f30D3bad0b1Ba7414770A947a5064B9c9756";
 const nftAddress = "0x4378682659304853EbD0146E85CF78EdECaE9647";
 
 // =====================
@@ -261,7 +276,19 @@ const stakingABI = [
     "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
     "stateMutability": "view",
     "type": "function"
+},
+
+{
+  "inputs": [{ "internalType": "uint256[]", "name": "tokenIds", "type": "uint256[]" }],
+  "name": "batchNFTData",
+  "outputs": [
+    { "internalType": "uint256[]", "name": "pendingRewards", "type": "uint256[]" },
+    { "internalType": "uint256[]", "name": "remainingCaps", "type": "uint256[]" }
+  ],
+  "stateMutability": "view",
+  "type": "function"
 }
+
 ];
 
 const nftABI = [
@@ -441,45 +468,87 @@ document.getElementById("pendingRewards").textContent = totalPending;
 }
 
 // =====================
-// Update Remaining YAM per NFT
+// Render NFTs (Updated)
 // =====================
-async function updateNFTYam() {
-    await loadMaxYAMPerNFTThisYear();
+async function renderNFT(tokenId, container, isStaked) {
+    try {
+        const tokenURI = await nftContractRO.tokenURI(tokenId);
+        const base64JSON = tokenURI.split(",")[1];
+        const jsonStr = atob(base64JSON);
+        const metadata = JSON.parse(jsonStr);
 
-    const containers = [
-        document.getElementById("stakedNFTs"),
-        document.getElementById("unstakedNFTs")
-    ];
+        const card = document.createElement("div");
+        card.className = "nft-card";
+        card.dataset.tokenId = tokenId;
 
-    for (const container of containers) {
-        if (!container) continue;
+        // Remaining YAM display
+        const remainingDiv = document.createElement("div");
+        remainingDiv.className = "remaining-yam";
+        remainingDiv.textContent = "Loading...";
+        card.appendChild(remainingDiv);
 
-        const tokenIds = Array.from(container.children).map(c => Number(c.dataset.tokenId));
-        const remainingArray = await fetchRemainingYAMBatch(tokenIds);
+        // Progress bar
+        const progressBar = document.createElement("div");
+        progressBar.className = "yam-progress";
+        const progressFill = document.createElement("div");
+        progressFill.className = "yam-progress-fill";
+        progressBar.appendChild(progressFill);
+        card.appendChild(progressBar);
 
-        for (let i = 0; i < container.children.length; i++) {
-            const card = container.children[i];
-            const tokenId = tokenIds[i];
-            const remainingNum = remainingArray[i];
-            if (remainingNum !== undefined && remainingNum !== null) {
-             nftRemainingYAMCache[tokenId] = remainingNum;
-       }
+        // NFT Image
+        const img = document.createElement("img");
+        img.src = metadata.image; // base64 image
+        img.alt = metadata.name || `NFT #${tokenId}`;
+        img.className = "nft-image";
+        card.appendChild(img);
 
-            const remainingDiv = card.querySelector(".remaining-yam");
-            const progressFill = card.querySelector(".yam-progress-fill");
+        // Token ID
+        const idDiv = document.createElement("div");
+        idDiv.className = "token-id";
+        idDiv.textContent = `#${tokenId}`;
+        card.appendChild(idDiv);
 
-            if (!remainingDiv || !progressFill) continue;
+        // NFT click select
+        card.addEventListener("click", () => {
+            if (selectedNFT) selectedNFT.classList.remove("active");
+            selectedNFT = card;
+            card.classList.add("active");
+            document.getElementById("stakeBtn").disabled = isStaked;
+            document.getElementById("unstakeBtn").disabled = !isStaked;
+        });
 
+        container.appendChild(card);
+
+        // Load remaining YAM using helper
+        try {
+            await loadMaxYAMPerNFTThisYear();
+
+            const remainingNum = await getRemainingYAM(tokenId);
+
+            nftRemainingYAMCache[tokenId] = remainingNum;
             const maxNum = maxYAMPerNFTThisYear;
+
             let progress = 0;
             if (maxNum > 0) {
                 progress = ((maxNum - remainingNum) / maxNum) * 100;
             }
             progress = Math.min(100, Math.max(0, progress));
 
-            remainingDiv.textContent = `${remainingNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $YAM`;
+            remainingDiv.textContent =
+                `${remainingNum.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                })} $YAM`;
+
             progressFill.style.width = `${progress.toFixed(2)}%`;
+
+        } catch (err) {
+            console.error("Error fetching remaining YAM for tokenId", tokenId, err);
+            remainingDiv.textContent = "— $YAM";
         }
+
+    } catch (err) {
+        console.error("Error rendering NFT", tokenId, err);
     }
 }
 
@@ -768,10 +837,9 @@ async function queryNFTRemainingYAM() {
     const statusBox = document.getElementById("queryStatus");
 
     if (!stakingContractRO || !nftContractRO) {
-    statusBox.textContent = "Public RPC not ready ❌";
-    return;
-}
-
+        statusBox.textContent = "Public RPC not ready ❌";
+        return;
+    }
 
     const tokenId = tokenIdInput.value.trim();
 
@@ -785,14 +853,14 @@ async function queryNFTRemainingYAM() {
     yamBox.textContent = "—";
 
     try {
+        // Check if token exists
         await nftContractRO.ownerOf(tokenId);
 
-        const remainingBN =
-    await stakingContractRO.currentRemainingYAM(tokenId);
+        // Use helper function to fetch remaining YAM
+        const remainingNum = await getRemainingYAM(tokenId);
 
-        const remaining = Number(
-            ethers.utils.formatEther(remainingBN)
-        ).toLocaleString(undefined, {
+        // Format number for display
+        const remaining = remainingNum.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         });
@@ -808,6 +876,7 @@ async function queryNFTRemainingYAM() {
         statusBox.textContent = "Token does not exist / not minted ❌";
     }
 }
+
 document.getElementById("queryNFTBtn")
     ?.addEventListener("click", queryNFTRemainingYAM);
 
