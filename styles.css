@@ -846,12 +846,30 @@ html {
 
   .link-buttons {
     display: flex;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;
     gap: 10px;
   }
 
   .link-buttons button {
-    width: 100%;
+    width: 150px;
+  }
+
+}
+
+@media (min-width: 1024px) {
+
+  .home-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .home-buttons button {
+    width: 120px;
   }
 
 }
