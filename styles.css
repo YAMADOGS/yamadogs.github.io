@@ -100,6 +100,36 @@ h1{color:#ffb703;text-shadow:3px 3px 0 #000}
   border:4px solid transparent;
   border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
 }
+
+.card2{
+  background:#111;color:#111;
+  padding:18px;max-width:420px;margin:12px auto;
+  box-shadow:8px 8px 0 #555;
+  border:4px solid transparent;
+  border-image:repeating-linear-gradient(90deg,#000 0 6px,transparent 6px 10px) 4;
+}
+
+@media (min-width: 1024px) {
+
+  .card2,
+ {
+    max-width: 100%;
+  }
+
+}
+@media (min-width: 1024px) {
+
+  .card2 {
+    position: sticky;
+    top: 35px;
+    align-self: start; 
+  }
+
+}
+
+
+
+
 .nft-supply{color:#4fc3ff}
 
 /* NFT IMAGE CONTAINER - ADDED */
@@ -1196,3 +1226,121 @@ button:active {
   text-align: center;
 }
 
+
+/*est//
+/* ===============================
+   NFT SIDE-BY-SIDE FIX
+=============================== */
+
+/* ===============================
+   LEFT ↔ RIGHT NFT LAYOUT
+=============================== */
+
+/* Main row */
+.nft-row {
+  width: 95%;
+  margin: 20px auto;
+
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+}
+
+/* Each side */
+.nft-panel {
+  flex: 1;
+  max-width: none;       /* remove 420px lock */
+  min-height: 600px;     /* equal height always */
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* NFT container fixed size */
+.nft-panel .nftContainer {
+  flex: 1;               /* fills available space */
+  min-height: 360px;
+  max-height: 360px;
+
+  overflow-y: auto;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px;
+  margin: 12px 0;
+
+  background: #111;
+  border: 3px dashed #000;
+}
+
+/* Empty state (no folding) */
+.nftContainer:empty::after {
+  content: "No YAMADOGS here 🐕";
+  margin: auto;
+  font-size: 10px;
+  opacity: 0.6;
+  color: #000;
+}
+
+/* Desktop only */
+@media (max-width: 1023px) {
+  .nft-row {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+.fixed-nft-container {
+  min-height: 320px;
+}
+.nft-desktop-row {
+  width: 95%;
+  margin: 0 auto;
+  display: flex;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .nft-desktop-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 900px) {
+  .nft-desktop-row {
+    flex-direction: column;
+  }
+}
+/* ===============================
+   MOBILE: TIGHT NFT STACK
+=============================== */
+@media (max-width: 900px) {
+
+  /* Remove card vertical spacing */
+  .nft-row .card {
+    margin: 4px auto;   /* 🔥 was 12px */
+  }
+
+  /* Reduce flex gap */
+  .nft-row {
+    gap: 4px;           /* 🔥 tight stack */
+    margin: 6px auto;   /* 🔥 reduce outer spacing */
+  }
+
+  /* Kill extra UI spacing */
+  .ui {
+    gap: 6px;
+  }
+}
+.nftContainer {
+  min-height: 220px;        /* prevents folding when empty */
+  max-height: 420px;        /* keeps original scroll behavior */
+  overflow-y: auto;         /* ENABLE scrollbar */
+  overflow-x: hidden;
+  padding: 8px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
