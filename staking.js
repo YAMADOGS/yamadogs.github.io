@@ -13,7 +13,7 @@ let loadingNFTs = false;
 let maxYAMPerNFTThisYear = null;
 let nftRemainingYAMCache = {}; 
 let publicProvider;
-
+let queryClearTimer = null;
 
 
 // =====================
@@ -33,6 +33,23 @@ function showProgress(id, text, autoClearMs = 0) {
     setProgress(id, text);
     if (autoClearMs > 0) setTimeout(() => clearProgress(id), autoClearMs);
 }
+
+function autoClearQueryUI(delayMs = 5000) {
+    if (queryClearTimer) {
+        clearTimeout(queryClearTimer);
+    }
+
+    queryClearTimer = setTimeout(() => {
+        const tokenBox = document.getElementById("queryResultToken");
+        const yamBox = document.getElementById("queryResultYAM");
+        const statusBox = document.getElementById("queryStatus");
+
+        if (tokenBox) tokenBox.textContent = "";
+        if (yamBox) yamBox.textContent = "";
+        if (statusBox) statusBox.textContent = "";
+    }, delayMs);
+}
+
 
 async function batchFetchNFTData(tokenId) {
     const [tokenURI, remaining] = await Promise.all([
@@ -411,11 +428,9 @@ async function updateGlobalStats() {
     try {
         if (!stakingContractRO) return;
 
-        // APY
         const apy = await stakingContractRO.currentAPY();
         document.getElementById("currentAPY").textContent = (apy.toNumber() / 100).toFixed(2);
 
-        // Halving Countdown
         const currentYear = await stakingContractRO.currentYear();
         const YEAR = await stakingContractRO.YEAR();
         const startTime = await stakingContractRO.startTime();
@@ -428,14 +443,28 @@ async function updateGlobalStats() {
         const mins = Math.floor((secondsLeft % 3600) / 60);
         document.getElementById("halvingCountdown").textContent = `${days}d ${hours}h ${mins}m`;
 
-        // Totals
         const totalStaked = await stakingContractRO.totalStaked();
         const totalMinted = await stakingContractRO.totalMinted();
         const remaining = await stakingContractRO.remainingEmission(currentYear);
 
         document.getElementById("totalStakedNFTs").textContent = totalStaked.toString();
-        document.getElementById("totalMintedYAM").textContent = ethers.utils.formatEther(totalMinted);
-        document.getElementById("remainingEmission").textContent = ethers.utils.formatEther(remaining);
+        const totalMintedFormatted = Number(
+    ethers.utils.formatEther(totalMinted)
+).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+});
+
+const remainingFormatted = Number(
+    ethers.utils.formatEther(remaining)
+).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+});
+
+document.getElementById("totalMintedYAM").textContent = totalMintedFormatted;
+document.getElementById("remainingEmission").textContent = remainingFormatted;
+
 
     } catch (err) {
         console.error("Error updating global stats", err);
@@ -497,9 +526,6 @@ async function connectWallet() {
         stakingContract = new ethers.Contract(stakingContractAddress, stakingABI, signer);
         nftContractRO = new ethers.Contract(nftAddress, nftABI, provider);
         nftContract = new ethers.Contract(nftAddress, nftABI, signer);
-// =====================
-// Live Contract Events
-// =====================
 stakingContract.on("Staked", async (user, tokenId) => {
     if (user.toLowerCase() === userAddress.toLowerCase()) {
         await refreshUIAfterTx();
@@ -535,9 +561,6 @@ stakingContract.on("Claimed", async (user) => {
     }
 }
 
-// =====================
-// Helper Functions
-// =====================
 function formatYAM(value) {
     let formatted = ethers.utils.formatUnits(value, 18); 
     return parseFloat(formatted).toFixed(2);          
@@ -569,7 +592,7 @@ progressBar.appendChild(progressFill);
 card.appendChild(progressBar);
 
         const img = document.createElement("img");
-        img.src = metadata.image; // base64 image
+        img.src = metadata.image; 
         img.alt = metadata.name || `NFT #${tokenId}`;
         img.className = "nft-image";
         card.appendChild(img);
@@ -698,11 +721,11 @@ document.getElementById("stakeBtn").addEventListener("click", async () => {
 
         const approved = await nftContract.getApproved(tokenId);
         if (approved.toLowerCase() !== stakingContractAddress.toLowerCase()) {
-            showProgress("stakeProgress", "Approving NFT...");
+            showProgress("stakeProgress", "Approving YAMADOGS...");
             await (await nftContract.approve(stakingContractAddress, tokenId)).wait();
         }
 
-        showProgress("stakeProgress", "Staking NFT...");
+        showProgress("stakeProgress", "Staking YAMADOGS...");
         await (await stakingContract.stake(tokenId)).wait();
 
         showProgress("stakeProgress", "Staking successful ✅", 5000);
@@ -725,7 +748,7 @@ document.getElementById("unstakeBtn").addEventListener("click", async () => {
         setProgress("unstakeProgress", "Waiting for wallet confirmation...");
         document.getElementById("unstakeBtn").disabled = true;
 
-        setProgress("unstakeProgress", "Unstaking NFT...");
+        setProgress("unstakeProgress", "Unstaking YAMADOGS...");
         await (await stakingContract.unstake(tokenId)).wait();
 
         showProgress("unstakeProgress", "Unstaking successful ✅", 5000);
@@ -766,12 +789,13 @@ document.getElementById("claimAllBtn").addEventListener("click", async () => {
         setProgress("claimProgress", "Transaction failed ❌");
         console.error(err);
     } finally {
-        document.getElementById("claimAllBtn").disabled = false; // ✅ ADD HERE
+        document.getElementById("claimAllBtn").disabled = false; 
     }
 });
 
 
 async function queryNFTRemainingYAM() {
+  if (queryClearTimer) clearTimeout(queryClearTimer);
     const tokenIdInput = document.getElementById("queryTokenId");
     const tokenBox = document.getElementById("queryResultToken");
     const yamBox = document.getElementById("queryResultYAM");
@@ -785,22 +809,18 @@ async function queryNFTRemainingYAM() {
     const tokenId = tokenIdInput.value.trim();
 
     if (tokenId === "" || isNaN(tokenId) || Number(tokenId) < 0) {
-        statusBox.textContent = "Invalid token ID ❌";
-        return;
+    statusBox.textContent = "Invalid token ID ❌";
+    autoClearQueryUI(4000);
+    return;
     }
-
+    
     statusBox.textContent = "Querying NFT... ⏳";
     tokenBox.textContent = "—";
     yamBox.textContent = "—";
 
     try {
-        // Check if token exists
         await nftContractRO.ownerOf(tokenId);
-
-        // Use helper function to fetch remaining YAM
         const remainingNum = await getRemainingYAM(tokenId);
-
-        // Format number for display
         const remaining = remainingNum.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
@@ -809,12 +829,16 @@ async function queryNFTRemainingYAM() {
         tokenBox.textContent = `NFT #${tokenId}`;
         yamBox.textContent = `${remaining} YAM`;
         statusBox.textContent = "Query successful ✅";
+        autoClearQueryUI(5000);
+
 
     } catch (err) {
         console.error(err);
         tokenBox.textContent = "—";
         yamBox.textContent = "—";
         statusBox.textContent = "Token does not exist / not minted ❌";
+        autoClearQueryUI(6000);
+
     }
 }
 
