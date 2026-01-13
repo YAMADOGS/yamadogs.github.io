@@ -1343,4 +1343,13 @@ button:active {
   padding: 8px;
   border-radius: 10px;
   box-sizing: border-box;
+
+  display: flex;          /* use flexbox */
+  flex-wrap: wrap;        /* allow wrapping to new rows */
+  justify-content: flex-start; /* align items from left to right */
+  gap: 12px;              /* spacing between NFTs */
+  padding: 8px;
+  background: #ffb703;
+  border: 2px solid #000;
+  
 }
