@@ -1248,14 +1248,11 @@ button:active {
 
 
 .nft-panel .nftContainer {
-  flex: 1;               
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   min-height: 360px;
   max-height: 360px;
-
   overflow-y: auto;
-
-  display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   gap: 8px;
 
@@ -1307,42 +1304,37 @@ button:active {
 =============================== */
 @media (max-width: 900px) {
 
-  /* Remove card vertical spacing */
   .nft-row .card {
-    margin: 4px auto;   /* 🔥 was 12px */
+    margin: 4px auto;    */
   }
 
-  /* Reduce flex gap */
   .nft-row {
-    gap: 4px;           /* 🔥 tight stack */
-    margin: 6px auto;   /* 🔥 reduce outer spacing */
+    gap: 4px;          
+    margin: 6px auto;   
   }
 
-  /* Kill extra UI spacing */
   .ui {
     gap: 6px;
   }
 }
 .nftContainer {
-  min-height: 200px;       /* prevents folding when empty */
-  max-height: 420px;       /* keeps scroll behavior */
+  min-height: 200px;       
+  max-height: 420px;      
   overflow-y: auto;
   overflow-x: hidden;
   padding: 8px;
   border-radius: 10px;
   box-sizing: border-box;
-
-  display: grid;           /* change from flex → grid */
-  grid-template-columns: repeat(3, 1fr); /* 3 NFTs per row */
-  gap: 8px;                /* space between cards */
-  justify-items: center;   /* center NFT cards horizontally */
-
+  display: grid;    
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 8px;               
+  justify-items: center;   
   background: #ffb703;
   border: 2px solid #000;
 }
 
 .nft-card {
-  width: 90px;   /* or adjust as needed */
+  width: 90px;   
   padding: 4px;
   background: #222;
   border: 3px solid #ffb703;
@@ -1355,12 +1347,12 @@ button:active {
 
 @media (max-width: 768px) {
   .nftContainer {
-    grid-template-columns: repeat(2, 1fr); /* 2 per row */
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 480px) {
   .nftContainer {
-    grid-template-columns: repeat(1, 1fr); /* 1 per row */
+    grid-template-columns: repeat(1, 1fr); 
   }
 }
