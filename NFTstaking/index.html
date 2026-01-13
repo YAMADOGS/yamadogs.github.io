@@ -26,13 +26,13 @@ block-all-mixed-content;
 
 <body>
 
-<!-- TITLE -->
+
 <div class="title-wrapper">
   <img src="/logo.png" alt="YAMADOGS Logo" class="title-logo">
   <h1>YAMADOGS Staking</h1>
 </div>
 
-<!-- WALLET -->
+
 <div class="card wallet-box">
   <button id="connectWalletBtn">Connect Wallet</button>
   <div id="walletProgress" class="tx-progress"></div>
@@ -52,12 +52,7 @@ block-all-mixed-content;
 
 
 <div class="card">
-<!-- =========================
-     NFT DESKTOP ROW (95%)
-========================== -->
 <div class="nft-desktop-row">
-
-  <!-- LEFT: UNSTAKED -->
   <div class="card nft-column">
     <h2>Your Lazy YAMADOGS</h2>
 
@@ -67,23 +62,20 @@ block-all-mixed-content;
     <div id="stakeProgress" class="tx-progress"></div>
   </div>
 
-  <!-- RIGHT: STAKED -->
   <div class="card nft-column">
     <h2>Your Warrior YAMADOGS</h2>
 
-    <div class="stats-row">
+    <div class="nftContainer fixed-nft-container" id="stakedNFTs"></div>
+  <div class="card">
+  <div class="stats-row">
       <span>Claimable $YAM:</span>
       <span id="pendingRewards">0</span>
-    </div>
-
-    <div class="nftContainer fixed-nft-container" id="stakedNFTs"></div>
-
+    </div></div>
     <button id="unstakeBtn">Unstake YAMADOGS</button>
     <button id="claimAllBtn">Claim $YAM</button>
     <div id="claimProgress" class="tx-progress"></div>
     <div id="unstakeProgress" class="tx-progress"></div>
 
-    <!-- QUERY -->
     <div class="query-box">
       <div class="query-input-row">
         <button id="queryNFTBtn">Query</button>
@@ -95,13 +87,30 @@ block-all-mixed-content;
         <div class="query-token" id="queryResultToken">—</div>
         <div class="query-yam" id="queryResultYAM">—</div>
       </div>
-
       <div id="queryStatus" class="tx-progress"></div>
+      <div class="copy-box">
+      <div class="card">
+        <p>
+Check your pupper’s rewards! Enter any YAMADOGS NFT token ID to see how much $YAM that NFT can possobly earn this year.  🐾 
+        </p>
+      </div></div>
+      
     </div>
 
   </div>
 
 </div>
+<div class="copy-box">
+  <div class="card">
+<h3>Stake or Unstake in a snap:</h3> <p>Select your NFT, press Stake or Unstake, confirm the wallet, and let your YAMADOGS do their thing!
+</p>
+  <h3>FYI:</h3>You can claim,Stake & Unstake at anytime <strong>There is No Locking Period!</strong></p>
+  <div class="card">
+  <div class="card">
+<div class="home-buttons">
+  <button data-url="/">Go Home</button>
+  </div></div></div></div>
+
 </div>
 <script src="/ethers.umd.min.js"></script>
 <script src="/staking.js" defer></script>
