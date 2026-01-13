@@ -1167,7 +1167,7 @@ button:active {
 .yam-progress-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #FFD700, #000);
+  background: solid #FFD700;
   transition: width 0.6s ease;
 }
 
@@ -1227,16 +1227,7 @@ button:active {
 }
 
 
-/*est//
-/* ===============================
-   NFT SIDE-BY-SIDE FIX
-=============================== */
 
-/* ===============================
-   LEFT ↔ RIGHT NFT LAYOUT
-=============================== */
-
-/* Main row */
 .nft-row {
   width: 95%;
   margin: 20px auto;
@@ -1246,19 +1237,18 @@ button:active {
   align-items: stretch;
 }
 
-/* Each side */
 .nft-panel {
   flex: 1;
-  max-width: none;       /* remove 420px lock */
-  min-height: 600px;     /* equal height always */
+  max-width: none;     
+  min-height: 600px;    
 
   display: flex;
   flex-direction: column;
 }
 
-/* NFT container fixed size */
+
 .nft-panel .nftContainer {
-  flex: 1;               /* fills available space */
+  flex: 1;               
   min-height: 360px;
   max-height: 360px;
 
@@ -1276,7 +1266,6 @@ button:active {
   border: 3px dashed #000;
 }
 
-/* Empty state (no folding) */
 .nftContainer:empty::after {
   content: "No YAMADOGS here 🐕";
   margin: auto;
@@ -1285,7 +1274,6 @@ button:active {
   color: #000;
 }
 
-/* Desktop only */
 @media (max-width: 1023px) {
   .nft-row {
     flex-direction: column;
@@ -1336,7 +1324,7 @@ button:active {
   }
 }
 .nftContainer {
-  min-height: 150px;       /* prevents folding when empty */
+  min-height: 200px;       /* prevents folding when empty */
   max-height: 420px;       /* keeps scroll behavior */
   overflow-y: auto;
   overflow-x: hidden;
