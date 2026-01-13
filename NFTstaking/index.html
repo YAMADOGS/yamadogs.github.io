@@ -6,10 +6,10 @@
 <title>YAMADOGS NFT Staking</title>
 
 <link rel="stylesheet" href="/styles.css">
+
 <meta http-equiv="Content-Security-Policy" content="
 default-src 'none';
 script-src 'self' 'unsafe-eval';
-
 style-src 'self';
 img-src 'self' data:;
 font-src 'self';
@@ -22,113 +22,88 @@ frame-ancestors 'none';
 upgrade-insecure-requests;
 block-all-mixed-content;
 ">
-
 </head>
+
 <body>
 
+<!-- TITLE -->
 <div class="title-wrapper">
   <img src="/logo.png" alt="YAMADOGS Logo" class="title-logo">
   <h1>YAMADOGS Staking</h1>
 </div>
-<div class="card">
-<div class="card">
-<div class="wallet-box">
+
+<!-- WALLET -->
+<div class="card wallet-box">
   <button id="connectWalletBtn">Connect Wallet</button>
-<div id="walletProgress" class="tx-progress" style="margin-top:12px"></div>
+  <div id="walletProgress" class="tx-progress"></div>
   <div class="wallet-address">
     Wallet: <span id="walletAddress">Not connected</span>
   </div>
-</div>
-</div>
-</div>
-
-<div class="copy-box">
-<div class="copy-box">
-<div class="card">
-    <h2>Global Stats</h2>
-    <p>Current APY: <span id="currentAPY">Loading...</span>%</p>
-    <p>Next Halving In: <span id="halvingCountdown">Loading...</span></p>
-    <p>Total NFTs Staked: <span id="totalStakedNFTs">0</span></p>
-    <p>Total YAM Minted: <span id="totalMintedYAM">0</span></p>
-    <p>Remaining Reward Pool: <span id="remainingEmission">0</span></p>
-  </div>
+  <!-- GLOBAL STATS (TOP, FULL WIDTH) -->
+<div class="card global-stats">
+  <h2>Global Stats</h2>
+  <p>Current APY: <span id="currentAPY">—</span>%</p>
+  <p>Next Halving In: <span id="halvingCountdown">—</span></p>
+  <p>Total NFTs Staked: <span id="totalStakedNFTs">0</span></p>
+  <p>Total YAM Minted: <span id="totalMintedYAM">0</span></p>
+  <p>Remaining Reward Pool: <span id="remainingEmission">0</span></p>
 </div>
 </div>
 
-<div class="ui">
-  
-  <div class="copy-box">
-    <h3>How to Stake?</h3>
-    <p>
-🐾 <strong>How to Stake & Unstake YAMADOGS</strong><br><br>
-<p></p>
-🐕 <strong>Staking (Send your dog to war):</strong><br>
-1. Tap the <strong>YAMADOGS NFT</strong> you want to stake<br>
-2. Click <strong>Stake YAMADOGS button</strong><br>
-3. Confirm wallet transactions 🦴<br><br>
-<p></p>
-🏠 <strong>Unstaking (Bring your dog home):</strong><br>
-<p></p>
-1. Tap the <strong>staked YAMADOGS NFT</strong><br>
-2. Click <strong>Unstake YAMADOGS button</strong><br>
-3. Confirm Wallet transaction 🐾<br><br>
-That’s it. <strong>Tap. Click. Woof.</strong> 🚀🐕‍🦺
-</p>
-<h3>How to claim rewards?</h3>
-<p>
-  1. Click <strong>Claim $YAM button</strong> and confirm wallet transaction</p>
-  <p>
-  <strong>FYI:</strong>You can claim anytime,Stake & Unstake anytime <strong>No Locking Period</strong>
-</p>
-  </div>
+
 <div class="card">
-  <div class="card">
+<!-- =========================
+     NFT DESKTOP ROW (95%)
+========================== -->
+<div class="nft-desktop-row">
+
+  <!-- LEFT: UNSTAKED -->
+  <div class="card nft-column">
     <h2>Your Lazy YAMADOGS</h2>
-    <div class="nftContainer" id="unstakedNFTs"></div>
+
+    <div class="nftContainer fixed-nft-container" id="unstakedNFTs"></div>
+
     <button id="stakeBtn">Stake YAMADOGS</button>
-<div id="stakeProgress" class="tx-progress"></div>
- </div>
+    <div id="stakeProgress" class="tx-progress"></div>
+  </div>
 
-  <div class="card">
-    <h2>Your Warior YAMADOGS</h2>
-   <div class="stats-row">
-    <span>Claimable $YAM:</span>
-    <span id="pendingRewards">0</span>
+  <!-- RIGHT: STAKED -->
+  <div class="card nft-column">
+    <h2>Your Warrior YAMADOGS</h2>
+
+    <div class="stats-row">
+      <span>Claimable $YAM:</span>
+      <span id="pendingRewards">0</span>
     </div>
-    <p> <button id="claimAllBtn">Claim $YAM</button></p>
-      <div id="claimProgress" class="tx-progress"></div>
-    <div class="nftContainer" id="stakedNFTs"></div>
+
+    <div class="nftContainer fixed-nft-container" id="stakedNFTs"></div>
+
     <button id="unstakeBtn">Unstake YAMADOGS</button>
+    <button id="claimAllBtn">Claim $YAM</button>
+    <div id="claimProgress" class="tx-progress"></div>
     <div id="unstakeProgress" class="tx-progress"></div>
-    
-<div class="query-box">
 
-  <div class="query-input-row">
-    <button id="queryNFTBtn">Query</button>
+    <!-- QUERY -->
+    <div class="query-box">
+      <div class="query-input-row">
+        <button id="queryNFTBtn">Query</button>
+        <span class="query-label">TYPE NFT ID:</span>
+        <input type="number" id="queryTokenId" placeholder="e.g. 2" min="0">
+      </div>
 
-    <span class="query-label">TYPE NFT ID:</span>
+      <div class="query-result-row">
+        <div class="query-token" id="queryResultToken">—</div>
+        <div class="query-yam" id="queryResultYAM">—</div>
+      </div>
 
-    <input
-      type="number"
-      id="queryTokenId"
-      placeholder="e.g. 2"
-      min="0"
-    />
+      <div id="queryStatus" class="tx-progress"></div>
+    </div>
+
   </div>
-
-  <div class="query-result-row">
-    <div class="query-token" id="queryResultToken">—</div>
-    <div class="query-yam" id="queryResultYAM">—</div>
-  </div>
-
-  <div id="queryStatus" class="tx-progress"></div>
 
 </div>
-  </div>
- </div>
 </div>
-
-<script src="/ethers.umd.min.js" integrity="sha384-Htz1SE4Sl5aitpvFgr2j0sfsGUIuSXI6t8hEyrlQ93zflEF3a29bH2AvkUROUw7J" crossorigin="anonymous"></script>
+<script src="/ethers.umd.min.js"></script>
 <script src="/staking.js" defer></script>
 
 </body>
