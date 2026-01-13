@@ -1336,20 +1336,43 @@ button:active {
   }
 }
 .nftContainer {
-  min-height: 220px;        /* prevents folding when empty */
-  max-height: 420px;        /* keeps original scroll behavior */
-  overflow-y: auto;         /* ENABLE scrollbar */
+  min-height: 150px;       /* prevents folding when empty */
+  max-height: 420px;       /* keeps scroll behavior */
+  overflow-y: auto;
   overflow-x: hidden;
   padding: 8px;
   border-radius: 10px;
   box-sizing: border-box;
 
-  display: flex;          /* use flexbox */
-  flex-wrap: wrap;        /* allow wrapping to new rows */
-  justify-content: flex-start; /* align items from left to right */
-  gap: 2px;              /* spacing between NFTs */
-  padding: 2px;
+  display: grid;           /* change from flex → grid */
+  grid-template-columns: repeat(3, 1fr); /* 3 NFTs per row */
+  gap: 8px;                /* space between cards */
+  justify-items: center;   /* center NFT cards horizontally */
+
   background: #ffb703;
   border: 2px solid #000;
-  
+}
+
+.nft-card {
+  width: 90px;   /* or adjust as needed */
+  padding: 4px;
+  background: #222;
+  border: 3px solid #ffb703;
+  box-shadow: 2px 2px 0 #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .nftContainer {
+    grid-template-columns: repeat(2, 1fr); /* 2 per row */
+  }
+}
+
+@media (max-width: 480px) {
+  .nftContainer {
+    grid-template-columns: repeat(1, 1fr); /* 1 per row */
+  }
 }
