@@ -1336,19 +1336,34 @@ button:active {
   }
 }
 .nftContainer {
-  min-height: 200px;       
-  max-height: 420px;      
+  min-height: 160px;
+  max-height: 420px;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 8px;
   border-radius: 10px;
   box-sizing: border-box;
-  display: grid;    
-  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-  gap: 8px;               
-  justify-items: center;   
+
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 🖥️ 5 NFTs per row */
+  gap: 8px;
+
+  justify-items: center;
   background: #ffb703;
   border: 2px solid #000;
+}
+
+@media (max-width: 768px) {
+  .nftContainer {
+    grid-template-columns: repeat(2, 1fr); /* 📱 2 NFTs per row */
+  }
+}
+
+
+@media (max-width: 480px) {
+  .nftContainer {
+    grid-template-columns: repeat(1, 1fr); 
+  }
 }
 
 .nft-card {
@@ -1363,14 +1378,3 @@ button:active {
   cursor: pointer;
 }
 
-@media (max-width: 768px) {
-  .nftContainer {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .nftContainer {
-    grid-template-columns: repeat(1, 1fr); 
-  }
-}
