@@ -106,6 +106,11 @@ async function getBatchNFTData(tokenIds) {
     return { pendingRewards, remainingCaps };
 }
 
+async function refreshUIAfterTx() {
+    nftRemainingYAMCache = {};
+    await loadUserNFTs();
+    await updatePendingRewards();
+}
 
 
 // =====================
@@ -467,90 +472,6 @@ document.getElementById("pendingRewards").textContent = totalPending;
     }
 }
 
-// =====================
-// Render NFTs (Updated)
-// =====================
-async function renderNFT(tokenId, container, isStaked) {
-    try {
-        const tokenURI = await nftContractRO.tokenURI(tokenId);
-        const base64JSON = tokenURI.split(",")[1];
-        const jsonStr = atob(base64JSON);
-        const metadata = JSON.parse(jsonStr);
-
-        const card = document.createElement("div");
-        card.className = "nft-card";
-        card.dataset.tokenId = tokenId;
-
-        // Remaining YAM display
-        const remainingDiv = document.createElement("div");
-        remainingDiv.className = "remaining-yam";
-        remainingDiv.textContent = "Loading...";
-        card.appendChild(remainingDiv);
-
-        // Progress bar
-        const progressBar = document.createElement("div");
-        progressBar.className = "yam-progress";
-        const progressFill = document.createElement("div");
-        progressFill.className = "yam-progress-fill";
-        progressBar.appendChild(progressFill);
-        card.appendChild(progressBar);
-
-        // NFT Image
-        const img = document.createElement("img");
-        img.src = metadata.image; // base64 image
-        img.alt = metadata.name || `NFT #${tokenId}`;
-        img.className = "nft-image";
-        card.appendChild(img);
-
-        // Token ID
-        const idDiv = document.createElement("div");
-        idDiv.className = "token-id";
-        idDiv.textContent = `#${tokenId}`;
-        card.appendChild(idDiv);
-
-        // NFT click select
-        card.addEventListener("click", () => {
-            if (selectedNFT) selectedNFT.classList.remove("active");
-            selectedNFT = card;
-            card.classList.add("active");
-            document.getElementById("stakeBtn").disabled = isStaked;
-            document.getElementById("unstakeBtn").disabled = !isStaked;
-        });
-
-        container.appendChild(card);
-
-        // Load remaining YAM using helper
-        try {
-            await loadMaxYAMPerNFTThisYear();
-
-            const remainingNum = await getRemainingYAM(tokenId);
-
-            nftRemainingYAMCache[tokenId] = remainingNum;
-            const maxNum = maxYAMPerNFTThisYear;
-
-            let progress = 0;
-            if (maxNum > 0) {
-                progress = ((maxNum - remainingNum) / maxNum) * 100;
-            }
-            progress = Math.min(100, Math.max(0, progress));
-
-            remainingDiv.textContent =
-                `${remainingNum.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                })} $YAM`;
-
-            progressFill.style.width = `${progress.toFixed(2)}%`;
-
-        } catch (err) {
-            console.error("Error fetching remaining YAM for tokenId", tokenId, err);
-            remainingDiv.textContent = "— $YAM";
-        }
-
-    } catch (err) {
-        console.error("Error rendering NFT", tokenId, err);
-    }
-}
 
 // =====================
 // Connect Wallet
@@ -576,6 +497,27 @@ async function connectWallet() {
         stakingContract = new ethers.Contract(stakingContractAddress, stakingABI, signer);
         nftContractRO = new ethers.Contract(nftAddress, nftABI, provider);
         nftContract = new ethers.Contract(nftAddress, nftABI, signer);
+// =====================
+// Live Contract Events
+// =====================
+stakingContract.on("Staked", async (user, tokenId) => {
+    if (user.toLowerCase() === userAddress.toLowerCase()) {
+        await refreshUIAfterTx();
+    }
+});
+
+stakingContract.on("Unstaked", async (user, tokenId) => {
+    if (user.toLowerCase() === userAddress.toLowerCase()) {
+        await refreshUIAfterTx();
+    }
+});
+
+stakingContract.on("Claimed", async (user) => {
+    if (user.toLowerCase() === userAddress.toLowerCase()) {
+        await refreshUIAfterTx();
+    }
+});
+
 
         document.getElementById("claimAllBtn").disabled = false;
 
@@ -648,13 +590,17 @@ card.appendChild(progressBar);
         try {
     await loadMaxYAMPerNFTThisYear();
 
-const remainingBN =
-    await stakingContractRO.currentRemainingYAM(tokenId);
+let remainingNum;
 
-const remainingNum =
-    Number(ethers.utils.formatEther(remainingBN));
+if (nftRemainingYAMCache[tokenId] !== undefined) {
+    remainingNum = nftRemainingYAMCache[tokenId];
+} else {
+    const remainingBN = await stakingContractRO.currentRemainingYAM(tokenId);
+    remainingNum = Number(ethers.utils.formatEther(remainingBN));
+  remainingNum = Math.max(0, remainingNum);
+    nftRemainingYAMCache[tokenId] = remainingNum;
+}
 
-nftRemainingYAMCache[tokenId] = remainingNum;
 const maxNum = maxYAMPerNFTThisYear;
 
 let progress = 0;
@@ -670,13 +616,6 @@ remainingDiv.textContent =
     })} $YAM`;
 
 progressFill.style.width = `${progress.toFixed(2)}%`;
-
-    const formatted = Number(
-        ethers.utils.formatEther(remaining)
-    ).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
 
     
    } 
@@ -769,9 +708,8 @@ document.getElementById("stakeBtn").addEventListener("click", async () => {
         showProgress("stakeProgress", "Staking successful ✅", 5000);
         selectedNFT.classList.remove("active");
         selectedNFT = null;
-        await loadUserNFTs();
-        await updateNFTYam();
-        await updatePendingRewards();
+        await refreshUIAfterTx();
+
 
     } catch (err) {
         setProgress("stakeProgress", "Transaction failed ❌");
@@ -793,9 +731,7 @@ document.getElementById("unstakeBtn").addEventListener("click", async () => {
         showProgress("unstakeProgress", "Unstaking successful ✅", 5000);
         selectedNFT.classList.remove("active");
         selectedNFT = null;
-        await loadUserNFTs();
-        await updateNFTYam();
-        await updatePendingRewards();
+        await refreshUIAfterTx();
 
     } catch (err) {
         showProgress("unstakeProgress", "Transaction failed ❌", 6000);
@@ -805,6 +741,8 @@ document.getElementById("unstakeBtn").addEventListener("click", async () => {
 });
 
 document.getElementById("claimAllBtn").addEventListener("click", async () => {
+    document.getElementById("claimAllBtn").disabled = true; // ✅ ADD HERE
+
     try {
         setProgress("claimProgress", "Waiting for wallet confirmation...");
 
@@ -817,18 +755,21 @@ document.getElementById("claimAllBtn").addEventListener("click", async () => {
         }
 
         setProgress("claimProgress", "Claiming $YAM...");
-        await (await stakingContract.claimAll(tokenIds)).wait();
+        const tx = await stakingContract.claimAll(tokenIds);
+         await tx.wait(1);
+
 
         showProgress("claimProgress", "Claim successful ✅", 5000);
-        await loadUserNFTs();
-        await updateNFTYam();
-        await updatePendingRewards();
+        await refreshUIAfterTx();
 
     } catch (err) {
         setProgress("claimProgress", "Transaction failed ❌");
         console.error(err);
+    } finally {
+        document.getElementById("claimAllBtn").disabled = false; // ✅ ADD HERE
     }
 });
+
 
 async function queryNFTRemainingYAM() {
     const tokenIdInput = document.getElementById("queryTokenId");
