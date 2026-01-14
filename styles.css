@@ -1287,10 +1287,10 @@ button:active {
 
 @media (min-width: 1024px) {
   .nftContainer {
-    width: 100%;
-    max-width: 600px;  
-    margin: 0 auto;   
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 90px); 
+    gap: 8px;
+    max-width: calc(90px * 4 + 8px * 3 + 16px); 
+    margin: 0 auto;
   }
 }
 
