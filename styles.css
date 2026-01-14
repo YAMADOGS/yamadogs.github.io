@@ -1242,8 +1242,15 @@ button:active {
   }
 }
 .fixed-nft-container {
+  flex: 1;
   min-height: 320px;
 }
+.nft-column {
+  display: flex;
+  flex-direction: column;
+}
+
+
 .nft-desktop-row {
   width: 95%;
   margin: 0 auto;
@@ -1298,7 +1305,7 @@ button:active {
 
 
 .nftContainer:empty::after {
-  content: "No YAMADOGS here 🐕";
+  content: "No YAMADOGS here 2 🐕";
   grid-column: 1 / -1;      
   justify-self: center;   
   align-self: center;   
