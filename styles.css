@@ -1065,7 +1065,7 @@ button:active {
 
 /* Individual NFT Card */
 .nft-card {
-  width: 100%;
+  width: 90px;
   padding: 4px;
   background: #222;
   border: 3px solid #ffb703;
