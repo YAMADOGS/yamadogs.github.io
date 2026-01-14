@@ -60,15 +60,22 @@ async function batchFetchNFTData(tokenId) {
 }
 
 async function loadMaxYAMPerNFTThisYear() {
-    if (maxYAMPerNFTThisYear !== null) return;
+    if (maxYAMPerNFTThisYear !== null) return maxYAMPerNFTThisYear;
 
     const currentYear = await stakingContractRO.currentYear();
-    const totalSupply = await nftContractRO.totalSupply();
-    const totalEmission = await stakingContractRO.remainingEmission(currentYear);
+    const totalSupplyBN = await nftContractRO.totalSupply();
+    const totalEmissionBN = await stakingContractRO.remainingEmission(currentYear);
 
-    maxYAMPerNFTThisYear =
-        Number(ethers.utils.formatEther(totalEmission)) /
-        totalSupply.toNumber();
+    const totalSupply = totalSupplyBN.toNumber();
+    const totalEmission = Number(ethers.utils.formatEther(totalEmissionBN));
+
+    if (totalSupply > 0) {
+        maxYAMPerNFTThisYear = totalEmission / totalSupply;
+    } else {
+        maxYAMPerNFTThisYear = 0;
+    }
+
+    return maxYAMPerNFTThisYear;
 }
 
 async function fetchRemainingYAMBatch(tokenIds) {
@@ -624,23 +631,21 @@ if (nftRemainingYAMCache[tokenId] !== undefined) {
     nftRemainingYAMCache[tokenId] = remainingNum;
 }
 
-const maxNum = maxYAMPerNFTThisYear;
+const maxNum = await loadMaxYAMPerNFTThisYear(); // Make sure maxYAM is loaded
 
 let progress = 0;
 if (maxNum > 0) {
-    progress = ((maxNum - remainingNum) / maxNum) * 100;
+    progress = (remainingNum / maxNum) * 100; // Fill based on remaining YAM
 }
 progress = Math.min(100, Math.max(0, progress));
 
-remainingDiv.textContent =
-    `${remainingNum.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    })} $YAM`;
+remainingDiv.textContent = `${remainingNum.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+})} $YAM`;
 
 progressFill.style.width = `${progress.toFixed(2)}%`;
 
-    
    } 
    catch (err) {
     console.error("Error fetching remaining YAM for tokenId", tokenId, err);
