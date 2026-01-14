@@ -1078,6 +1078,8 @@ button:active {
   margin: 4px;
   cursor: pointer;
   transition: transform 0.1s ease;
+  position:relative;
+  overflow: visible;
 }
 
 .nft-card:active {
@@ -1287,7 +1289,7 @@ button:active {
 
 
 .nftContainer:empty::after {
-  content: "No YAMADOGS here 🐕";
+  content: "No YAMADOGY here 🐕";
   grid-column: 1 / -1;      
   justify-self: center;   
   align-self: center;   
@@ -1308,12 +1310,12 @@ button:active {
   border-radius: 3px;
 }
 .nftContainer::-webkit-scrollbar {
-  width: 6px;
+  width: 6px;}
 
 .yam-progress {
   width: 90%;
   height: 8px;
-  background: #222;
+  background-color: #ccc;
   border-radius: 6px;
   overflow: hidden;
   margin: 6px auto 4px;
@@ -1322,7 +1324,8 @@ button:active {
 .yam-progress-fill {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #FFD700, #000);
+  background-color: linear-gradient(90deg, #FFD700, #000);
   transition: width 0.6s ease;
+  border-radius:4px;
 }
 
