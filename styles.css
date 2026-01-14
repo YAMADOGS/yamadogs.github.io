@@ -926,17 +926,6 @@ section,
   height: 100%;
 }
 
-.nftContainer {
-  max-height: 300px; /* limit container height */
-  overflow-y: auto;  /* vertical scroll */
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  padding: 8px;
-  background: #111;
-  border: 2px solid #000;
-}
 
 .nft-card {
   width: calc(270px / 3);
@@ -969,8 +958,7 @@ section,
   text-align: center;
   color: #fff;
 }
-.nftContainer::-webkit-scrollbar {
-  width: 6px;
+
 }
 .nft-card {
     transition: transform 0.1s ease;  /* smooth quick scaling */
@@ -1074,27 +1062,6 @@ button:active {
     text-overflow: ellipsis;
 }
 
-/* NFT Container */
-.nftContainer {
-  max-height: 300px;
-  overflow-y: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  padding: 8px;
-  background: #ffb703;
-  border: 2px solid #111;
-}
-
-/* Scrollbar */
-.nftContainer::-webkit-scrollbar {
-  width: 6px;
-}
-.nftContainer::-webkit-scrollbar-thumb {
-  background: #ffb703;
-  border-radius: 3px;
-}
 
 /* Individual NFT Card */
 .nft-card {
@@ -1173,21 +1140,6 @@ button:active {
   box-shadow: 6px 6px 0 #000;
 }
 
-.yam-progress {
-  width: 90%;
-  height: 8px;
-  background: #222;
-  border-radius: 6px;
-  overflow: hidden;
-  margin: 6px auto 4px;
-}
-
-.yam-progress-fill {
-  height: 100%;
-  width: 0%;
-  background: solid #FFD700;
-  transition: width 0.6s ease;
-}
 
 /* ============================
    NFT QUERY BOX
@@ -1281,13 +1233,7 @@ button:active {
   border: 3px dashed #000;
 }
 
-.nftContainer:empty::after {
-  content: "No YAMADOGS here 🐕";
-  margin: auto;
-  font-size: 10px;
-  opacity: 0.6;
-  color: #000;
-}
+
 
 @media (max-width: 1023px) {
   .nft-row {
@@ -1343,15 +1289,30 @@ button:active {
   padding: 8px;
   border-radius: 10px;
   box-sizing: border-box;
-
   display: grid;
   grid-template-columns: repeat(5, 1fr); /* 🖥️ 5 NFTs per row */
   gap: 8px;
-
-  justify-items: center;
   background: #ffb703;
   border: 2px solid #000;
 }
+.nftContainer:empty::after {
+  content: "No YAMADOGS here 🐕";
+  margin: auto;
+  font-size: 10px;
+  opacity: 0.6;
+  color: #000;
+}
+
+/* Scrollbar */
+.nftContainer::-webkit-scrollbar {
+  width: 6px;
+}
+.nftContainer::-webkit-scrollbar-thumb {
+  background: #ffb703;
+  border-radius: 3px;
+}
+.nftContainer::-webkit-scrollbar {
+  width: 6px;
 
 @media (max-width: 768px) {
   .nftContainer {
@@ -1359,12 +1320,6 @@ button:active {
   }
 }
 
-
-@media (max-width: 480px) {
-  .nftContainer {
-    grid-template-columns: repeat(1, 1fr); 
-  }
-}
 
 .nft-card {
   width: 90px;   
@@ -1378,3 +1333,18 @@ button:active {
   cursor: pointer;
 }
 
+.yam-progress {
+  width: 90%;
+  height: 8px;
+  background: #222;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 6px auto 4px;
+}
+
+.yam-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: solid #FFD700;
+  transition: width 0.6s ease;
+}
