@@ -1217,24 +1217,6 @@ button:active {
 }
 
 
-/*/.nft-panel .nftContainer { 
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  min-height: 360px;
-  max-height: 360px;
-  overflow-y: auto;
-  justify-content: center;
-  gap: 8px;
-
-  padding: 10px;
-  margin: 12px 0;
-
-  background: #111;
-  border: 3px dashed #000;
-}/*/
-
-
-
 @media (max-width: 1023px) {
   .nft-row {
     flex-direction: column;
@@ -1305,7 +1287,7 @@ button:active {
 
 
 .nftContainer:empty::after {
-  content: "No YAMADOGS here 2 🐕";
+  content: "No YAMADOGO here 2 🐕";
   grid-column: 1 / -1;      
   justify-self: center;   
   align-self: center;   
