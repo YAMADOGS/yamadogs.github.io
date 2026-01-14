@@ -162,7 +162,7 @@ h1{color:#ffb703;text-shadow:3px 3px 0 #000}
 /* Desktop hover */
 @media (hover: hover) {
   .nft-container img:hover{
-    transform: scale(2.5);
+    transform: scale(1.1);
     z-index: 20;
     box-shadow: 6px 6px 0 #000;
   }
@@ -170,7 +170,7 @@ h1{color:#ffb703;text-shadow:3px 3px 0 #000}
 
 /* Mobile tap (active state) */
 .nft-container img.active{
-  transform: scale(2.5);
+  transform: scale(1.1);
   z-index: 20;
   box-shadow: 6px 6px 0 #000;
 }
@@ -1125,7 +1125,7 @@ button:active {
 /* Desktop scaling (hover) */
 @media (hover: hover) {
   .nft-card:hover img {
-    transform: scale(1.2);
+    transform: scale(1.1);
     z-index: 20;
     box-shadow: 6px 6px 0 #000;
   }
