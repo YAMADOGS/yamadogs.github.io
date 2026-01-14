@@ -14,6 +14,7 @@ let nftRemainingYAMCache = {};
 let publicProvider;
 let queryClearTimer = null;
 
+const MAX_PER_NFT_PER_YEAR = 1_000_000;
 
 // =====================
 // Utility Functions
@@ -69,25 +70,23 @@ function initPublicProvider() {
     );
 }
 
-async function getRemainingYAM(tokenId) {
-    if (!stakingContractRO) return 0;
-    const remainingBN = await stakingContractRO.currentRemainingYAM(tokenId);
-    return Number(ethers.utils.formatEther(remainingBN));
+async function getRemainingYAMForNFT(tokenId) {
+    const year = await stakingContractRO.currentYear();
+
+    const earnedBN = await stakingContractRO.nftEarnedPerYear(tokenId, year);
+    const pendingBN = await stakingContractRO.pending(tokenId);
+
+    const earned = Number(ethers.utils.formatEther(earnedBN));
+    const pending = Number(ethers.utils.formatEther(pendingBN));
+
+    const remaining = Math.max(
+        0,
+        MAX_PER_NFT_PER_YEAR - earned - pending
+    );
+
+    return remaining;
 }
 
-async function getRemainingBatch(tokenIds) {
-    if (!stakingContractRO) return [];
-    const remainingBNArray = await stakingContractRO.currentRemainingBatch(tokenIds);
-    return remainingBNArray.map(bn => Number(ethers.utils.formatEther(bn)));
-}
-
-async function getBatchNFTData(tokenIds) {
-    if (!stakingContractRO) return { pendingRewards: [], remainingCaps: [] };
-    const [pendingRewardsBN, remainingCapsBN] = await stakingContractRO.batchNFTData(tokenIds);
-    const pendingRewards = pendingRewardsBN.map(bn => Number(ethers.utils.formatEther(bn)));
-    const remainingCaps = remainingCapsBN.map(bn => Number(ethers.utils.formatEther(bn)));
-    return { pendingRewards, remainingCaps };
-}
 
 async function refreshUIAfterTx() {
     nftRemainingYAMCache = {};
@@ -122,16 +121,6 @@ const stakingABI = [
     "anonymous": false,
     "inputs": [
       { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
-    ],
-    "name": "Claimed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
       { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" }
     ],
     "name": "Staked",
@@ -144,6 +133,16 @@ const stakingABI = [
       { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" }
     ],
     "name": "Unstaked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "Claimed",
     "type": "event"
   },
 
@@ -175,7 +174,6 @@ const stakingABI = [
     "stateMutability": "view",
     "type": "function"
   },
-
   {
     "inputs": [],
     "name": "totalStaked",
@@ -199,9 +197,12 @@ const stakingABI = [
   },
 
   {
-    "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }],
-    "name": "remainingPerNFTThisYear",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "inputs": [
+      { "internalType": "address", "name": "user", "type": "address" },
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "name": "userStaked",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -213,13 +214,14 @@ const stakingABI = [
     "stateMutability": "view",
     "type": "function"
   },
+
   {
-    "inputs": [{ "internalType": "uint256[]", "name": "tokenIds", "type": "uint256[]" }],
-    "name": "pendingBatch",
-    "outputs": [
-      { "internalType": "uint256", "name": "total", "type": "uint256" },
-      { "internalType": "uint256[]", "name": "perNFT", "type": "uint256[]" }
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+      { "internalType": "uint256", "name": "year", "type": "uint256" }
     ],
+    "name": "nftEarnedPerYear",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -245,44 +247,31 @@ const stakingABI = [
     "stateMutability": "nonpayable",
     "type": "function"
   },
-
   {
-    "inputs": [
-      { "internalType": "address", "name": "user", "type": "address" },
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
-    ],
-    "name": "userStaked",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  
-{
-    "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }],
-    "name": "currentRemainingYAM",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-},
-{
-    "inputs": [{ "internalType": "uint256[]", "name": "tokenIds", "type": "uint256[]" }],
-    "name": "currentRemainingBatch",
-    "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
-    "stateMutability": "view",
-    "type": "function"
-},
-
-{
-  "inputs": [{ "internalType": "uint256[]", "name": "tokenIds", "type": "uint256[]" }],
-  "name": "batchNFTData",
+  "inputs": [
+    { "internalType": "uint256[]", "name": "tokenIds", "type": "uint256[]" }
+  ],
+  "name": "pendingBatch",
   "outputs": [
-    { "internalType": "uint256[]", "name": "pendingRewards", "type": "uint256[]" },
-    { "internalType": "uint256[]", "name": "remainingCaps", "type": "uint256[]" }
+    { "internalType": "uint256", "name": "total", "type": "uint256" }
+  ],
+  "stateMutability": "view",
+  "type": "function"
+},
+{
+  "inputs": [
+    { "internalType": "address", "name": "user", "type": "address" }
+  ],
+  "name": "getUserStakedTokens",
+  "outputs": [
+    { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
   ],
   "stateMutability": "view",
   "type": "function"
 }
 
+
+  
 ];
 
 const nftABI = [
@@ -581,20 +570,21 @@ async function renderNFT(tokenId, container, isStaked) {
         container.appendChild(card);
 
         // ===== YAM DATA =====
-        const remainingBN = await stakingContractRO.currentRemainingYAM(tokenId);
-        const remainingNum = Math.max(0, Number(ethers.utils.formatEther(remainingBN)));
-        nftRemainingYAMCache[tokenId] = remainingNum;
-
-        const { remainingCaps } = await stakingContractRO.batchNFTData([tokenId]);
-        const yearlyCap = Number(ethers.utils.formatEther(remainingCaps[0]));
-
-        let progress = calculateProgressPercent(remainingNum, yearlyCap);
-        progress = Math.min(100, Math.max(0, progress));
+        let remainingNum;
+        if (nftRemainingYAMCache[tokenId] !== undefined) {
+            remainingNum = nftRemainingYAMCache[tokenId];
+        } else {
+            remainingNum = await getRemainingYAMForNFT(tokenId);
+            nftRemainingYAMCache[tokenId] = remainingNum;
+        }
 
         remainingDiv.textContent = `${remainingNum.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         })} $YAM`;
+
+        let progress = (remainingNum / MAX_PER_NFT_PER_YEAR) * 100;
+        progress = Math.min(100, Math.max(0, progress));
 
         progressFill.style.width = `${progress.toFixed(2)}%`;
         progressFill.style.transition = "width 0.5s ease-in-out";
@@ -618,22 +608,27 @@ async function loadUserNFTs() {
     stakedContainer.innerHTML = "";
 
     try {
-        const totalSupply = await nftContractRO.totalSupply();
+        // ===============================
+        // LOAD STAKED NFTS (O(1))
+        // ===============================
+        const stakedTokenIds =
+            await stakingContractRO.getUserStakedTokens(userAddress);
 
-        for (let tokenId = 1; tokenId <= totalSupply.toNumber(); tokenId++) {
-          
-            const isStaked = await stakingContractRO.userStaked(userAddress, tokenId);
+        for (const tokenId of stakedTokenIds) {
+            await renderNFT(Number(tokenId), stakedContainer, true);
+        }
 
-            if (isStaked) {
-                await renderNFT(tokenId, stakedContainer, true);
-                continue;
-            }
-            try {
-                const owner = await nftContractRO.ownerOf(tokenId);
-                if (owner.toLowerCase() === userAddress.toLowerCase()) {
-                    await renderNFT(tokenId, unstakedContainer, false);
-                }
-            } catch (_) {
+        // ===============================
+        // LOAD UNSTAKED NFTS (USER ONLY)
+        // ===============================
+        const balance = await nftContractRO.balanceOf(userAddress);
+
+        for (let i = 0; i < balance; i++) {
+            const tokenId =
+                await nftContractRO.tokenOfOwnerByIndex(userAddress, i);
+
+            if (!stakedTokenIds.map(id => id.toString()).includes(tokenId.toString())) {
+                await renderNFT(Number(tokenId), unstakedContainer, false);
             }
         }
 
@@ -772,7 +767,7 @@ async function queryNFTRemainingYAM() {
 
     try {
         await nftContractRO.ownerOf(tokenId);
-        const remainingNum = await getRemainingYAM(tokenId);
+        const remainingNum = await getRemainingYAMForNFT(tokenId);
         const remaining = remainingNum.toLocaleString(undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
@@ -810,20 +805,22 @@ async function updateNFTYam() {
         const remainingDiv = card.querySelector(".remaining-yam");
 
         try {
-            const remainingBN = await stakingContractRO.currentRemainingYAM(tokenId);
-            const remainingNum = Math.max(0, Number(ethers.utils.formatEther(remainingBN)));
-            nftRemainingYAMCache[tokenId] = remainingNum;
-
-            const { remainingCaps } = await stakingContractRO.batchNFTData([tokenId]);
-            const yearlyCap = Number(ethers.utils.formatEther(remainingCaps[0]));
-
-            let progress = calculateProgressPercent(remainingNum, yearlyCap);
-            progress = Math.min(100, Math.max(0, progress));
+            // Use cache first
+            let remainingNum;
+            if (nftRemainingYAMCache[tokenId] !== undefined) {
+                remainingNum = nftRemainingYAMCache[tokenId];
+            } else {
+                remainingNum = await getRemainingYAMForNFT(tokenId);
+                nftRemainingYAMCache[tokenId] = remainingNum;
+            }
 
             remainingDiv.textContent = `${remainingNum.toLocaleString(undefined, {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             })} $YAM`;
+
+            let progress = (remainingNum / MAX_PER_NFT_PER_YEAR) * 100;
+            progress = Math.min(100, Math.max(0, progress));
 
             progressFill.style.width = `${progress.toFixed(2)}%`;
             progressFill.style.transition = "width 0.5s ease-in-out";
@@ -833,7 +830,6 @@ async function updateNFTYam() {
         }
     }
 }
-
 
 // =====================
 // Auto Updates
