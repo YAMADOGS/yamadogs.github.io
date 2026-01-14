@@ -866,9 +866,6 @@ html {
     align-items: center;
     flex-direction: column;
     gap: 10px;
-  }
-
-  .home-buttons button {
     width: 120px;
   }
 
@@ -1153,6 +1150,8 @@ button:active {
   background: #111;
   border: 3px solid #000;
   box-shadow: 4px 4px 0 #000;
+  width: 100%;
+  max-width: 420px;
 }
 
 .query-input-row {
