@@ -1065,7 +1065,7 @@ button:active {
 
 /* Individual NFT Card */
 .nft-card {
-  width: 90px;
+  width: 100%;
   padding: 4px;
   background: #222;
   border: 3px solid #ffb703;
@@ -1290,18 +1290,23 @@ button:active {
   border-radius: 10px;
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 🖥️ 5 NFTs per row */
   gap: 8px;
   background: #ffb703;
   border: 2px solid #000;
 }
+
 .nftContainer:empty::after {
   content: "No YAMADOGS here 🐕";
-  margin: auto;
+  grid-column: 1 / -1;      
+  justify-self: center;   
+  align-self: center;   
+  text-align: center;
+  white-space: nowrap;  
   font-size: 10px;
   opacity: 0.6;
   color: #000;
 }
+
 
 /* Scrollbar */
 .nftContainer::-webkit-scrollbar {
@@ -1314,11 +1319,17 @@ button:active {
 .nftContainer::-webkit-scrollbar {
   width: 6px;
 
-@media (max-width: 768px) {
+@media (min-width: 1024px) {
   .nftContainer {
-    grid-template-columns: repeat(2, 1fr); /* 📱 2 NFTs per row */
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
+@media (max-width: 1023px) {
+  .nftContainer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 
 
 .nft-card {
@@ -1345,6 +1356,6 @@ button:active {
 .yam-progress-fill {
   height: 100%;
   width: 0%;
-  background: solid #FFD700;
+  background: #FFD700;
   transition: width 0.6s ease;
 }
