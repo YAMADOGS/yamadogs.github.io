@@ -859,7 +859,6 @@ html {
 }
 
 @media (min-width: 1024px) {
-
   .home-buttons {
     display: flex;
     justify-content: center;
@@ -867,8 +866,8 @@ html {
     flex-direction: column;
     gap: 10px;
     width: 120px;
+    margin: 0 auto;
   }
-
 }
   
 .ui {
@@ -1126,7 +1125,7 @@ button:active {
 /* Desktop scaling (hover) */
 @media (hover: hover) {
   .nft-card:hover img {
-    transform: scale(2.5);
+    transform: scale(1.2);
     z-index: 20;
     box-shadow: 6px 6px 0 #000;
   }
@@ -1284,6 +1283,14 @@ button:active {
   gap: 8px;
   background: #ffb703;
   border: 2px solid #000;
+}
+
+@media (min-width: 1024px) {
+  .nftContainer {
+    width: 100%;
+    max-width: 600px;  
+    margin: 0 auto;    
+  }
 }
 
 
