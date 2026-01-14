@@ -10,7 +10,6 @@ let nftContractRO;
 let nftContract;
 let selectedNFT = null;
 let loadingNFTs = false;
-let maxYAMPerNFTThisYear = null;
 let nftRemainingYAMCache = {}; 
 let publicProvider;
 let queryClearTimer = null;
@@ -50,46 +49,6 @@ function autoClearQueryUI(delayMs = 5000) {
     }, delayMs);
 }
 
-
-async function batchFetchNFTData(tokenId) {
-    const [tokenURI, remaining] = await Promise.all([
-        nftContractRO.tokenURI(tokenId),
-        stakingContractRO.currentRemainingYAM(tokenId)
-    ]);
-    return { tokenURI, remaining }; 
-}
-
-async function loadMaxYAMPerNFTThisYear() {
-    if (maxYAMPerNFTThisYear !== null) return maxYAMPerNFTThisYear;
-
-    const currentYear = await stakingContractRO.currentYear();
-    const totalSupplyBN = await nftContractRO.totalSupply();
-    const totalEmissionBN = await stakingContractRO.remainingEmission(currentYear);
-
-    const totalSupply = totalSupplyBN.toNumber();
-    const totalEmission = Number(ethers.utils.formatEther(totalEmissionBN));
-
-    if (totalSupply > 0) {
-        maxYAMPerNFTThisYear = totalEmission / totalSupply;
-    } else {
-        maxYAMPerNFTThisYear = 0;
-    }
-
-    return maxYAMPerNFTThisYear;
-}
-
-async function fetchRemainingYAMBatch(tokenIds) {
-    if (!stakingContractRO) return [];
-
-    try {
-        // Use our helper function
-        const remainingArray = await getRemainingBatch(tokenIds);
-        return remainingArray;
-    } catch (err) {
-        console.error("Failed to fetch remaining YAM batch:", err);
-        return tokenIds.map(id => nftRemainingYAMCache[id] ?? maxYAMPerNFTThisYear ?? 0);
-    }
-}
 
 function initPublicProvider() {
     publicProvider = new ethers.providers.JsonRpcProvider(
@@ -572,11 +531,6 @@ stakingContract.on("Claimed", async (user) => {
         setProgress("walletProgress", "Wallet connection failed ❌");
         console.error(err);
     }
-}
-
-function formatYAM(value) {
-    let formatted = ethers.utils.formatUnits(value, 18); 
-    return parseFloat(formatted).toFixed(2);          
 }
 
 // =====================
