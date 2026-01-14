@@ -1296,12 +1296,6 @@ button:active {
   border: 2px solid #000;
 }
 
-@media (max-width: 1024px) {
-  .nftContainer {
-    grid-template-columns: repeat(3, 1fr); /* 3 NFTs per row */
-  }
-}
-
 
 .nftContainer:empty::after {
   content: "No YAMADOGS here 🐕";
