@@ -104,7 +104,7 @@ function calculateProgressPercent(remaining, yearlyCap) {
 // =====================
 // Contract Addresses
 // =====================
-const stakingContractAddress = "0x258fe358e53F409B2043B01deB2020a1187f8a71";
+const stakingContractAddress = "0x0f0c7E264dca174B5d853688552d6546f9d3B492";
 const nftAddress = "0x4378682659304853EbD0146E85CF78EdECaE9647";
 
 // =====================
