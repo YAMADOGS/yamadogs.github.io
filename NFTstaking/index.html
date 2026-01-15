@@ -3,13 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YAMADOGS NFT Staking</title>
-
-<link rel="stylesheet" href="/styles.css">
 
 <meta http-equiv="Content-Security-Policy" content="
 default-src 'none';
-script-src 'self' ;
+script-src 'self';
 style-src 'self';
 img-src 'self' data:;
 font-src 'self';
@@ -22,13 +19,21 @@ frame-ancestors 'none';
 upgrade-insecure-requests;
 block-all-mixed-content;
 ">
+<link rel="icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png">
+<link rel="apple-touch-icon" href="/favicon-192.png">
+
+<title>YAMADOGS NFT - Staking</title>
+<link rel="stylesheet" href="/styles.css">
+
 </head>
 
 <body>
 
 
 <div class="title-wrapper">
-  <img src="/logo.png" alt="YAMADOGS Logo" class="title-logo">
+  <img src="/logo.svg" alt="YAMADOGS Logo" class="title-logo">
   <h1>YAMADOGS Staking</h1>
 </div>
 
@@ -54,7 +59,7 @@ block-all-mixed-content;
 <div class="card">
 <div class="nft-desktop-row">
   <div class="card nft-column">
-    <h2>Your Lazy YAMADOGS</h2>
+    <h2>Idle Paws</h2>
 
     <div class="nftContainer fixed-nft-container" id="unstakedNFTs"></div>
 
@@ -63,7 +68,7 @@ block-all-mixed-content;
   </div>
 
   <div class="card nft-column">
-    <h2>Your Warrior YAMADOGS</h2>
+    <h2>Active Paws</h2>
 
     <div class="nftContainer fixed-nft-container" id="stakedNFTs"></div>
   <div class="card">
