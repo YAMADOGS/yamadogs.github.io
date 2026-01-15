@@ -544,10 +544,24 @@ async function renderNFT(tokenId, container, isStaked) {
         })} $YAM`;
 
         let progress = (remainingNum / MAX_PER_NFT_PER_YEAR) * 100;
-        progress = Math.min(100, Math.max(0, progress));
+progress = Math.min(100, Math.max(0, progress));
 
-        progressFill.style.width = `${progress.toFixed(2)}%`;
-        progressFill.style.transition = "width 0.5s ease-in-out";
+progressFill.style.width = `${progress.toFixed(2)}%`;
+progressFill.style.transition = "width 0.5s ease-in-out, background-color 0.4s ease";
+
+if (progress > 60) {
+    progressFill.style.backgroundColor = "#3fe0c3"; // green/teal
+} else if (progress > 40) {
+    progressFill.style.backgroundColor = "#ffb703"; // gold
+} else {
+    progressFill.style.backgroundColor = "#e63946"; // red
+}
+if (progress <= 40) {
+    progressFill.classList.add("low");
+} else {
+    progressFill.classList.remove("low");
+}
+
 
     } catch (err) {
         console.error("Error rendering NFT", tokenId, err);
