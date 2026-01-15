@@ -1327,16 +1327,32 @@ button:active {
   width: 100%;
   height: 8px;
   background-color: #ccc;
-  border-radius: 4px;
-  overflow: hidden;
   margin: 6px auto 4px;
+  position: relative;
+  overflow: hidden;
+
+  /* Sword shape */
+  clip-path: polygon(
+    0 0,
+    96% 0,
+    100% 50%,
+    96% 100%,
+    0 100%
+  );
 }
 
 .yam-progress-fill {
-  height: 8px;
+  height: 100%;
   width: 0%;
   background-color: #FFD700;
   transition: width 0.6s ease;
-  border-radius:4px;
-}
 
+  /* Same sword shape */
+  clip-path: polygon(
+    0 0,
+    96% 0,
+    100% 50%,
+    96% 100%,
+    0 100%
+  );
+}
