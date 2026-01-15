@@ -691,6 +691,9 @@ document.getElementById("stakeBtn").addEventListener("click", async () => {
 document.getElementById("unstakeBtn").addEventListener("click", async () => {
     if (!selectedNFT) return;
     const tokenId = Number(selectedNFT.dataset.tokenId);
+    const card = selectedNFT;
+    const unstakedContainer = document.getElementById("unstakedNFTs");
+
     try {
         setProgress("unstakeProgress", "Waiting for wallet confirmation...");
         document.getElementById("unstakeBtn").disabled = true;
@@ -699,7 +702,10 @@ document.getElementById("unstakeBtn").addEventListener("click", async () => {
         await (await stakingContract.unstake(tokenId)).wait();
 
         showProgress("unstakeProgress", "Unstaking successful ✅", 5000);
-        selectedNFT.classList.remove("active");
+        
+        card.classList.remove("active");
+        unstakedContainer.appendChild(card);
+
         selectedNFT = null;
         await refreshUIAfterTx();
 
