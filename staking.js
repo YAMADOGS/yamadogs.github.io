@@ -806,7 +806,6 @@ async function updatePendingRewards() {
     try {
         if (!stakingContractRO || !userAddress) return;
 
-        // 1. Get fresh staked token IDs from contract, NOT the DOM
         const stakedTokenIds = await stakingContractRO.getUserStakedTokens(userAddress);
 
         if (stakedTokenIds.length === 0) {
@@ -814,22 +813,21 @@ async function updatePendingRewards() {
             return;
         }
 
-        // 2. Fetch total pending from contract
-        const result = await stakingContractRO.pendingBatch(stakedTokenIds);
+        const [totalPendingBN, perNFTsBN] = await stakingContractRO.pendingBatch(stakedTokenIds);
+
         const totalPending = Number(
-            ethers.utils.formatEther(result.total)
+            ethers.utils.formatEther(totalPendingBN)
         ).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        // 3. Update UI
         document.getElementById("pendingRewards").textContent = totalPending;
+        
+        for (let i = 0; i < stakedTokenIds.length; i++) {
+            const tokenId = stakedTokenIds[i];
+            const rewardBN = perNFTsBN[i];
+            const remainingNum = MAX_PER_NFT_PER_YEAR - Number(ethers.utils.formatEther(nftRemainingYAMCache[tokenId] ?? 0));
 
-        // 4. Optional: Update each NFT card
-        for (let tokenId of stakedTokenIds) {
             const card = document.querySelector(`.nft-card[data-token-id='${tokenId}']`);
             if (card) {
-                const remainingNum = await getRemainingYAMForNFT(tokenId);
-                nftRemainingYAMCache[tokenId] = remainingNum;
-
                 const remainingDiv = card.querySelector(".remaining-yam");
                 const progressFill = card.querySelector(".yam-progress-fill");
 
