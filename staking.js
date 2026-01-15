@@ -197,24 +197,12 @@ const stakingABI = [
   },
 
   {
-    "inputs": [
-      { "internalType": "address", "name": "user", "type": "address" },
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
-    ],
-    "name": "userStaked",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-
-  {
     "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }],
     "name": "pending",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
-
   {
     "inputs": [
       { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
@@ -222,6 +210,31 @@ const stakingABI = [
     ],
     "name": "nftEarnedPerYear",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  {
+    "inputs": [
+      { "internalType": "uint256[]", "name": "tokenIds", "type": "uint256[]" }
+    ],
+    "name": "pendingBatch",
+    "outputs": [
+      { "internalType": "uint256", "name": "total", "type": "uint256" },
+      { "internalType": "uint256[]", "name": "perNFT", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+
+  {
+    "inputs": [
+      { "internalType": "address", "name": "user", "type": "address" }
+    ],
+    "name": "getUserStakedTokens",
+    "outputs": [
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -241,37 +254,14 @@ const stakingABI = [
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256[]", "name": "tokenIds", "type": "uint256[]" }],
+    "inputs": [
+      { "internalType": "uint256[]", "name": "tokenIds", "type": "uint256[]" }
+    ],
     "name": "claimAll",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
-  },
-  {
-  "inputs": [
-    { "internalType": "uint256[]", "name": "tokenIds", "type": "uint256[]" }
-  ],
-  "name": "pendingBatch",
-  "outputs": [
-    { "internalType": "uint256", "name": "total", "type": "uint256" }
-  ],
-  "stateMutability": "view",
-  "type": "function"
-},
-{
-  "inputs": [
-    { "internalType": "address", "name": "user", "type": "address" }
-  ],
-  "name": "getUserStakedTokens",
-  "outputs": [
-    { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
-  ],
-  "stateMutability": "view",
-  "type": "function"
-}
-
-
-  
+  }
 ];
 
 const nftABI = [
@@ -429,36 +419,6 @@ document.getElementById("remainingEmission").textContent = remainingFormatted;
 
     } catch (err) {
         console.error("Error updating global stats", err);
-    }
-}
-
-// =====================
-// Pending Rewards
-// =====================
-async function updatePendingRewards() {
-    try {
-        if (!stakingContractRO || !userAddress) return;
-
-        const stakedContainer = document.getElementById("stakedNFTs");
-        const tokenIds = Array.from(stakedContainer.children).map(c => Number(c.dataset.tokenId));
-
-        if (tokenIds.length === 0) {
-            document.getElementById("pendingRewards").textContent = "0";
-            return;
-        }
-
-        const result = await stakingContractRO.pendingBatch(tokenIds);
-        const totalPending = Number(
-  ethers.utils.formatEther(result.total)
-).toLocaleString(undefined, {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2
-});
-
-document.getElementById("pendingRewards").textContent = totalPending;
-
-    } catch (err) {
-        console.error("Error updating pending rewards", err);
     }
 }
 
@@ -802,6 +762,9 @@ window.addEventListener("load", () => {
     initPublicProvider();
 });
 
+// =====================
+// UPDATE Pendint Rewards
+// =====================
 async function updatePendingRewards() {
     try {
         if (!stakingContractRO || !userAddress) return;
@@ -813,31 +776,18 @@ async function updatePendingRewards() {
             return;
         }
 
-        const [totalPendingBN, perNFTsBN] = await stakingContractRO.pendingBatch(stakedTokenIds);
+        // Correctly read pendingBatch return values
+        const [totalPendingBN] =
+            await stakingContractRO.pendingBatch(stakedTokenIds);
 
         const totalPending = Number(
             ethers.utils.formatEther(totalPendingBN)
-        ).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        ).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
 
         document.getElementById("pendingRewards").textContent = totalPending;
-        
-        for (let i = 0; i < stakedTokenIds.length; i++) {
-            const tokenId = stakedTokenIds[i];
-            const rewardBN = perNFTsBN[i];
-            const remainingNum = MAX_PER_NFT_PER_YEAR - Number(ethers.utils.formatEther(nftRemainingYAMCache[tokenId] ?? 0));
-
-            const card = document.querySelector(`.nft-card[data-token-id='${tokenId}']`);
-            if (card) {
-                const remainingDiv = card.querySelector(".remaining-yam");
-                const progressFill = card.querySelector(".yam-progress-fill");
-
-                remainingDiv.textContent = `${remainingNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $YAM`;
-
-                let progress = (remainingNum / MAX_PER_NFT_PER_YEAR) * 100;
-                progress = Math.min(100, Math.max(0, progress));
-                progressFill.style.width = `${progress.toFixed(2)}%`;
-            }
-        }
 
     } catch (err) {
         console.error("Error updating pending rewards", err);
