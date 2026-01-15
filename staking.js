@@ -802,38 +802,47 @@ window.addEventListener("load", () => {
     initPublicProvider();
 });
 
-async function updateNFTYam() {
-    const stakedContainer = document.getElementById("stakedNFTs");
+async function updatePendingRewards() {
+    try {
+        if (!stakingContractRO || !userAddress) return;
 
-    for (let card of stakedContainer.children) {
-        const tokenId = Number(card.dataset.tokenId);
-        const progressFill = card.querySelector(".yam-progress-fill");
-        const remainingDiv = card.querySelector(".remaining-yam");
+        // 1. Get fresh staked token IDs from contract, NOT the DOM
+        const stakedTokenIds = await stakingContractRO.getUserStakedTokens(userAddress);
 
-        try {
-            // Use cache first
-            let remainingNum;
-            if (nftRemainingYAMCache[tokenId] !== undefined) {
-                remainingNum = nftRemainingYAMCache[tokenId];
-            } else {
-                remainingNum = await getRemainingYAMForNFT(tokenId);
-                nftRemainingYAMCache[tokenId] = remainingNum;
-            }
-
-            remainingDiv.textContent = `${remainingNum.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            })} $YAM`;
-
-            let progress = (remainingNum / MAX_PER_NFT_PER_YEAR) * 100;
-            progress = Math.min(100, Math.max(0, progress));
-
-            progressFill.style.width = `${progress.toFixed(2)}%`;
-            progressFill.style.transition = "width 0.5s ease-in-out";
-
-        } catch (err) {
-            console.error("Error updating NFT YAM:", tokenId, err);
+        if (stakedTokenIds.length === 0) {
+            document.getElementById("pendingRewards").textContent = "0";
+            return;
         }
+
+        // 2. Fetch total pending from contract
+        const result = await stakingContractRO.pendingBatch(stakedTokenIds);
+        const totalPending = Number(
+            ethers.utils.formatEther(result.total)
+        ).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        // 3. Update UI
+        document.getElementById("pendingRewards").textContent = totalPending;
+
+        // 4. Optional: Update each NFT card
+        for (let tokenId of stakedTokenIds) {
+            const card = document.querySelector(`.nft-card[data-token-id='${tokenId}']`);
+            if (card) {
+                const remainingNum = await getRemainingYAMForNFT(tokenId);
+                nftRemainingYAMCache[tokenId] = remainingNum;
+
+                const remainingDiv = card.querySelector(".remaining-yam");
+                const progressFill = card.querySelector(".yam-progress-fill");
+
+                remainingDiv.textContent = `${remainingNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $YAM`;
+
+                let progress = (remainingNum / MAX_PER_NFT_PER_YEAR) * 100;
+                progress = Math.min(100, Math.max(0, progress));
+                progressFill.style.width = `${progress.toFixed(2)}%`;
+            }
+        }
+
+    } catch (err) {
+        console.error("Error updating pending rewards", err);
     }
 }
 
