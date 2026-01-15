@@ -1341,11 +1341,14 @@ button:active {
   );
 }
 
-.yam-progress-fill {
-  height: 100%;
-  width: 0%;
-  background-color: #FFD700;
-  transition: width 0.6s ease;
+/* WHITE STROKE */
+.yam-progress::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  border: 1px solid white;
 
   /* Same sword shape */
   clip-path: polygon(
@@ -1355,4 +1358,11 @@ button:active {
     96% 100%,
     0 100%
   );
+}
+
+.yam-progress-fill {
+  height: 100%;
+  width: 0%;
+  background-color: #FFD700;
+  transition: width 0.6s ease;
 }
