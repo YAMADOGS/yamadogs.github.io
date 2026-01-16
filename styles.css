@@ -1051,7 +1051,7 @@ button:active {
 .remaining-yam {
     margin-bottom: 4px;       /* space between YAM and image */
     font-weight: bold;
-    font-size: 4px;
+    font-size: 2px;
     color: #3fe0c3;
     white-space: nowrap;
     overflow: hidden;
@@ -1370,3 +1370,4 @@ button:active {
 .yam-progress-fill.low {
   box-shadow: 0 0 6px rgba(230,57,70,0.8);
 }
+
