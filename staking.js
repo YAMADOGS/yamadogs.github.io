@@ -503,12 +503,13 @@ document.getElementById("remainingEmission").textContent = remainingFormatted;
 // =====================
 // CONNECT WALLET
 // =====================
+// =====================
+// CONNECT WALLET
+// =====================
 async function connectWallet() {
     try {
-        // ✅ Show progress immediately
+        // Step 1: Check wallet presence
         setProgress("walletProgress", "Checking for wallet...");
-
-        // ✅ Wallet detection
         if (!window.ethereum || !window.ethereum.request) {
             setProgress(
                 "walletProgress",
@@ -522,17 +523,15 @@ async function connectWallet() {
             return;
         }
 
-        // Small delay to render UI
-        await new Promise(r => setTimeout(r, 100));
-
+        // Step 2: Create provider
         provider = new ethers.providers.Web3Provider(window.ethereum);
-
-        setProgress("walletProgress", "Waiting for wallet confirmation...");
+        setProgress("walletProgress", "Requesting wallet connection...");
         showToast("Connecting wallet...", "info");
 
+        // Step 3: Request accounts
         await provider.send("eth_requestAccounts", []);
 
-        // Ensure user is on Sepolia
+        // Step 4: Ensure Sepolia network
         try {
             await ensureSepoliaNetwork();
         } catch {
@@ -541,47 +540,43 @@ async function connectWallet() {
             return;
         }
 
+        // Step 5: Get signer & user address
         signer = provider.getSigner();
         userAddress = await signer.getAddress();
 
-        // Initialize contracts with provider + signer
+        // Step 6: Initialize contracts
         stakingContractRO = new ethers.Contract(stakingContractAddress, stakingABI, provider);
         stakingContract = new ethers.Contract(stakingContractAddress, stakingABI, signer);
         nftContractRO = new ethers.Contract(nftAddress, nftABI, provider);
         nftContract = new ethers.Contract(nftAddress, nftABI, signer);
 
-        // Event listeners for staking events
-        stakingContract.on("Staked", async (user, tokenId) => {
-            if (user.toLowerCase() === userAddress.toLowerCase()) {
-                await refreshUIAfterTx();
-            }
-        });
-        stakingContract.on("Unstaked", async (user, tokenId) => {
-            if (user.toLowerCase() === userAddress.toLowerCase()) {
-                await refreshUIAfterTx();
-            }
-        });
-        stakingContract.on("Claimed", async (user) => {
-            if (user.toLowerCase() === userAddress.toLowerCase()) {
-                await refreshUIAfterTx();
-            }
-        });
+        // Step 7: Setup staking event listeners
+        const setupEvent = (eventName) => {
+            stakingContract.on(eventName, async (user, tokenId) => {
+                if (user.toLowerCase() === userAddress.toLowerCase()) {
+                    await refreshUIAfterTx();
+                }
+            });
+        };
+        ["Staked", "Unstaked", "Claimed"].forEach(setupEvent);
 
-        // Update wallet UI
+        // Step 8: Update wallet UI
         document.getElementById("walletAddress").textContent =
             userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
         document.getElementById("claimAllBtn").disabled = false;
 
-        // Load NFTs and global stats
+        // Step 9: Load NFTs and stats
+        setProgress("walletProgress", "Loading your NFTs...");
         await loadUserNFTs();
         await updateGlobalStats();
         await updatePendingRewards();
 
-        // Auto-update NFT YAM data every 10 seconds
+        // Step 10: Start auto-refresh loop for NFT YAM (optional)
         setInterval(() => {
             if (stakingContractRO) updateNFTYam();
         }, 10000);
 
+        // Step 11: Final progress & toast
         setProgress("walletProgress", "Wallet connected ✅");
         showToast("Wallet connected ✅", "success");
 
@@ -591,6 +586,9 @@ async function connectWallet() {
         console.error(err);
     }
 }
+
+
+
 
 // =====================
 //Render NFTs
