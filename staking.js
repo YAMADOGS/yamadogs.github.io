@@ -500,22 +500,29 @@ document.getElementById("remainingEmission").textContent = remainingFormatted;
 // CONNECT WALLET 
 // =====================
 
+// =====================
+// CONNECT WALLET
+// =====================
 async function connectWallet() {
     try {
-        // ✅ SHOW PROGRESS IMMEDIATELY (matches old JS behavior)
+        // ✅ Show progress immediately
         setProgress("walletProgress", "Checking for wallet...");
 
-        // ✅ STRONG WALLET DETECTION (desktop + mobile safe)
+        // ✅ Wallet detection
         if (!window.ethereum || !window.ethereum.request) {
             setProgress(
                 "walletProgress",
                 "No wallet detected ❌ If your using Mobile device please open this website directly in your wallet built-in browser"
             );
-            showToast("No wallet detected ❌ If your using Mobile device please open this website directly in your wallet built-in browser", "error", 6000);
+            showToast(
+                "No wallet detected ❌ If your using Mobile device please open this website directly in your wallet built-in browser",
+                "error",
+                6000
+            );
             return;
         }
 
-        // Small delay so UI always renders before async calls
+        // Small delay to render UI
         await new Promise(r => setTimeout(r, 100));
 
         provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -525,13 +532,11 @@ async function connectWallet() {
 
         await provider.send("eth_requestAccounts", []);
 
+        // Ensure user is on Sepolia
         try {
             await ensureSepoliaNetwork();
         } catch {
-            setProgress(
-                "walletProgress",
-                "Wrong network. Please switch to Sepolia ❌"
-            );
+            setProgress("walletProgress", "Wrong network ❌ Please switch to Sepolia");
             showToast("Wrong network. Switch to Sepolia", "error", 6000);
             return;
         }
@@ -539,49 +544,51 @@ async function connectWallet() {
         signer = provider.getSigner();
         userAddress = await signer.getAddress();
 
-        const network = await provider.getNetwork();
-        if (network.chainId !== SEPOLIA_CHAIN_ID) {
-            setProgress(
-                "walletProgress",
-                "Please switch to Sepolia ❌"
-            );
-            showToast("Please switch to Sepolia", "error", 6000);
-            return;
-        }
+        // Initialize contracts with provider + signer
+        stakingContractRO = new ethers.Contract(stakingContractAddress, stakingABI, provider);
+        stakingContract = new ethers.Contract(stakingContractAddress, stakingABI, signer);
+        nftContractRO = new ethers.Contract(nftAddress, nftABI, provider);
+        nftContract = new ethers.Contract(nftAddress, nftABI, signer);
 
-        // CREATE CONTRACTS ONLY AFTER NETWORK IS CORRECT
-        stakingContractRO = new ethers.Contract(
-            stakingContractAddress,
-            stakingABI,
-            provider
-        );
-        stakingContract = new ethers.Contract(
-            stakingContractAddress,
-            stakingABI,
-            signer
-        );
-        nftContractRO = new ethers.Contract(
-            nftAddress,
-            nftABI,
-            provider
-        );
-        nftContract = new ethers.Contract(
-            nftAddress,
-            nftABI,
-            signer
-        );
+        // Event listeners for staking events
+        stakingContract.on("Staked", async (user, tokenId) => {
+            if (user.toLowerCase() === userAddress.toLowerCase()) {
+                await refreshUIAfterTx();
+            }
+        });
+        stakingContract.on("Unstaked", async (user, tokenId) => {
+            if (user.toLowerCase() === userAddress.toLowerCase()) {
+                await refreshUIAfterTx();
+            }
+        });
+        stakingContract.on("Claimed", async (user) => {
+            if (user.toLowerCase() === userAddress.toLowerCase()) {
+                await refreshUIAfterTx();
+            }
+        });
 
-        // ✅ DISPLAY WALLET ADDRESS (same as old JS)
+        // Update wallet UI
         document.getElementById("walletAddress").textContent =
             userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
+        document.getElementById("claimAllBtn").disabled = false;
 
-        setProgress("walletProgress", "Wallet connected (Sepolia) ✅");
-        showToast("Wallet connected (Sepolia)", "success");
+        // Load NFTs and global stats
+        await loadUserNFTs();
+        await updateGlobalStats();
+        await updatePendingRewards();
+
+        // Auto-update NFT YAM data every 10 seconds
+        setInterval(() => {
+            if (stakingContractRO) updateNFTYam();
+        }, 10000);
+
+        setProgress("walletProgress", "Wallet connected ✅");
+        showToast("Wallet connected ✅", "success");
 
     } catch (err) {
-        console.error(err);
         setProgress("walletProgress", "Wallet connection failed ❌");
-        showToast("Wallet connection failed", "error");
+        showToast("Wallet connection failed ❌", "error", 5000);
+        console.error(err);
     }
 }
 
