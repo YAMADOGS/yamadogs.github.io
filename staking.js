@@ -17,6 +17,25 @@ let queryClearTimer = null;
 const MAX_PER_NFT_PER_YEAR = 1_000_000;
 
 // =====================
+// NETWORK CONFIG (ADD)
+// =====================
+const SEPOLIA_CHAIN_ID = 11155111;
+const SEPOLIA_HEX_CHAIN_ID = "0xaa36a7";
+
+const SEPOLIA_PARAMS = {
+  chainId: SEPOLIA_HEX_CHAIN_ID,
+  chainName: "Sepolia Test Network",
+  nativeCurrency: {
+    name: "SepoliaETH",
+    symbol: "ETH",
+    decimals: 18
+  },
+  rpcUrls: ["https://ethereum-sepolia-rpc.publicnode.com"],
+  blockExplorerUrls: ["https://sepolia.etherscan.io"]
+};
+
+
+// =====================
 // Utility Functions
 // =====================
 function setProgress(id, text) {
@@ -96,6 +115,60 @@ async function refreshUIAfterTx() {
 function calculateProgressPercent(remaining, yearlyCap) {
     if (yearlyCap <= 0) return 0;
     return (remaining / yearlyCap) * 100;
+}
+
+// =====================
+// TOAST NOTIFICATION (USES EXISTING CSS)
+// =====================
+function showToast(message, type = "info", duration = 4000) {
+    const toast = document.querySelector(".mint-toast");
+    const overlay = document.querySelector(".toast-overlay");
+
+    if (!toast || !overlay) return;
+
+    toast.className = `mint-toast ${type} show`;
+    toast.querySelector(".mint-toast-body").textContent = message;
+
+    overlay.classList.add("show");
+
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => {
+        toast.classList.remove("show");
+        overlay.classList.remove("show");
+    }, duration);
+}
+
+// =====================
+// ENSURE SEPOLIA NETWORK
+// =====================
+async function ensureSepoliaNetwork() {
+    const network = await provider.getNetwork();
+
+    if (network.chainId !== SEPOLIA_CHAIN_ID) {
+        try {
+            await window.ethereum.request({
+                method: "wallet_switchEthereumChain",
+                params: [{ chainId: SEPOLIA_HEX_CHAIN_ID }]
+            });
+        } catch (err) {
+            if (err.code === 4902) {
+                await window.ethereum.request({
+                    method: "wallet_addEthereumChain",
+                    params: [SEPOLIA_PARAMS]
+                });
+            } else {
+                throw new Error("WRONG_NETWORK");
+            }
+        }
+    }
+}
+
+// =====================
+// WALLET STATUS HELPER (INLINE + TOAST)
+// =====================
+function walletStatus(text, type = "info", toastMs = 4000) {
+    setProgress("walletProgress", text);
+    showToast(text, type, toastMs);
 }
 
 
@@ -424,61 +497,91 @@ document.getElementById("remainingEmission").textContent = remainingFormatted;
 
 
 // =====================
-// Connect Wallet
+// CONNECT WALLET 
 // =====================
+
 async function connectWallet() {
     try {
-        if (!window.ethereum) {
-            setProgress("walletProgress", "Wallet not detected ❌");
+        // ✅ SHOW PROGRESS IMMEDIATELY (matches old JS behavior)
+        setProgress("walletProgress", "Checking for wallet...");
+
+        // ✅ STRONG WALLET DETECTION (desktop + mobile safe)
+        if (!window.ethereum || !window.ethereum.request) {
+            setProgress(
+                "walletProgress",
+                "No wallet detected ❌ If your using Mobile device please open this website directly in your wallet built-in browser"
+            );
+            showToast("No wallet detected ❌ If your using Mobile device please open this website directly in your wallet built-in browser", "error", 6000);
             return;
         }
 
-        setProgress("walletProgress", "Waiting for wallet confirmation...");
+        // Small delay so UI always renders before async calls
+        await new Promise(r => setTimeout(r, 100));
 
         provider = new ethers.providers.Web3Provider(window.ethereum);
+
+        setProgress("walletProgress", "Waiting for wallet confirmation...");
+        showToast("Connecting wallet...", "info");
+
         await provider.send("eth_requestAccounts", []);
+
+        try {
+            await ensureSepoliaNetwork();
+        } catch {
+            setProgress(
+                "walletProgress",
+                "Wrong network. Please switch to Sepolia ❌"
+            );
+            showToast("Wrong network. Switch to Sepolia", "error", 6000);
+            return;
+        }
+
         signer = provider.getSigner();
         userAddress = await signer.getAddress();
 
-        setProgress("walletProgress", "Wallet connected ✅");
-        document.getElementById("walletAddress").textContent = userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
+        const network = await provider.getNetwork();
+        if (network.chainId !== SEPOLIA_CHAIN_ID) {
+            setProgress(
+                "walletProgress",
+                "Please switch to Sepolia ❌"
+            );
+            showToast("Please switch to Sepolia", "error", 6000);
+            return;
+        }
 
-        stakingContractRO = new ethers.Contract(stakingContractAddress, stakingABI, provider);
-        stakingContract = new ethers.Contract(stakingContractAddress, stakingABI, signer);
-        nftContractRO = new ethers.Contract(nftAddress, nftABI, provider);
-        nftContract = new ethers.Contract(nftAddress, nftABI, signer);
-stakingContract.on("Staked", async (user, tokenId) => {
-    if (user.toLowerCase() === userAddress.toLowerCase()) {
-        await refreshUIAfterTx();
-    }
-});
+        // CREATE CONTRACTS ONLY AFTER NETWORK IS CORRECT
+        stakingContractRO = new ethers.Contract(
+            stakingContractAddress,
+            stakingABI,
+            provider
+        );
+        stakingContract = new ethers.Contract(
+            stakingContractAddress,
+            stakingABI,
+            signer
+        );
+        nftContractRO = new ethers.Contract(
+            nftAddress,
+            nftABI,
+            provider
+        );
+        nftContract = new ethers.Contract(
+            nftAddress,
+            nftABI,
+            signer
+        );
 
-stakingContract.on("Unstaked", async (user, tokenId) => {
-    if (user.toLowerCase() === userAddress.toLowerCase()) {
-        await refreshUIAfterTx();
-    }
-});
+        // ✅ DISPLAY WALLET ADDRESS (same as old JS)
+        document.getElementById("walletAddress").textContent =
+            userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
 
-stakingContract.on("Claimed", async (user) => {
-    if (user.toLowerCase() === userAddress.toLowerCase()) {
-        await refreshUIAfterTx();
-    }
-});
-
-
-        document.getElementById("claimAllBtn").disabled = false;
-
-        await loadUserNFTs();
-        await updateGlobalStats();
-        await updatePendingRewards();
-
-        setInterval(() => {
-            if (stakingContractRO) updateNFTYam();
-        }, 10000);
+        setProgress("walletProgress", "Wallet connected (Sepolia) ✅");
+        showToast("Wallet connected (Sepolia)", "success");
 
     } catch (err) {
-        setProgress("walletProgress", "Wallet connection failed ❌");
         console.error(err);
+        setProgress("walletProgress", "Wallet connection failed ❌");
+        showToast("Wallet connection failed", "error");
     }
 }
 
@@ -808,6 +911,8 @@ async function updatePendingRewards() {
     }
 }
 
+
+
 // =====================
 // Auto Updates
 // =====================
@@ -818,3 +923,28 @@ setInterval(() => {
 setInterval(() => {
     if (stakingContractRO) updateGlobalStats();
 }, 15000);
+
+// =====================
+// NETWORK CHANGE LISTENER (SEPOLIA GUARD)
+// =====================
+if (window.ethereum) {
+    window.ethereum.on("chainChanged", (chainId) => {
+        const parsed = parseInt(chainId, 16);
+
+        if (parsed !== SEPOLIA_CHAIN_ID) {
+            walletStatus(
+                "Wrong network detected. Please switch to Sepolia ❌",
+                "warning",
+                7000
+            );
+
+            // Disable critical actions
+            document.getElementById("claimAllBtn").disabled = true;
+            document.getElementById("stakeBtn").disabled = true;
+            document.getElementById("unstakeBtn").disabled = true;
+        } else {
+            walletStatus("Sepolia network detected ✅", "success", 3000);
+            setTimeout(() => window.location.reload(), 800);
+        }
+    });
+}
