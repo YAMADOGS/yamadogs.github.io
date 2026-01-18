@@ -982,9 +982,41 @@ closeLearnMore?.addEventListener("click", () => {
   learnMoreModal.classList.add("hidden");
 });
 
-// Close when clicking outside modal box
+
 learnMoreModal?.addEventListener("click", (e) => {
   if (e.target === learnMoreModal) {
     learnMoreModal.classList.add("hidden");
   }
 });
+
+
+
+// -----------------------------
+// Update NFT progress bar & remaining $YAM
+// -----------------------------
+function updateNFTProgress() {
+  const cards = document.querySelectorAll('.nft-card');
+  cards.forEach(card => {
+    let earned = parseInt(card.dataset.earned);
+    const max = parseInt(card.dataset.max);
+    const progress = Math.min(100, (earned / max) * 100);
+    card.querySelector('.progress').style.width = progress + '%';
+    card.querySelector('.remaining').innerText = (max - earned).toLocaleString();
+  });
+}
+
+setInterval(() => {
+  const cards = document.querySelectorAll('.nft-card');
+  cards.forEach(card => {
+    let earned = parseInt(card.dataset.earned);
+    const max = parseInt(card.dataset.max);
+    if (earned < max) {
+      earned += Math.floor(Math.random() * 5000);
+      if (earned > max) earned = max;
+      card.dataset.earned = earned;
+    }
+  });
+  updateNFTProgress();
+}, 2000);
+
+updateNFTProgress();
