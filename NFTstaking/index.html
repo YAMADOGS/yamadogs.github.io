@@ -30,7 +30,7 @@ block-all-mixed-content;
 </head>
 
 <body>
-<!-- DISCLAIMER MODAL OVERLAY -->
+
 <div id="disclaimerOverlay" class="yam-overlay">
   <div class="yam-modal" id="yamModal">
 
@@ -114,7 +114,7 @@ block-all-mixed-content;
   <div class="wallet-address">
     Wallet: <span id="walletAddress">Not connected</span>
   </div>
-  <!-- GLOBAL STATS (TOP, FULL WIDTH) -->
+  
 <div class="card global-stats">
   <h2>Global Stats</h2>
   <p>Current APY: <span id="currentAPY">—</span>%</p>
@@ -203,7 +203,81 @@ Check your pupper’s rewards! Enter any YAMADOGS token ID to see how much $YAM 
     </div>
 
     <div class="learn-modal-content">
-      kjshhsisoalalsndbdhiskash
+      <div class="learn-content">
+
+  <h3>📊 Global Stats</h3>
+  <p>
+    The staking dashboard shows the system overview:
+  </p>
+  <ul>
+    <li><strong>Total Staked NFTs:</strong> Number of NFTs currently staked in the pool.</li>
+    <li><strong>Total Minted $YAM:</strong> Total $YAM minted so far (max 1B).</li>
+    <li><strong>Claimable $YAM:</strong> Total $YAM earned but not claimed.</li>
+    <li><strong>Current APY:</strong> Yearly yield per NFT.</li>
+    <li><strong>Rollover:</strong> Unused rewards from a year carry over to the next year.</li>
+  </ul>
+
+  <h3>🖼 NFT Cards & Remaining $YAM</h3>
+  <p>
+    Each NFT card shows remaining $YAM, progress bar, image, and token ID:
+  </p>
+  <div class="nft-cards">
+    <div class="nft-card" data-token-id="1" data-max="1000000" data-earned="400000">
+      <p><strong>Remaining $YAM:</strong> <span class="remaining">600,000</span></p>
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
+      <img src="nft1.svg" class="nft-img" alt="YAMADOG #1">
+      <p><strong>Token ID:</strong> 1</p>
+    </div>
+
+    <div class="nft-card" data-token-id="2" data-max="1000000" data-earned="750000">
+      <p><strong>Remaining $YAM:</strong> <span class="remaining">250,000</span></p>
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
+      <img src="nft2.svg" class="nft-img" alt="YAMADOG #2">
+      <p><strong>Token ID:</strong> 2</p>
+    </div>
+  </div>
+
+  <h3>🟢 How Staking Works</h3>
+  <ol>
+    <li>Select an NFT from Your "Idle Paws" section and click the Stake button.</li>
+    <li>A wallet confirmation will pop-up just confirm and approve the nft then after that confirm the staking transaction in your wallet.</li>
+    <li>After the transaction is mined (confirmed on the blockchain) your  NFT will automatically transfered into the "Your Active Paws" section </li>
+    <li>Rewards accumulate based on staking duration, total staked NFTs, and remaining yearly emission.</li>
+    <li>Yearly cap: 1,000,000 $YAM per NFT. Once reached, rewards stop for that NFT for the year.</li>
+    <li>Unused rewards roll over to the next year.</li>
+  </ol>
+
+  <h3>💰 How Claiming Works</h3>
+  <ol>
+    <li>Click the "Claim $YAM" button to mint your "Claimable $YAM" then after the wallet confirmation, the $YAM token will be minted into your wallet.</li>
+    <li>But each NFT has a cap of 1,000,000 $YAM token per current year.. and even if you reach the nft cap per year you can still claim your earned rewards and unstake your NFT safely..however once the NFT reach the cap per year...that NFT will stop earning rewards..</li>
+    <li>If max $YAM supply is reached, NFTs can still be unstaked safely.</li>
+  </ol>
+
+  <h3>🔴 How Unstaking Works</h3>
+  <ol>
+    <li>Select the NFT you want to unstake from the "Your Active Paws" section and click the "unstake" button then confirm the transaction in your wallet; claimable rewards are automatically claimed.</li>
+    <li>The NFT is returned to your wallet immediately.</li>
+    <li>Unstaking is independent of $YAM supply.</li>
+  </ol>
+
+  <h3>🔍 Query NFT Function</h3>
+  <p>
+    Use the query function to check any NFT before buying or staking:
+  </p>
+  <ul>
+    <li>Enter the token ID to see remaining $YAM earnings for the current year.</li>
+    <li>Know exactly how much $YAM an NFT can still earn.</li>
+    <li>Ensures transparency for buyers and stakers.</li>
+    <li>Prevents surprises, especially if an NFT has already earned most of its yearly cap.</li>
+  </ul>
+
+</div>
+
     </div>
   </div>
 </div>
