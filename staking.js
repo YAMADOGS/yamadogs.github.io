@@ -17,7 +17,7 @@ let queryClearTimer = null;
 const MAX_PER_NFT_PER_YEAR = 1_000_000;
 
 // =====================
-// NETWORK CONFIG (ADD)
+// NETWORK CONFIG
 // =====================
 const SEPOLIA_CHAIN_ID = 11155111;
 const SEPOLIA_HEX_CHAIN_ID = "0xaa36a7";
@@ -117,9 +117,7 @@ function calculateProgressPercent(remaining, yearlyCap) {
     return (remaining / yearlyCap) * 100;
 }
 
-// =====================
-// TOAST NOTIFICATION (USES EXISTING CSS)
-// =====================
+
 function showToast(message, type = "info", duration = 4000) {
     const toast = document.querySelector(".mint-toast");
     const overlay = document.querySelector(".toast-overlay");
@@ -138,9 +136,7 @@ function showToast(message, type = "info", duration = 4000) {
     }, duration);
 }
 
-// =====================
-// ENSURE SEPOLIA NETWORK
-// =====================
+
 async function ensureSepoliaNetwork() {
     const network = await provider.getNetwork();
 
@@ -163,9 +159,7 @@ async function ensureSepoliaNetwork() {
     }
 }
 
-// =====================
-// WALLET STATUS HELPER (INLINE + TOAST)
-// =====================
+
 function walletStatus(text, type = "info", toastMs = 4000) {
     setProgress("walletProgress", text);
     showToast(text, type, toastMs);
@@ -177,7 +171,7 @@ function walletStatus(text, type = "info", toastMs = 4000) {
 // =====================
 // Contract Addresses
 // =====================
-const stakingContractAddress = "0x0f0c7E264dca174B5d853688552d6546f9d3B492";
+const stakingContractAddress = "0x3D369d0DA69BAF83D8D47bc4F71f80E32359F9F3";
 const nftAddress = "0x4378682659304853EbD0146E85CF78EdECaE9647";
 
 // =====================
@@ -497,18 +491,10 @@ document.getElementById("remainingEmission").textContent = remainingFormatted;
 
 
 // =====================
-// CONNECT WALLET 
-// =====================
-
-// =====================
-// CONNECT WALLET
-// =====================
-// =====================
 // CONNECT WALLET
 // =====================
 async function connectWallet() {
     try {
-        // Step 1: Check wallet presence
         setProgress("walletProgress", "Checking for wallet...");
         if (!window.ethereum || !window.ethereum.request) {
             setProgress(
@@ -523,15 +509,14 @@ async function connectWallet() {
             return;
         }
 
-        // Step 2: Create provider
         provider = new ethers.providers.Web3Provider(window.ethereum);
         setProgress("walletProgress", "Requesting wallet connection...");
         showToast("Connecting wallet...", "info");
 
-        // Step 3: Request accounts
+      
         await provider.send("eth_requestAccounts", []);
 
-        // Step 4: Ensure Sepolia network
+        
         try {
             await ensureSepoliaNetwork();
         } catch {
@@ -540,17 +525,15 @@ async function connectWallet() {
             return;
         }
 
-        // Step 5: Get signer & user address
+        
         signer = provider.getSigner();
         userAddress = await signer.getAddress();
 
-        // Step 6: Initialize contracts
         stakingContractRO = new ethers.Contract(stakingContractAddress, stakingABI, provider);
         stakingContract = new ethers.Contract(stakingContractAddress, stakingABI, signer);
         nftContractRO = new ethers.Contract(nftAddress, nftABI, provider);
         nftContract = new ethers.Contract(nftAddress, nftABI, signer);
 
-        // Step 7: Setup staking event listeners
         const setupEvent = (eventName) => {
             stakingContract.on(eventName, async (user, tokenId) => {
                 if (user.toLowerCase() === userAddress.toLowerCase()) {
@@ -560,23 +543,19 @@ async function connectWallet() {
         };
         ["Staked", "Unstaked", "Claimed"].forEach(setupEvent);
 
-        // Step 8: Update wallet UI
         document.getElementById("walletAddress").textContent =
             userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
         document.getElementById("claimAllBtn").disabled = false;
 
-        // Step 9: Load NFTs and stats
         setProgress("walletProgress", "Loading your NFTs...");
         await loadUserNFTs();
         await updateGlobalStats();
         await updatePendingRewards();
 
-        // Step 10: Start auto-refresh loop for NFT YAM (optional)
         setInterval(() => {
             if (stakingContractRO) updateNFTYam();
         }, 10000);
 
-        // Step 11: Final progress & toast
         setProgress("walletProgress", "Wallet connected ✅");
         showToast("Wallet connected ✅", "success");
 
@@ -586,8 +565,6 @@ async function connectWallet() {
         console.error(err);
     }
 }
-
-
 
 
 // =====================
@@ -637,7 +614,6 @@ async function renderNFT(tokenId, container, isStaked) {
 
         container.appendChild(card);
 
-        // ===== YAM DATA =====
         let remainingNum;
         if (nftRemainingYAMCache[tokenId] !== undefined) {
             remainingNum = nftRemainingYAMCache[tokenId];
@@ -690,9 +666,6 @@ async function loadUserNFTs() {
     stakedContainer.innerHTML = "";
 
     try {
-        // ===============================
-        // LOAD STAKED NFTS (O(1))
-        // ===============================
         const stakedTokenIds =
             await stakingContractRO.getUserStakedTokens(userAddress);
 
@@ -700,9 +673,6 @@ async function loadUserNFTs() {
             await renderNFT(Number(tokenId), stakedContainer, true);
         }
 
-        // ===============================
-        // LOAD UNSTAKED NFTS (USER ONLY)
-        // ===============================
         const balance = await nftContractRO.balanceOf(userAddress);
 
         for (let i = 0; i < balance; i++) {
@@ -898,7 +868,6 @@ async function updatePendingRewards() {
             return;
         }
 
-        // Correctly read pendingBatch return values
         const [totalPendingBN] =
             await stakingContractRO.pendingBatch(stakedTokenIds);
 
@@ -916,8 +885,6 @@ async function updatePendingRewards() {
     }
 }
 
-
-
 // =====================
 // Auto Updates
 // =====================
@@ -930,7 +897,7 @@ setInterval(() => {
 }, 15000);
 
 // =====================
-// NETWORK CHANGE LISTENER (SEPOLIA GUARD)
+// NETWORK CHANGE LISTENER 
 // =====================
 if (window.ethereum) {
     window.ethereum.on("chainChanged", (chainId) => {
@@ -942,8 +909,7 @@ if (window.ethereum) {
                 "warning",
                 7000
             );
-
-            // Disable critical actions
+            
             document.getElementById("claimAllBtn").disabled = true;
             document.getElementById("stakeBtn").disabled = true;
             document.getElementById("unstakeBtn").disabled = true;
@@ -953,3 +919,72 @@ if (window.ethereum) {
         }
     });
 }
+
+// =====================
+// DISCLAIMER MODAL LOGIC
+// =====================
+window.addEventListener("load", () => {
+  const overlay = document.getElementById("disclaimerOverlay");
+  const modal   = document.getElementById("yamModal");
+  const content = modal?.querySelector(".yam-content");
+  const btn     = document.getElementById("closeDisclaimerBtn");
+  const closeX  = document.getElementById("closeDisclaimerX");
+
+  if (!overlay || !modal || !content || !btn) return;
+
+  btn.disabled = true;
+  btn.classList.add("disabled");
+
+  function enableButtonIfScrolled() {
+    const atBottom =
+      content.scrollTop + content.clientHeight >= content.scrollHeight - 5;
+
+    if (atBottom) {
+      btn.disabled = false;
+      btn.classList.remove("disabled");
+      content.removeEventListener("scroll", enableButtonIfScrolled);
+    }
+  }
+
+  content.addEventListener("scroll", enableButtonIfScrolled);
+
+  function closeModal() {
+    overlay.style.display = "none";
+  }
+
+  btn.addEventListener("click", () => {
+    if (!btn.disabled) closeModal();
+  });
+
+  closeX.addEventListener("click", () => {
+    if (!btn.disabled) closeModal();
+  });
+
+  overlay.addEventListener("click", (e) => {
+    if (!btn.disabled && !modal.contains(e.target)) {
+      closeModal();
+    }
+  });
+});
+
+// =====================
+// LEARN MORE MODAL
+// =====================
+const learnMoreBtn = document.getElementById("learnMoreBtn");
+const learnMoreModal = document.getElementById("learnMoreModal");
+const closeLearnMore = document.getElementById("closeLearnMore");
+
+learnMoreBtn?.addEventListener("click", () => {
+  learnMoreModal.classList.remove("hidden");
+});
+
+closeLearnMore?.addEventListener("click", () => {
+  learnMoreModal.classList.add("hidden");
+});
+
+// Close when clicking outside modal box
+learnMoreModal?.addEventListener("click", (e) => {
+  if (e.target === learnMoreModal) {
+    learnMoreModal.classList.add("hidden");
+  }
+});
