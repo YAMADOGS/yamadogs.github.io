@@ -189,6 +189,10 @@ button:hover{background:#ffd166}
 #mintBtn{background:#6fdcff}
 #mintBtn:hover{background:#8be6ff}
 
+button:hover{background:#ffd166}
+#mintBtn2{background:#A8E6CF}
+#mintBtn2:hover{background:#A8E6CF}
+
 /* COPY BOX */
 .copy-box{
   background:#fff;padding:14px;
