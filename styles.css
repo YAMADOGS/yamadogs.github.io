@@ -92,7 +92,7 @@ h1{color:#ffb703;text-shadow:3px 3px 0 #000}
   
 }
 
-/* CARD */
+
 .card{
   background:#111;color:#fff;
   padding:18px;max-width:420px;margin:12px auto;
@@ -132,7 +132,7 @@ h1{color:#ffb703;text-shadow:3px 3px 0 #000}
 
 .nft-supply{color:#4fc3ff}
 
-/* NFT IMAGE CONTAINER - ADDED */
+
 .nft-container{
   max-width:420px;
   margin:12px auto 6px; 
@@ -237,12 +237,12 @@ button:hover{background:#ffd166}
 /* FAQ */
 .faq-wrapper{
   max-width:620px;
-  margin:16px auto; /* default (mobile) */
+  margin:16px auto; 
 }
 
 @media (min-width: 1024px) {
   .faq-wrapper{
-    margin-top: 8px;   /* 🔽 closer to NFTs */
+    margin-top: 8px;
     margin-bottom: 12px;
   }
 }
@@ -335,7 +335,7 @@ button:hover{background:#ffd166}
   font-size:9px;
 }
 
-/* OVERLAY */
+
 .toast-overlay{
   position:fixed;
   inset:0;
@@ -380,13 +380,13 @@ button:hover{background:#ffd166}
 .mint-toast.info::before    { content: "ℹ️ "; }
 
 
-/* SHOW STATE */
+
 .mint-toast.show{
   display:block;
   transform:translate(-50%, -50%) scale(1);
 }
 
-/* CLOSE BUTTON (TOP RIGHT) */
+
 #closeToast {
   position: absolute;
   top: 6px;
@@ -433,10 +433,10 @@ button:hover{background:#ffd166}
 }
 
 #mintStatus {
-  font-size: 12px;   /* adjust to whatever size you like */
-  color: #6fdcff;    /* default text color */
+  font-size: 12px;   
+  color: #6fdcff;    
   margin-top: 12px;
-  font-weight: bold;  /* optional for emphasis */
+  font-weight: bold;  
 }
 
 
@@ -479,7 +479,7 @@ button:hover{background:#ffd166}
   z-index: 99999;
 }
 
-/* CLOSE BUTTON */
+
 #closePageLoad {
   position: absolute;
   top: 6px;
@@ -497,7 +497,6 @@ button:hover{background:#ffd166}
   border-radius: 2px;
 }
 
-/* OVERLAY */
 #pageLoadOverlay {
   position: fixed;
   inset: 0;
@@ -509,7 +508,7 @@ button:hover{background:#ffd166}
 /* BLUR THE PAGE */
 body.blurred > .ui {
   filter: blur(5px) brightness(0.8);
-  pointer-events: none; /* disable interactions */
+  pointer-events: none; 
   user-select: none;
 }
 
@@ -582,7 +581,7 @@ html {
   text-align: center;
 }
 
-/* LOGO */
+
 .intro-logo{
   width: 96px;
   image-rendering: pixelated;
@@ -600,7 +599,7 @@ html {
   25%  { transform: translateY(-26px) scale(0.9,1.15); }
   40%  { transform: translateY(-32px) scale(1,1); }
   55%  { transform: translateY(-14px) scale(1,1); }
-  70%  { transform: translateY(0) scale(1.2,0.8); }  /* bar impact */
+  70%  { transform: translateY(0) scale(1.2,0.8); }  
   85%  { transform: translateY(0) scale(0.95,1.05); }
   100% { transform: translateY(0) scale(1,1); }
 }
@@ -633,17 +632,17 @@ html {
 
 .intro-title {
   margin-top: 10px;
-  font-size: 22px;           /* adjust as needed */
+  font-size: 22px;          
   letter-spacing: 2px;
-  color: #ffb703;            /* same as header h1 */
-  text-shadow: 3px 3px 0 #000; /* same as header h1 */
+  color: #ffb703;     
+  text-shadow: 3px 3px 0 #000; 
   font-family: inherit;
   image-rendering: pixelated;
 }
 
 .download-logo {
   max-width: 420px;
-  margin: 16px auto; /* 🔽 smaller default gap */
+  margin: 16px auto; 
   padding: 16px;
   background: #fff;
   box-shadow: 6px 6px 0 #000;
@@ -655,7 +654,7 @@ html {
 
 @media (min-width: 1024px) {
   .download-logo{
-    margin-top: 8px; /* 🔥 pulls it close to FAQ */
+    margin-top: 8px; 
   }
 }
 
@@ -677,14 +676,14 @@ html {
 
 /* MINTING OVERLAY */
 #mintingOverlay {
-  display: none; /* hidden by default */
+  display: none; 
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.75); /* dark blur overlay */
-  backdrop-filter: blur(5px);      /* blur the background */
+  background: rgba(0, 0, 0, 0.75); 
+  backdrop-filter: blur(5px);      
   display: flex;
   justify-content: center;
   align-items: center;
@@ -700,7 +699,7 @@ html {
   gap: 15px;
 }
 
-/* Logo animation - jump + squeeze like startup intro */
+
 .minting-logo {
   width: 120px;
   image-rendering: pixelated;
@@ -709,7 +708,7 @@ html {
   animation: yamadogsJump 0.9s infinite;
 }
 
-/* Jump + Squeeze keyframes (copy from startup) */
+
 @keyframes yamadogsJump {
   0%   { transform: translateY(0) scale(1,1); }
   12%  { transform: translateY(0) scale(1.25,0.75); }
@@ -740,7 +739,7 @@ html {
   animation: barPulse 0.9s infinite, progressAnim 1.5s linear forwards;
 }
 
-/* Bar pulse animation like startup */
+
 @keyframes barPulse {
   0%, 60% { transform: scaleY(1); }
   70%     { transform: scaleY(0.85); }
@@ -748,13 +747,13 @@ html {
   100%    { transform: scaleY(1); }
 }
 
-/* Optional: progress from 0 → 100% during mint */
+
 @keyframes progressAnim {
   0%   { width: 0%; }
   100% { width: 100%; }
 }
 
-/* Minting title text */
+
 .minting-title {
   margin-top: 10px;
   font-size: 18px;
@@ -773,7 +772,7 @@ html {
   .ui {
     max-width: 1200px;
     margin: 0 auto;
-    padding-inline: clamp(16px, 4vw, 48px); /* ✅ equal left & right space */
+    padding-inline: clamp(16px, 4vw, 48px); 
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
     gap: clamp(20px, 3vw, 48px);
@@ -886,16 +885,16 @@ section,
 
 /* Page load notification scaling */
 #pageLoadNotification {
-  width: 90%;        /* mobile default */
-  max-width: 400px;  /* prevent too huge on mid-screen */
+  width: 90%;        
+  max-width: 400px;  
   padding: 20px;
 }
 
 @media (min-width: 1024px) {
   #pageLoadNotification {
-    width: 380px;       /* fixed reasonable size */
-    max-width: 450px;   /* can increase for bigger screens */
-    padding: 24px 32px; /* more padding for desktop */
+    width: 380px;       
+    max-width: 450px;   
+    padding: 24px 32px; 
   }
 }
 
@@ -936,7 +935,7 @@ section,
   background: #222;
   box-shadow: 2px 2px 0 #000;
 
-  box-sizing: border-box; /* 🔥 THIS IS THE FIX */
+  box-sizing: border-box; 
 }
 
 
@@ -957,12 +956,12 @@ section,
 
 }
 .nft-card {
-    transition: transform 0.1s ease;  /* smooth quick scaling */
+    transition: transform 0.1s ease;  
     cursor: pointer;
 }
 
 .nft-card:active {
-    transform: scale(1.03);           /* tiny enlarge when tapped */
+    transform: scale(1.03);           
 }
 
 
@@ -973,25 +972,25 @@ section,
 #unstakedNFTs img.active,
 #stakedNFTs img.active {
   transform: scale(1.2);
-  border: 2px solid #FFD700; /* golden border */
+  border: 2px solid #FFD700; 
   transition: transform 0.2s, border 0.2s;
-  z-index: 10; /* bring to front */
+  z-index: 10; 
 }
 #stakeBtn, #unstakeBtn {
   transition: transform 0.2s;
 }
 
 button {
-    transition: transform 0.1s ease;  /* smooth and quick */
-    outline: none;                    /* remove default focus/transparent effect */
+    transition: transform 0.1s ease;
+    outline: none;                
     cursor: pointer;
 }
 
 button:active {
-    transform: scale(1.05);           /* tiny enlarge on click */
+    transform: scale(1.05);         
 }
 .nft-card, button {
-    -webkit-tap-highlight-color: transparent; /* prevents the gray overlay on mobile */
+    -webkit-tap-highlight-color: transparent; 
 }
 
 /* Global Stats Values */
@@ -1002,16 +1001,16 @@ button:active {
 #totalStakedNFTs,
 #totalMintedYAM,
 #remainingEmission {
-    font-size: 14px;               /* smaller text */
-    color: #3fe0c3;                /* mint blue */
-    font-weight: bold;              /* optional: makes numbers pop */
-    overflow: hidden;               /* prevents text overflow */
-    text-overflow: ellipsis;       /* adds ... if text too long */
-    white-space: nowrap;            /* keep on one line */
-    padding: 2px 4px;               /* space around numbers */
+    font-size: 14px;            
+    color: #3fe0c3;                
+    font-weight: bold;              
+    overflow: hidden;             
+    text-overflow: ellipsis;      
+    white-space: nowrap;    
+    padding: 2px 4px;           
     display: inline-block;
-    max-width: 100%;                /* ensures it doesn’t exceed container */
-    box-sizing: border-box;         /* includes padding in width */
+    max-width: 100%;        
+    box-sizing: border-box;         
 }
 #totalRewards:hover,
 #pendingRewards:hover,
@@ -1020,12 +1019,12 @@ button:active {
     transition: transform 0.15s ease;
 }
 
-/* Transaction progress text */
+
 .tx-progress {
   margin-top: 6px;
   font-size: 12px;
-  color: #3fe0c3; /* mint blue */
-  min-height: 14px; /* prevents layout jump */
+  color: #3fe0c3; 
+  min-height: 14px; 
 }
 
 .tx-progress {
@@ -1036,7 +1035,7 @@ button:active {
   min-height: 18px;
   margin-top: 10px;
 
-  font-size: 14px;              /* 🔥 bigger for pixel font */
+  font-size: 14px;        
   line-height: 1.6;
 
   color: #3fe0c3;
@@ -1059,7 +1058,7 @@ button:active {
 }
 
 
-/* Individual NFT Card */
+
 .nft-card {
   width: 90px;
   padding: 4px;
@@ -1082,7 +1081,7 @@ button:active {
   transform: scale(1.03);
 }
 
-/* NFT Image inside Card */
+
 .nft-card img {
   width: 100%;
   height: auto;
@@ -1114,7 +1113,7 @@ button:active {
 }
 
 
-/* Token ID below NFT image */
+
 .nft-card .token-id {
   font-size: 8px;
   color: #fff;
@@ -1122,7 +1121,7 @@ button:active {
   margin-top: 2px;
 }
 
-/* Desktop scaling (hover) */
+
 @media (hover: hover) {
   .nft-card:hover img {
     transform: scale(1.1);
@@ -1131,7 +1130,7 @@ button:active {
   }
 }
 
-/* Mobile tap active */
+
 .nft-card img.active {
   transform: scale(2.5);
   z-index: 20;
@@ -1252,9 +1251,7 @@ button:active {
     flex-direction: column;
   }
 }
-/* ===============================
-   MOBILE: TIGHT NFT STACK
-=============================== */
+
 @media (max-width: 900px) {
 
   .nft-row .card {
@@ -1312,7 +1309,7 @@ button:active {
 }
 
 
-/* Scrollbar */
+
 .nftContainer::-webkit-scrollbar {
   width: 6px;
 }
@@ -1331,7 +1328,7 @@ button:active {
   position: relative;
   overflow: hidden;
 
-  /* Sword shape */
+
   clip-path: polygon(
     0 0,
     96% 0,
@@ -1341,7 +1338,7 @@ button:active {
   );
 }
 
-/* WHITE STROKE */
+
 .yam-progress::before {
   content: "";
   position: absolute;
@@ -1350,7 +1347,7 @@ button:active {
 
   border: 1px solid #ffb703;
 
-  /* Same sword shape */
+
   clip-path: polygon(
     0 0,
     96% 0,
@@ -1369,5 +1366,234 @@ button:active {
 }
 .yam-progress-fill.low {
   box-shadow: 0 0 6px rgba(230,57,70,0.8);
+}
+
+/* ===============================
+   YAMADOGS DISCLAIMER MODAL
+=============================== */
+
+.yam-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(5px);
+  z-index: 100000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yam-modal{
+  width: 400px;
+  height: 500px;
+  background: #111;
+  color: #fff;
+
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+
+  box-shadow: 8px 8px 0 #000;
+  border: 4px solid transparent;
+  border-image: repeating-linear-gradient(
+    90deg,#000 0 6px,transparent 6px 10px
+  ) 4;
+
+  padding: 18px 14px 14px;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+.yam-title{
+  margin: 0 0 10px;
+  color: #ffb703;
+  text-shadow: 2px 2px 0 #000;
+  font-size: 14px;
+  text-align: center;
+}
+
+
+.yam-content{
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px;
+  line-height: 1.6;
+}
+
+.yam-content ul{
+  padding-left: 18px;
+  margin: 6px 0;
+}
+
+/* BUTTON */
+.yam-btn{
+  margin-top: 10px;
+  padding: 12px;
+  background: #ffb703;
+  color: #000;
+  cursor: pointer;
+
+  font-family: inherit;
+  font-size: 10px;
+
+  box-shadow: 4px 4px 0 #000;
+  border: 4px solid transparent;
+  border-image: repeating-linear-gradient(
+    90deg,#000 0 6px,transparent 6px 10px
+  ) 4;
+}
+
+.yam-btn:hover{
+  background: #ffd166;
+}
+
+
+.yam-close{
+  position: absolute;
+  top: 6px;
+  right: 6px;
+
+  width: 18px;
+  height: 18px;
+
+  font-size: 12px;
+  line-height: 18px;
+
+  background: #ffd166;
+  color: #fff;
+
+  border: none;
+  cursor: pointer;
+
+  box-shadow: 2px 2px 0 #000;
+  padding: 0;
+}
+
+@media (min-width: 768px) {
+  .yam-modal {
+    width: 600px;
+    height: 700px;
+    font-size: 12px;
+  }
+
+  .yam-title {
+    font-size: 16px;
+  }
+}
+@media (max-width: 360px) {
+  .yam-modal {
+    width: 92vw;
+    height: 85vh;
+  }
+}
+
+.yam-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(40%);
+}
+
+
+/* ===============================
+   LEARN MORE BUTTON
+=============================== */
+.learn-more-wrapper {
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.learn-more-btn {
+  background: transparent;
+  border: 1px solid #ffd166;
+  color: #ffd166;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.learn-more-btn:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+/* Desktop positioning */
+@media (min-width: 768px) {
+  .learn-more-wrapper {
+    text-align: left;
+  }
+}
+
+/* ===============================
+   MODAL OVERLAY (NO BLUR)
+=============================== */
+.learn-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.learn-modal.hidden {
+  display: none;
+}
+
+/* ===============================
+   MODAL BOX
+=============================== */
+.learn-modal-box {
+  width: 350px;
+  height: 500px;
+  background: #0f0f0f;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 30px rgba(0,0,0,0.7);
+}
+
+/* Desktop size */
+@media (min-width: 768px) {
+  .learn-modal-box {
+    width: 600px;
+    height: 700px;
+  }
+}
+
+/* ===============================
+   MODAL HEADER
+=============================== */
+.learn-modal-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #eee;
+  font-size: 14px;
+}
+
+.learn-close {
+  background: #222;
+  border: #eee;
+  color: #ffd166;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ===============================
+   MODAL CONTENT (SCROLL)
+=============================== */
+.learn-modal-content {
+  padding: 14px;
+  overflow-y: auto;
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #ddd;
 }
 
