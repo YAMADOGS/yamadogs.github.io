@@ -30,6 +30,76 @@ block-all-mixed-content;
 </head>
 
 <body>
+<!-- DISCLAIMER MODAL OVERLAY -->
+<div id="disclaimerOverlay" class="yam-overlay">
+  <div class="yam-modal" id="yamModal">
+
+<button class="yam-close" id="closeDisclaimerX"></button>
+
+
+    <h2 class="yam-title">⚠️ WARNING</h2>
+
+    <div class="yam-content">
+      <h2>🐕⚠️ YAMADOGS & YAMAINU ($YAM) — IMPORTANT WARNING & DISCLAIMER</h2>
+
+      <p>
+        Welcome to YAMADOGS-Staking, a fully on-chain NFT project where good dogs can earn and mint YAMAINU ($YAM) 🦴
+      </p>
+      <p>Before you stake, mint, or bark too loudly, please read this carefully.</p>
+
+      <h3>🦴 Ownerless & Fully Decentralized</h3>
+      <p>YAMADOGS NFTs, $YAM token, and the staking contract are 100% open-source and ownerless</p>
+      <p>There are no admins, no owners, no backdoors, and no controls</p>
+      <p>Once deployed, the contracts cannot be changed, paused, upgraded, or fixed by anyone</p>
+      <h3>🐾 $YAM Minting Rules:</h3>
+      <ul>
+      <li>$YAM can ONLY be minted by staking YAMADOGS NFTs</li>
+      <li>There is no other mint function</li>
+      <li>No team wallets. No hidden supply. No special privileges.</li>
+      </ul>
+      <h3>⚙️ Smart Contract Risk (Read This Twice)</h3>
+      <ul>
+        <li>The staking contract is immutable</li>
+        <li>Any bugs, exploits, or unexpected behavior will be permanent</li>
+        <li>If something breaks, it stays broken</li>
+        <li>There is no one who can step in to save it</li>
+      </ul>
+
+      <h3>🐶 $YAM Disclaimer</h3>
+      <ul>
+        <li>$YAM is a meme token</li>
+        <li>No roadmap</li>
+        <li>No promises of profit</li>
+        <li>No guaranteed value</li>
+        <li>No financial promises</li>
+        <li>No pump-and-dump scheme</li>
+        <li>No clear goal beyond being a decentralized meme token earned by dogs</li>
+        <li>No obligation for future development</li>
+      </ul>
+
+      <p>🐕 Stake responsibly. Mint responsibly. Meme responsibly.</p>
+      <p>Only good dogs understand the risks. 🐕</p>
+      <h2>Final Woof🐕</h2>
+      <h3>This project is built for:</h3>
+      <ul>
+        <li>Transparency</li>
+        <li>Decentralization</li>
+        <li>On-chain experimentation</li>
+        <li>Meme culture</li>
+      </ul>
+            <p>By staking your YAMADOGS, you fully accept this risk and are responsible for your own decisions.</p>
+    </div>
+
+<button id="closeDisclaimerBtn" class="yam-btn" disabled>
+  I UNDERSTAND
+</button>
+
+
+  </div>
+</div>
+
+
+
 
 
 <div class="title-wrapper">
@@ -57,9 +127,13 @@ block-all-mixed-content;
 
 
 <div class="card">
+<div class="learn-more-wrapper">
+  <button id="learnMoreBtn" class="learn-more-btn">Learn more</button>
+</div>
+
 <div class="nft-desktop-row">
   <div class="card nft-column">
-    <h2>Idle Paws</h2>
+    <h2>Your Idle Paws</h2>
 
     <div class="nftContainer fixed-nft-container" id="unstakedNFTs"></div>
 
@@ -68,7 +142,7 @@ block-all-mixed-content;
   </div>
 
   <div class="card nft-column">
-    <h2>Active Paws</h2>
+    <h2>Your Active Paws</h2>
 
     <div class="nftContainer fixed-nft-container" id="stakedNFTs"></div>
   <div class="card">
@@ -118,6 +192,23 @@ Check your pupper’s rewards! Enter any YAMADOGS token ID to see how much $YAM 
   </div></div></div></div>
 
 </div>
+<!-- ===============================
+     LEARN MORE MODAL
+================================ -->
+<div id="learnMoreModal" class="learn-modal hidden">
+  <div class="learn-modal-box">
+    <div class="learn-modal-header">
+      <span>Learn More</span>
+      <button id="closeLearnMore" class="learn-close">✖</button>
+    </div>
+
+    <div class="learn-modal-content">
+      kjshhsisoalalsndbdhiskash
+    </div>
+  </div>
+</div>
+
+
 <script src="/ethers.umd.min.js"></script>
 <script src="/staking.js" defer></script>
 
