@@ -66,6 +66,14 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "/NFTmint/";
     });
   }
+  
+  const mintBtn2 = document.getElementById("mintBtn2");
+  if (mintBtn2) {
+    mintBtn2.addEventListener("click", () => {
+      window.location.href = "/NFTstaking/";
+    });
+  }
+
 
   // Copy contract
   const contractEl = document.querySelector(".contract-address");
