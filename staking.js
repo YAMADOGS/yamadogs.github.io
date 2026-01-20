@@ -1005,6 +1005,14 @@ function updateNFTProgress() {
   });
 }
 
+  // View source
+  const viewSourceBtn = document.getElementById("viewSourceBtn");
+  if (viewSourceBtn) {
+    viewSourceBtn.addEventListener("click", () => {
+      window.open("https://github.com/YAMADOGS/yamadogs.github.io", "_blank", "noopener,noreferrer");
+    });
+  }
+
 setInterval(() => {
   const cards = document.querySelectorAll('.nft-card');
   cards.forEach(card => {
