@@ -1650,3 +1650,19 @@ button:active {
   border-radius: 6px;
   transition: width 1s ease-in-out;
 }
+
+/* =========================
+   Selected NFT Highlight
+========================= */
+
+.nft-card.active {
+  border: 3px solid #3fe0c3;
+  box-shadow:
+    0 0 0 2px rgba(255, 215, 0, 0.6),
+    0 0 16px rgba(255, 215, 0, 0.45);
+  transform: translateY(-2px);
+  z-index: 10;
+}
+.nft-card.active {
+  pointer-events: none;
+}
